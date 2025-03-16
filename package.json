@@ -1,0 +1,14 @@
+{
+    "name": "timer",
+    "private": true,
+    "type": "module",
+    "scripts": {
+      "start": "node backend/server.js",
+      "dev": "concurrently \"npm run dev --prefix timer_BACKEND\" \"npm run dev --prefix timer_FRONTEND\"",
+      "build": "npm run build --prefix frontend",
+      "install-all": "npm install && npm install --prefix timer_BACKEND && npm install --prefix timer_FRONTEND"
+    },
+    "devDependencies": {
+      "concurrently": "^6.0.0" 
+    }
+  }
