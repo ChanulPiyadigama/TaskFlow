@@ -35,14 +35,17 @@ const typeDefs = `
         findUser(id: ID!): User
         findTimer(id: ID!): Timer
         findBreak(id: ID!): Break
+        getUserTimers:[Timer]
     }
     
     type Mutation{
-        createUser(username: String!, password: String!, name: String!): User
+        createUser(username: String!, password: String!, name: String!): String!
         createTimer(totalTime: Int!): Timer
-        createBreak(timePaused: Int!, timeResumed: Int!, elapsedTime: Int!, timeLeft: Int!): Break
         login(username: String!, password: String!): String!
         handleBreak(timerID: String, timeOfChange: String!, isPaused: Boolean!): Timer!
+        clearBreaks: String!
+        setPause(timerID:String!):String!
+        resetTimer(timerID:String!, startTime: String!):Timer!
     }
 
 `;

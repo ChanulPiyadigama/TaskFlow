@@ -1,35 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react'
+import { useAuth } from './context/AuthContext'
+import Login from './components/Login'
+import {jwtDecode} from 'jwt-decode'
+import TimerList from './components/TimerList'
 
 function App() {
-  const [count, setCount] = useState(0)
+  //when login works, token and user are set for context, rendering the app with user
+  const { token, user, setToken, setUser } = useAuth()
+  
+  //set token and user from local storage if they exist, rerendering app to not show login page
+  useEffect(() => {
+    const token = localStorage.getItem('user-token')
+    if (token) {
+      setToken(token)
+      const decodedToken = jwtDecode(token)
+      setUser(decodedToken)
+    }
+  }
+  , [])
+
+
+
+  const handleLogout = () => {
+    setToken(null)
+    setUser(null)
+    localStorage.removeItem('user-token')
+  }
 
   return (
-    <>
+    token ? (
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <h1>Hey {user.user}!</h1>
+        <TimerList />
+        <button onClick={handleLogout}>Logout</button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    ) : (
+      <Login />
+    )
   )
+  
 }
 
 export default App
