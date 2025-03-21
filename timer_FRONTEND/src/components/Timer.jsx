@@ -138,7 +138,6 @@ export default function Timer({timer}) {
             <button onClick={handlePause}>
                 {timer.isPaused ? "Resume" : "Pause"}
             </button>
-            <Button color="blue" size="lg">Reset</Button>
             <button onClick={handleReset}>Reset</button>
             <button>Edit</button>
             <div>
