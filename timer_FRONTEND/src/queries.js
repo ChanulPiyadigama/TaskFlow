@@ -73,3 +73,27 @@ export const RESET_TIMER = gql`
     }
 
 `
+
+export const CREATE_TIMER = gql`
+mutation Mutation($totalTime: Int!, $startTime: String!) {
+  createTimer(totalTime: $totalTime, startTime: $startTime) {
+    timeLeft
+    totalTime
+    startTime
+    id
+    isPaused
+    currentBreak {
+        pausedTime
+        resumedTime
+        id
+        elapsedTime
+    }
+    log {
+        elapsedTime
+        id
+        pausedTime
+        resumedTime
+    }
+  }
+}
+`

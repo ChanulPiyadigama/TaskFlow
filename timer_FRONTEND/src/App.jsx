@@ -3,40 +3,49 @@ import { useAuth } from './context/AuthContext'
 import Login from './components/Login'
 import {jwtDecode} from 'jwt-decode'
 import TimerList from './components/TimerList'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import HomePage from './components/HomePage'
+import TimerPage from './components/TimerPage'
 
 function App() {
-  //when login works, token and user are set for context, rendering the app with user
-  const { token, user, setToken, setUser } = useAuth()
+
+  const { token, setToken, setUser } = useAuth()
   
-  //set token and user from local storage if they exist, rerendering app to not show login page
+  //set token and user from local storage if they exist
   useEffect(() => {
     const token = localStorage.getItem('user-token')
     if (token) {
-      setToken(token)
+      //first check if token is expired, if not set token and user from decoded token info
       const decodedToken = jwtDecode(token)
-      setUser(decodedToken)
+      const currentTime = Date.now() / 1000
+      if (decodedToken.exp < currentTime){
+        handleLogout()
+      } else{
+        setToken(token)
+        setUser(decodedToken)
+      }
+
     }
-  }
-  , [])
+  }, [])
 
 
-
+  
   const handleLogout = () => {
     setToken(null)
     setUser(null)
     localStorage.removeItem('user-token')
   }
 
+
+  //when the app first starts we chekc if a token exists/is valid, if not the user must login 
   return (
-    token ? (
-      <div>
-        <h1>Hey {user.user}!</h1>
-        <TimerList />
-        <button onClick={handleLogout}>Logout</button>
-      </div>
-    ) : (
-      <Login />
-    )
+    <Router>
+      <Routes>
+        <Route path='/' element={token? <HomePage /> : <Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/timer/:id" element={<TimerPage />} />
+      </Routes>
+    </Router>
   )
   
 }

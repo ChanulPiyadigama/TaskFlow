@@ -40,12 +40,14 @@ const typeDefs = `
     
     type Mutation{
         createUser(username: String!, password: String!, name: String!): String!
-        createTimer(totalTime: Int!): Timer
+        createTimer(totalTime: Int!, startTime: String!): Timer
         login(username: String!, password: String!): String!
         handleBreak(timerID: String, timeOfChange: String!, isPaused: Boolean!): Timer!
         clearBreaks: String!
         setPause(timerID:String!):String!
+        resumeAllTimers:String!
         resetTimer(timerID:String!, startTime: String!):Timer!
+        deleteAllTimers:String!
     }
 
 `;

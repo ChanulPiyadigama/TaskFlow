@@ -77,17 +77,17 @@ const resolvers = {
             if(!context.currentUser){
                 throw new Error('You must be logged in to create a timer');
             }
+            //creates a timer for user (id is from token), startTime is date obj created with given iso string
             try {
               const timer = new Timer({
                 totalTime: args.totalTime,
                 timeLeft: args.totalTime,
-                startTime: new Date(),
-                log: [],
+                startTime: new Date(args.startTime),
                 user: context.currentUser.id
               });
       
               await timer.save();
-              return await timer.populate(['user', 'log', 'currentBreak']);
+              return timer.populate(['log', 'currentBreak'])
             } catch (error) {
               console.error("Error creating timer:", error);
               throw new Error("Failed to create timer");
@@ -242,9 +242,35 @@ const resolvers = {
                 console.error("Error resuming timer:", error);
                 throw new Error("Failed to resume timer");
             }
-        }
+        },
+        resumeAllTimers: async (parent, args, context) => {
+            try {
+                // Find all timers
+                const timers = await Timer.find({});
         
+                // Resume all timers
+                timers.forEach(async (timer) => {
+                    timer.isPaused = false;
+                    await timer.save();
+                });
+        
+                return "All timers have been resumed successfully!";
+            } catch (error) {
+                console.error("Error resuming all timers:", error);
+                throw new Error("Failed to resume all timers");
+        }    
     },
-}
+    deleteAllTimers: async (parent, args, context) => {
+        try {
+            // Delete all Timers
+            await Timer.deleteMany({});
+    
+            return "All timers have been deleted successfully!";
+        } catch (error) {
+            console.error("Error deleting all timers:", error);
+            throw new Error("Failed to delete all timers");
+        }
+    }
+}}
 
 export default resolvers;
