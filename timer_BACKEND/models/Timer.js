@@ -37,11 +37,6 @@ const timerSchema = new Schema({
     }
 });
 
-timerSchema.pre('save', function(next) {
-    this.updatedAt = Date.now();
-    next();
-});
-
 const Timer = mongoose.model('Timer', timerSchema);
 
 export default Timer;
