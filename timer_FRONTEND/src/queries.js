@@ -97,3 +97,39 @@ mutation Mutation($totalTime: Int!, $startTime: String!) {
   }
 }
 `
+
+export const GET_USER_FRIENDS = gql`
+query Query {
+  getUserFriends {
+    id
+    username
+    name
+  }
+}
+`
+
+export const GET_USER_INCOMING_FRIEND_REQUESTS = gql`
+query GetUserIncomingFriendRequests {
+  getUserIncomingFriendRequests {
+    id
+    name
+    username
+  }
+}
+`
+
+export const GET_USER_OUTGOING_FRIEND_REQUESTS = gql`
+query GetUserOutgoingFriendRequests {
+  getUserOutgoingFriendRequests {
+    id
+    name
+    username
+  }
+}
+`
+
+export const CREATE_USER = gql`
+mutation CreateUser($username: String!, $password: String!, $name: String!) {
+  createUser(username: $username, password: $password, name: $name)
+}
+`

@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import HomePage from './components/HomePage'
 import TimerPage from './components/TimerPage'
 
+
 function App() {
 
   const { token, setToken, setUser } = useAuth()

@@ -19,7 +19,24 @@ const userSchema = new mongoose.Schema({
     },
     timers: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Timer'
+        ref: 'Timer',
+        default: []
+    }],
+    friends: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: []
+    }],
+    
+    incomingFriendRequests: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: [] 
+    }],
+    outgoingFriendRequests: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: [] 
     }]
 });
 

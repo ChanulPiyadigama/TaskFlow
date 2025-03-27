@@ -4,11 +4,14 @@ const typeDefs = `
     type User{
         id: ID!
         username: String!
-        password: String!
         name: String!
         timers: [Timer]
+        friends: [User]
+        incomingFriendRequests: [User]
+        outgoingFriendRequests: [User]
     }
-    
+
+
     type Timer{
         id: ID!
         totalTime: Int!
@@ -36,6 +39,9 @@ const typeDefs = `
         findTimer(id: ID!): Timer
         findBreak(id: ID!): Break
         getUserTimers:[Timer]
+        getUserFriends:[User]
+        getUserIncomingFriendRequests:[User]
+        getUserOutgoingFriendRequests:[User]
     }
     
     type Mutation{
@@ -48,6 +54,8 @@ const typeDefs = `
         resumeAllTimers:String!
         resetTimer(timerID:String!, startTime: String!):Timer!
         deleteAllTimers:String!
+        sendFriendRequest(receiverID:ID!):String!
+        handleFriendRequest(senderID:ID!, action: Boolean!):String!
     }
 
 `;

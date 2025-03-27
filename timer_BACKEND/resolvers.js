@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { SECRET } from "./util/config.js";
 import mongoose from "mongoose";
+import { get } from "http";
 
 const resolvers = {
     Query: {
@@ -42,6 +43,31 @@ const resolvers = {
             //the user information from the token
             const timers = await Timer.find({ user: user._id }).populate(['log', 'currentBreak']);
             return timers
+        },
+        getUserIncomingFriendRequests: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to view incoming friend requests');
+            }
+
+            const user = await context.currentUser.populate('incomingFriendRequests');
+            return user.incomingFriendRequests
+        },
+        getUserOutgoingFriendRequests: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to view outgoing friend requests');
+            }
+
+            const user = await context.currentUser.populate('outgoingFriendRequests');
+            return user.outgoingFriendRequests
+        },
+        getUserFriends: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to view your friends');
+            }
+            //wait to popoulate friends
+            const user = await context.currentUser.populate('friends')
+            return user.friends
+            
         }
     },
 
@@ -258,19 +284,91 @@ const resolvers = {
             } catch (error) {
                 console.error("Error resuming all timers:", error);
                 throw new Error("Failed to resume all timers");
-        }    
-    },
-    deleteAllTimers: async (parent, args, context) => {
-        try {
-            // Delete all Timers
-            await Timer.deleteMany({});
-    
-            return "All timers have been deleted successfully!";
-        } catch (error) {
-            console.error("Error deleting all timers:", error);
-            throw new Error("Failed to delete all timers");
+            }    
+        },
+        deleteAllTimers: async (parent, args, context) => {
+            try {
+                // Delete all Timers
+                await Timer.deleteMany({});
+        
+                return "All timers have been deleted successfully!";
+            } catch (error) {
+                console.error("Error deleting all timers:", error);
+                throw new Error("Failed to delete all timers");
+            }
+        },
+        sendFriendRequest: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to send a friend request');
+            }
+        
+            const receiver = await User.findById(args.receiverID);
+            if (!receiver) {
+                throw new Error('No user found');
+            }
+        
+            if (context.currentUser.id === receiver.id) {
+                throw new Error('You cannot send a friend request to yourself');
+            }
+            
+
+            //even though array of objects, mongo converts object id to string, so will just be string of objects
+            if (context.currentUser.friends.includes(receiver.id)) {
+                throw new Error('You are already friends with this user');
+            }
+            
+
+            if (context.currentUser.outgoingFriendRequests.includes(receiver.id)) {
+                throw new Error('You have already sent a friend request to this user');
+            }
+        
+            if (context.currentUser.incomingFriendRequests.includes(receiver.id)) {
+                throw new Error('You have already received a friend request from this user');
+            }
+            
+
+            receiver.incomingFriendRequests.push(context.currentUser.id);
+            context.currentUser.outgoingFriendRequests.push(receiver.id)
+            await receiver.save();
+            await context.currentUser.save();
+        
+            return "Friend request sent successfully!";
+        },
+        handleFriendRequest: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to handle a friend request');
+            }
+        
+            const sender = await User.findById(args.senderID)
+            if (!sender) {
+                throw new Error('No user found');
+            }
+            
+            //check if incoming req from the sender exists in user 
+            const incomingRequest = context.currentUser.incomingFriendRequests.find(senderId => senderId.equals(sender.id));
+            if (!incomingRequest) {
+                throw new Error('No friend request found from this user');
+            }
+
+
+            if (args.action) {
+                // Accept friend request, add friend to both users
+                context.currentUser.friends.push(sender.id);
+                sender.friends.push(context.currentUser.id);
+
+            }
+            
+            
+            // Remove the friend request from both users
+            context.currentUser.incomingFriendRequests = context.currentUser.incomingFriendRequests.filter(senderId => !senderId.equals(sender.id));
+            sender.outgoingFriendRequests = sender.outgoingFriendRequests.filter(req => !req.equals(context.currentUser.id));
+            await context.currentUser.save();
+            await sender.save();
+
+            return `Friend request ${args.action? "accepted" : "rejected"} successfully!`;
         }
+
     }
-}}
+}
 
 export default resolvers;
