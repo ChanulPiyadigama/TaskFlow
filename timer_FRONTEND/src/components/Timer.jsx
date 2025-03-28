@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { HANDLE_BREAK, RESET_TIMER } from "../queries";
-import { useApolloClient, useMutation } from "@apollo/client";
-import { GET_USER_TIMERS } from "../queries";
-import { useQuery } from "@apollo/client";
+import { useApolloClient, useFragment, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
 
 //the usequery gets the timers from the cache, since it looks there first, then using the timer id we find
 //the timer, and use it as our state by using its attributes
@@ -18,17 +17,41 @@ export default function Timer({timerID}) {
     //on second rerender we get data and can then use timer logic
     //also on page refresh, this query will be sent to network not cache, so there will be loading, since
     //both timerlist and timer send the same query and timer page/route if refreshed, will be first.
-    const { data: timersData, loading: timersLoading, error: errorGettingTimers } = useQuery(GET_USER_TIMERS);
+    console.log(timerID)
+    const GET_TIMER_BYID = gql`
+    fragment TimerFields on Timer{
+        id
+        timeLeft
+        totalTime
+        startTime
+        isPaused
+        currentBreak {
+        id
+        pausedTime
+        resumedTime
+        elapsedTime
+        }
+        log {
+        id
+        pausedTime
+        resumedTime
+        elapsedTime
+        }      
+    }`
+    const { data: timerData, loading: timersLoading, error: errorGettingTimers } = useFragment({
+        fragment: GET_TIMER_BYID,
+        from:{
+            __typename: "Timer",
+            id: timerID
+        }
+    })
     const [handleBreak, { loading: breakLoading }] = useMutation(HANDLE_BREAK);
     const [resetTimer, { loading: resetLoading }] = useMutation(RESET_TIMER);
 
-    const timers = timersData?.getUserTimers || [];
-    let timer = [];  
+    const timer = timerData
 
-    if (timers.length > 0) {
-        timer = timers.find((t) => t.id === timerID);
-    }
 
+    console.log(timer)
     
 
     

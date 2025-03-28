@@ -8,6 +8,7 @@ import { SECRET } from "./util/config.js";
 import mongoose from "mongoose";
 
 import { createTimer } from "./resolverutils.js";
+import { get } from "http";
 
 const resolvers = {
     Query: {
@@ -70,6 +71,34 @@ const resolvers = {
             const user = await context.currentUser.populate('friends')
             return user.friends
             
+        },
+        getSpecificTimer: async (parent, args, context) => {
+            const timer = await Timer.findById(args.timerID);
+            if (!timer) {
+                throw new Error('No timer found');
+            }
+            const populatedTimer = await timer.populate(['log', 'currentBreak']);
+            return populatedTimer
+        },
+        getSpecificStudySession: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to view a study session');
+            }
+
+            const studySession = await StudySession.findById(args.studySessionID);
+            if (!studySession) {
+                throw new Error('No study session found');
+            }
+
+            const populatedStudySession = await studySession.populate({
+                path: 'timer',
+                populate: [
+                    { path: 'log' },       
+                    { path: 'currentBreak' }  
+                ]
+            });
+
+            return populatedStudySession
         }
     },
 
@@ -383,7 +412,17 @@ const resolvers = {
                 await studySession.save({ session }); 
 
                 await session.commitTransaction();
-                return await studySession.populate('timer');
+                
+                //once a timer is created, we have to return the timer of session populated with these fields
+                //so we can display the needed informatoin on the study session page
+                const populatedStudySession = await studySession.populate({
+                    path: 'timer',
+                    populate: [
+                        { path: 'log' },       
+                        { path: 'currentBreak' }  
+                    ]
+                });
+                return populatedStudySession;
             }  catch (error) {
                 await session.abortTransaction();
                 console.error("Error creating study session:", error);

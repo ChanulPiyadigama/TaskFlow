@@ -5,14 +5,13 @@ import {jwtDecode} from 'jwt-decode'
 import TimerList from './components/TimerList'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import HomePage from './components/HomePage'
-import TimerPage from './components/TimerPage'
-
+import StudySessionPage from './components/StudySessionPage'
 
 function App() {
 
   const { token, setToken, setUser } = useAuth()
   
-  //set token and user from local storage if they exist
+  //set token and user from local storage if they exist, check token first tho
   useEffect(() => {
     const token = localStorage.getItem('user-token')
     if (token) {
@@ -38,13 +37,13 @@ function App() {
   }
 
 
-  //when the app first starts we chekc if a token exists/is valid, if not the user must login 
+  //when the app first starts we check if a token exists/is valid, if not the user must login 
   return (
     <Router>
       <Routes>
         <Route path='/' element={token? <HomePage /> : <Login />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/timer/:id" element={<TimerPage />} />
+        <Route path="/StudySession/:id" element={<StudySessionPage />} />
       </Routes>
     </Router>
   )

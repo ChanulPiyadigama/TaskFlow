@@ -51,6 +51,8 @@ const typeDefs = `
         getUserFriends:[User]
         getUserIncomingFriendRequests:[User]
         getUserOutgoingFriendRequests:[User]
+        getSpecificTimer(timerID: ID!): Timer!
+        getSpecificStudySession(studySessionID: ID!): StudySession!
     }
     
     type Mutation{

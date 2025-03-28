@@ -1,12 +1,19 @@
 import { CREATE_STUDY_SESSION } from "../queries"
 import { useMutation } from "@apollo/client"
 import { TextInput, Textarea, NumberInput, Stack, Button, Text } from '@mantine/core'
+import { useNavigate } from "react-router-dom"
 
 
+//creates a study session and redirects to the study session page, on creation mutation loads page, and loads page
+//again with study session obj that been saved to cache along with timer obj 
 export default function CreateStudySessionForm() {
+    const navigate = useNavigate()
+    
     const [createStudySession, {loading: loadingCreateStudySession, data: dataCreateStudySession, error: errorCreateStudySession}] = useMutation(CREATE_STUDY_SESSION, {
         onCompleted: (dataCreateStudySession) => {
             console.log("Study session created:", dataCreateStudySession.createStudySession)
+
+            navigate(`/StudySession/${dataCreateStudySession.createStudySession.id}`)
         },
         onError: (errorCreateStudySession) => {
             console.error("Error creating study session:", errorCreateStudySession)

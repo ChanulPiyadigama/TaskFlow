@@ -138,6 +138,66 @@ export const CREATE_STUDY_SESSION =gql`
 mutation CreateStudySession($startTimeIsoString: String!, $title: String, $description: String, $duration: Int) {
   createStudySession(startTimeIsoString: $startTimeIsoString, title: $title, description: $description, duration: $duration) {
     title
+    id
+    description
+    createdAt
+    timer {
+      id
+      parentId
+      currentBreak {
+        elapsedTime
+        id
+        pausedTime
+        resumedTime
+        timer {
+          id
+        }
+      }
+      isPaused
+      log {
+        elapsedTime
+        id
+        pausedTime
+        resumedTime
+        timer {
+          id
+        }
+      }
+      startTime
+      timeLeft
+      totalTime
+    }
+  }
+}
+`
+export const GET_STUDY_SESSION_BYID = gql`
+query GetSpecificStudySession($studySessionId: ID!) {
+  getSpecificStudySession(studySessionID: $studySessionId) {
+    createdAt
+    description
+    id
+    title
+    timer {
+      currentBreak {
+        elapsedTime
+        id
+        resumedTime
+        pausedTime
+      }
+      id
+      isPaused
+      log {
+        elapsedTime
+        id
+        pausedTime
+        resumedTime
+      }
+      parentId
+      parentType
+      startTime
+      timeLeft
+      totalTime
+    }
   }
 }
 `
