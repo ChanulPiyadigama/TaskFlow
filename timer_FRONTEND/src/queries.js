@@ -53,22 +53,23 @@ export const HANDLE_BREAK = gql`
 export const RESET_TIMER = gql`
     mutation SetPause($timerId: String!, $startTime: String!) {
     resetTimer(timerID: $timerId, startTime: $startTime) {
-        currentBreak {
-        elapsedTime
-        id
-        pausedTime
-        resumedTime
-        }
-        id
-        isPaused
-        log {
-        elapsedTime
-        id
-        pausedTime
-        resumedTime
-        }
-        startTime
-        timeLeft
+          id 
+          timeLeft
+          totalTime
+          startTime
+          isPaused
+          currentBreak {
+              id
+              pausedTime
+              resumedTime
+              elapsedTime
+          }
+          log {
+              id
+              pausedTime
+              resumedTime
+              elapsedTime
+          }
     }
     }
 

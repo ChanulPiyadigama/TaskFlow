@@ -157,14 +157,15 @@ const resolvers = {
         handleBreak: async (parent, args, context) => {
             if (!context.currentUser) {
                 throw new Error('You must be logged in to handle a break');
+
             }
 
-            if (args.isPaused) {
-                //check if timer being paused exists 
-                const timer = await Timer.findById(args.timerID);
+            const timer = await Timer.findById(args.timerID);
                 if (!timer) {
                     throw new Error('No timer found');
                 }
+
+            if (args.isPaused) {
                 //create a break for specific timer
                 const newBreak = new Break({
                     pausedTime: args.timeOfChange,
@@ -183,17 +184,21 @@ const resolvers = {
                         populate: {
                             path: 'timer', // Populate the timer field inside currentBreak
                         },
-                    }, 'user','log'])
+                    },'log'])
 
 
             } else {
-                //check if timer being resumed exists
-                const timer = await Timer.findById(args.timerID);
-                if (!timer) {
-                    throw new Error('No timer found');
+                //special case when timer is reset and there is no current break, 
+                //hopefully this is the only case where a resume is called with no break to end
+                if (!timer.currentBreak) {
+                    timer.isPaused = false;
+                    await timer.save();
+                    return await timer.populate(['log']);
                 }
+
                 //check if current break exists within that timer
                 const currentBreak = await Break.findById(timer.currentBreak);
+                console.log(currentBreak)
                 if (!currentBreak) {
                     throw new Error('No break found');
                 }
@@ -213,7 +218,7 @@ const resolvers = {
                         populate: {
                             path: 'timer', // Populate the timer field inside currentBreak
                         },
-                    }, 'user','log'])
+                    },'log'])
             }
         },
         clearBreaks: async (parent, args, context) => {
@@ -272,7 +277,7 @@ const resolvers = {
                 timer.startTime = args.startTime
                 timer.timeLeft = timer.totalTime
                 timer.isPaused = true
-                
+                console.log(timer)
                 return await timer.save()
             } catch (error) {
                 console.error("Error resuming timer:", error);
