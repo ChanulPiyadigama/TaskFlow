@@ -1,11 +1,13 @@
 import User from "./models/User.js";
 import Timer from "./models/Timer.js";
 import Break from "./models/Break.js";
+import StudySession from "./models/StudySession.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { SECRET } from "./util/config.js";
 import mongoose from "mongoose";
-import { get } from "http";
+
+import { createTimer } from "./resolverutils.js";
 
 const resolvers = {
     Query: {
@@ -366,6 +368,46 @@ const resolvers = {
             await sender.save();
 
             return `Friend request ${args.action? "accepted" : "rejected"} successfully!`;
+        },
+        createStudySession: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to create a study session');
+            }
+
+            //we start a session so that the studysession can be created without the timer,
+            //and its saved to session again with the timer attribute when its created, 
+            //then commiting the transaction will save the changes to the db, where validation is done .
+            const session = await mongoose.startSession();
+            session.startTransaction();
+            try{
+                const studySession = new StudySession({
+                    title: args.title,
+                    description: args.description,
+                    createdAt: new Date(args.startTimeIsoString),
+                });
+
+                await studySession.save({ session });
+
+                const timer = await createTimer(
+                    args.duration,
+                    args.startTimeIsoString,
+                    "StudySession",
+                    studySession._id
+                )
+
+                studySession.timer = timer._id;
+                await studySession.save({ session });
+                await session.commitTransaction();
+
+                return studySession.populate('timer');
+            }  catch (error) {
+                await session.abortTransaction();
+                console.error("Error creating study session:", error);
+                throw new Error("Failed to create study session");
+            } finally {
+                session.endSession();
+            }
+
         }
 
     }

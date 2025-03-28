@@ -56,6 +56,7 @@ const typeDefs = `
         deleteAllTimers:String!
         sendFriendRequest(receiverID:ID!):String!
         handleFriendRequest(senderID:ID!, action: Boolean!):String!
+        createStudySession(startTimeIsoString: String!, title: String, description: String, duration: Int): StudySession!
     }
 
 `;

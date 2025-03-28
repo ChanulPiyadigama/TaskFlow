@@ -14,6 +14,11 @@ const studySessionSchema = new Schema({
         ref: 'User',
         required: true
     },
+    timer: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Timer',
+        required: true
+    },
     createdAt: {
         type: Date,
         default: Date.now

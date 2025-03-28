@@ -17,9 +17,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    timers: [{
+    studySessions: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Timer',
+        ref: 'StudySession',
         default: []
     }],
     friends: [{

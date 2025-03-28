@@ -5,6 +5,7 @@ import TimerList from "./TimerList";
 import Friends from "./Friends";
 import { AppShell, Button, Text, Group, Grid, Card, Stack, Modal } from '@mantine/core';
 import { IconClock, IconUsers, IconPlus, IconBook } from "@tabler/icons-react";
+import CreateStudySessionForm from "./CreatStudySessionForm";
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -32,9 +33,7 @@ export default function HomePage() {
     switch (modelContent) {
       case "Study Session":
         return (
-          <Stack>
-            <Text size="sm">Here you can set up your study session details...</Text>
-          </Stack>
+          <CreateStudySessionForm />
         )
       case "Create Post":
         return (
