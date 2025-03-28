@@ -11,6 +11,14 @@ const typeDefs = `
         outgoingFriendRequests: [User]
     }
 
+    type StudySession{
+        id: ID!
+        title: String
+        description: String
+        user: User!
+        timer: Timer!
+        createdAt: String!
+    }
 
     type Timer{
         id: ID!
@@ -18,9 +26,10 @@ const typeDefs = `
         timeLeft: Int!
         startTime: String!
         log: [Break]
-        user: User!
         isPaused: Boolean!
         currentBreak: Break
+        parentType: String
+        parentId: ID
     }   
 
     type Break{
@@ -46,7 +55,6 @@ const typeDefs = `
     
     type Mutation{
         createUser(username: String!, password: String!, name: String!): String!
-        createTimer(totalTime: Int!, startTime: String!): Timer
         login(username: String!, password: String!): String!
         handleBreak(timerID: String, timeOfChange: String!, isPaused: Boolean!): Timer!
         clearBreaks: String!

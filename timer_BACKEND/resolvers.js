@@ -100,27 +100,6 @@ const resolvers = {
             throw new Error('Error creating user')
         }
         },
-        createTimer: async (parent, args, context) => {
-            //check if user exists then create timer and upload it to db
-            if(!context.currentUser){
-                throw new Error('You must be logged in to create a timer');
-            }
-            //creates a timer for user (id is from token), startTime is date obj created with given iso string
-            try {
-              const timer = new Timer({
-                totalTime: args.totalTime,
-                timeLeft: args.totalTime,
-                startTime: new Date(args.startTime),
-                user: context.currentUser.id
-              });
-      
-              await timer.save();
-              return timer.populate(['log', 'currentBreak'])
-            } catch (error) {
-              console.error("Error creating timer:", error);
-              throw new Error("Failed to create timer");
-            }
-        },
         login: async (parent, args) => {
             const user = await User.findOne({ username: args.username })
             if (!user) {
@@ -374,9 +353,7 @@ const resolvers = {
                 throw new Error('You must be logged in to create a study session');
             }
 
-            //we start a session so that the studysession can be created without the timer,
-            //and its saved to session again with the timer attribute when its created, 
-            //then commiting the transaction will save the changes to the db, where validation is done .
+            
             const session = await mongoose.startSession();
             session.startTransaction();
             try{
@@ -384,22 +361,27 @@ const resolvers = {
                     title: args.title,
                     description: args.description,
                     createdAt: new Date(args.startTimeIsoString),
+                    user: context.currentUser.id
                 });
 
-                await studySession.save({ session });
+                await studySession.save({ session, validateBeforeSave: false });
 
                 const timer = await createTimer(
                     args.duration,
                     args.startTimeIsoString,
                     "StudySession",
-                    studySession._id
+                    studySession._id,
+                    session
                 )
 
-                studySession.timer = timer._id;
-                await studySession.save({ session });
-                await session.commitTransaction();
+                await timer.save({ session });
 
-                return studySession.populate('timer');
+                studySession.timer = timer._id;
+
+                await studySession.save({ session }); 
+
+                await session.commitTransaction();
+                return await studySession.populate('timer');
             }  catch (error) {
                 await session.abortTransaction();
                 console.error("Error creating study session:", error);

@@ -1,9 +1,9 @@
-import Timer from "./models/Timer";
+import Timer from "./models/Timer.js";
 
 
 
 //This creates a Timer obj 
-const createTimer = async (duration, startTimeIsoString, parentType, parentId) => {
+const createTimer = async (duration, startTimeIsoString, parentType, parentId, session) => {
     try {
       const timer = new Timer({
         totalTime: duration,
@@ -12,9 +12,6 @@ const createTimer = async (duration, startTimeIsoString, parentType, parentId) =
         parentType: parentType,
         parentId: parentId
     });
-
-    // Save the timer to the database
-    await timer.save();
       
     return timer 
     } catch (error) {
