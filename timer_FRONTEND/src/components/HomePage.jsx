@@ -65,6 +65,7 @@ export default function HomePage() {
         onClose={() => setModalOpened(false)}
         title={modelContent}
         centered
+        size="60%"
       >
         {displayModalContent()}
         <Button fullWidth onClick={closeModal}>Close</Button>

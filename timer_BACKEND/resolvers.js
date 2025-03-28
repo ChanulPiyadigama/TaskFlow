@@ -353,7 +353,9 @@ const resolvers = {
                 throw new Error('You must be logged in to create a study session');
             }
 
-            
+            // we use a session to ensure that both the study session and the timer are created together.
+            //if one messes up we can rollback everything, so for example the timer is created but the study session isn't due to error
+            //and then we wuold have a lone timer 
             const session = await mongoose.startSession();
             session.startTransaction();
             try{

@@ -133,3 +133,11 @@ mutation CreateUser($username: String!, $password: String!, $name: String!) {
   createUser(username: $username, password: $password, name: $name)
 }
 `
+
+export const CREATE_STUDY_SESSION =gql`
+mutation CreateStudySession($startTimeIsoString: String!, $title: String, $description: String, $duration: Int) {
+  createStudySession(startTimeIsoString: $startTimeIsoString, title: $title, description: $description, duration: $duration) {
+    title
+  }
+}
+`
