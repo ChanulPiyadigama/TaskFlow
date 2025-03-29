@@ -142,6 +142,7 @@ mutation CreateStudySession($startTimeIsoString: String!, $title: String, $descr
     id
     description
     createdAt
+    lastInteraction
     timer {
       id
       parentId
@@ -175,6 +176,7 @@ export const GET_STUDY_SESSION_BYID = gql`
 query GetSpecificStudySession($studySessionId: ID!) {
   getSpecificStudySession(studySessionID: $studySessionId) {
     createdAt
+    lastInteraction
     description
     id
     title
@@ -199,6 +201,47 @@ query GetSpecificStudySession($studySessionId: ID!) {
       timeLeft
       totalTime
     }
+  }
+}
+`
+
+export const GET_ALL_USER_STUDY_SESSIONS = gql`
+query GetUserStudySessions {
+  getUserStudySessions {
+    title
+    lastInteraction
+    timer {
+      currentBreak {
+        elapsedTime
+        id
+        pausedTime
+        resumedTime
+      }
+      id
+      isPaused
+      log {
+        elapsedTime
+        id
+        pausedTime
+        resumedTime
+      }
+      parentId
+      startTime
+      timeLeft
+      totalTime
+    }
+    createdAt
+    description
+    id
+  }
+}
+`
+
+export const UPDATE_STUDY_SESSION_INTERACTION_TIME = gql`
+mutation UpdateStudySessionInteractionDate($studySessionId: ID!, $newTime: String!) {
+  updateStudySessionInteractionDate(studySessionID: $studySessionId, newTime: $newTime) {
+    id
+    lastInteraction
   }
 }
 `

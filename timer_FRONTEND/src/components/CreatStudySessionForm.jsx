@@ -1,4 +1,4 @@
-import { CREATE_STUDY_SESSION } from "../queries"
+import { CREATE_STUDY_SESSION, GET_ALL_USER_STUDY_SESSIONS } from "../queries"
 import { useMutation } from "@apollo/client"
 import { TextInput, Textarea, NumberInput, Stack, Button, Text } from '@mantine/core'
 import { useNavigate } from "react-router-dom"
@@ -10,9 +10,27 @@ export default function CreateStudySessionForm() {
     const navigate = useNavigate()
     
     const [createStudySession, {loading: loadingCreateStudySession, data: dataCreateStudySession, error: errorCreateStudySession}] = useMutation(CREATE_STUDY_SESSION, {
+        //we have to manually update the cache with the new timer, specfically for the query that 
+        //previousstudylist uses so that it will grab the new timer
+        //also cache is autmoatically from the mutation which is apollo client thus no need for client
+        update: (cache, { data: { createStudySession } }) => {
+            // Read existing study sessions from cache
+            const existingData = cache.readQuery({ 
+                query: GET_ALL_USER_STUDY_SESSIONS 
+            });
+    
+            // Write back to cache for specific query, so now when that query runs in cache, 
+            // it will return this new array
+            cache.writeQuery({
+                query: GET_ALL_USER_STUDY_SESSIONS,
+                data: {
+                    getUserStudySessions: existingData ? 
+                        [...existingData.getUserStudySessions, createStudySession]
+                        : [createStudySession]
+                }
+            });
+        },
         onCompleted: (dataCreateStudySession) => {
-            console.log("Study session created:", dataCreateStudySession.createStudySession)
-
             navigate(`/StudySession/${dataCreateStudySession.createStudySession.id}`)
         },
         onError: (errorCreateStudySession) => {
@@ -26,7 +44,6 @@ export default function CreateStudySessionForm() {
         e.preventDefault()
 
         const formData = new FormData(e.currentTarget)
-
         createStudySession({
             variables: {
                 title: formData.get("title"),

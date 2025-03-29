@@ -18,6 +18,7 @@ const typeDefs = `
         user: User!
         timer: Timer!
         createdAt: String!
+        lastInteraction: String!
     }
 
     type Timer{
@@ -53,6 +54,7 @@ const typeDefs = `
         getUserOutgoingFriendRequests:[User]
         getSpecificTimer(timerID: ID!): Timer!
         getSpecificStudySession(studySessionID: ID!): StudySession!
+        getUserStudySessions:[StudySession]
     }
     
     type Mutation{
@@ -67,6 +69,8 @@ const typeDefs = `
         sendFriendRequest(receiverID:ID!):String!
         handleFriendRequest(senderID:ID!, action: Boolean!):String!
         createStudySession(startTimeIsoString: String!, title: String, description: String, duration: Int): StudySession!
+        updateStudySessionInteractionDate(studySessionID: ID!, newTime: String!): StudySession!
+        deleteAllStudySessions: String!
     }
 
 `;

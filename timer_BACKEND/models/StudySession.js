@@ -22,7 +22,11 @@ const studySessionSchema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    lastInteraction: {
+        type: Date,
+        default: Date.now
+    },
 });
 
 const StudySession = mongoose.model('StudySession', studySessionSchema);

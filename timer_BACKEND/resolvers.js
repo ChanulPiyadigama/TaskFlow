@@ -99,6 +99,29 @@ const resolvers = {
             });
 
             return populatedStudySession
+        },
+        getUserStudySessions: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to view your study sessions');
+            }
+        
+            const studySessions = await StudySession.find({ user: context.currentUser.id });
+            
+            // Use Promise.all since map will return an array of promises, no point using await inside map is await unaware
+            const populatedStudySessions = await Promise.all(
+                studySessions.map(studySession =>
+                    studySession.populate({
+                        path: 'timer',
+                        populate: [
+                            { path: 'log' },
+                            { path: 'currentBreak' }
+                        ]
+                    })
+                )
+            );
+            
+        
+            return populatedStudySessions;
         }
     },
 
@@ -436,7 +459,32 @@ const resolvers = {
                 session.endSession();
             }
 
+        },
+        updateStudySessionInteractionDate: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to update the interaction date of a study session');
+            }
+
+            const studySession = await StudySession.findById(args.studySessionID);
+            if (!studySession) {
+                throw new Error('No study session found');
+            }
+
+            studySession.lastInteraction = new Date(args.newTime);
+            await studySession.save();
+            
+            return studySession;
+        },
+        deleteAllStudySessions: async (parent, args, context) => {
+            try{
+                await StudySession.deleteMany({});
+                return "All study sessions have been deleted successfully!";
+            } catch (error) {
+                console.error("Error deleting all study sessions:", error);
+                throw new Error("Failed to delete all study sessions");
+            }
         }
+
 
     }
 }

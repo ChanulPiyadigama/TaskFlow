@@ -1,7 +1,10 @@
 import { useParams } from "react-router-dom";
 import Timer from "./Timer";
 import { GET_STUDY_SESSION_BYID } from "../queries";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
+import { useEffect } from "react";
+import { UPDATE_STUDY_SESSION_INTERACTION_TIME } from "../queries";
+import { Loader } from "@mantine/core";
 
 export default function StudySessionPage() {
 
@@ -16,7 +19,38 @@ export default function StudySessionPage() {
         }
     });
 
-    if(loadingStudySession) return <p>Loading...</p>
+    const [updateInteraction] = useMutation(UPDATE_STUDY_SESSION_INTERACTION_TIME, {
+        onCompleted: (data) => {
+            console.log("Interaction time updated:", data.updateStudySessionInteractionDate
+            );},
+
+        onError: (error) => {
+            console.error("Error updating interaction time:", error);
+        }
+    });
+
+    //when page loads, add ane ven listenr to update latest iteraction time to the db when the user
+    //leaves the page
+    useEffect(() => {
+        const updateInteractionTime = () => {
+            updateInteraction({
+                variables: {
+                    studySessionId: id,
+                    newTime: new Date().toISOString()
+                }
+            });
+        };
+        
+        window.addEventListener("beforeunload", updateInteractionTime);
+        
+        // Cleanup: remove listener 
+        return () => {
+            window.removeEventListener("beforeunload", updateInteractionTime);
+        };
+    }, [id, updateInteraction]);
+
+    if(loadingStudySession) return <Loader />;
+    if(errorStudySession) return <p>Error...</p>
     
     const studySession = dataStudySession.getSpecificStudySession;
 
