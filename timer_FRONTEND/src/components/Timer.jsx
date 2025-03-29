@@ -1,12 +1,11 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { HANDLE_BREAK, RESET_TIMER } from "../queries";
-import { useApolloClient, useMutation } from "@apollo/client";
-import { GET_USER_TIMERS } from "../queries";
-import { useQuery } from "@apollo/client";
+import { useApolloClient, useFragment, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { Button, Card, Group, List, Loader, Text, Title } from "@mantine/core";
 
-//the usequery gets the timers from the cache, since it looks there first, then using the timer id we find
-//the timer, and use it as our state by using its attributes
-//every time the cache timer object is updated, the timer obj will rerender since usequery is a subsriber
+//the usefragment gets the timer obj from the cache using id
+//every time the cache timer object is updated, the timer obj will rerender since usefragment is a subsriber
 //and then we get the newest timer obj and its updated values are displayed on the screen
 export default function Timer({timerID}) {
     //all breaks, resets and edits are saved to db upon happening, execpt timeleft which is saved ot localstorage
@@ -16,22 +15,51 @@ export default function Timer({timerID}) {
     //on first rerender we get loading and data(timer) is undef, so we return loading
     //(Which is located at the bottom so the same hooks are called between each render)
     //on second rerender we get data and can then use timer logic
-    //also on page refresh, this query will be sent to network not cache, so there will be loading, since
-    //both timerlist and timer send the same query and timer page/route if refreshed, will be first.
-    const { data: timersData, loading: timersLoading, error: errorGettingTimers } = useQuery(GET_USER_TIMERS);
+
+    const GET_TIMER_BYID = gql`
+    fragment TimerFields on Timer{
+        id
+        timeLeft
+        totalTime
+        startTime
+        isPaused
+        currentBreak {
+        id
+        pausedTime
+        resumedTime
+        elapsedTime
+        }
+        log {
+        id
+        pausedTime
+        resumedTime
+        elapsedTime
+        }      
+    }`
+    //since timer obj is a componenet on studypage, studysession usequery will fill cache with timer obj on refresh
+    //so everytime we just grab the timer obj from cache with this usefragment
+    const { data: timerData, loading: timersLoading, error: errorGettingTimers } = useFragment({
+        fragment: GET_TIMER_BYID,
+        from:{
+            __typename: "Timer",
+            id: timerID
+        }
+    })
     const [handleBreak, { loading: breakLoading }] = useMutation(HANDLE_BREAK);
-    const [resetTimer, { loading: resetLoading }] = useMutation(RESET_TIMER);
 
-    const timers = timersData?.getUserTimers || [];
-    let timer = [];  
+    //reseting timer replaces old one in cache
+    const [resetTimer, { loading: resetLoading, data: resetData }] = useMutation(RESET_TIMER, {
+        onCompleted: (data) => {
+            console.log(data)
+            if (data && data.resetTimer) {
+                localStorage.setItem(`timer-${timerID}-timeLeft`, data.resetTimer.timeLeft);
+            }
+        }
+    });
 
-    if (timers.length > 0) {
-        timer = timers.find((t) => t.id === timerID);
-    }
+    const timer = timerData
 
-    
 
-    
     //we store the timeleft to local storage to grab when app refreshes, we grab it and set it to the 
     //cache timeleft value to use.
     //if it doesnt exist it means its the first time the timer is running
@@ -53,21 +81,12 @@ export default function Timer({timerID}) {
             });
         }
     }, [timer]);
-    //sends mutation response, display loading on first render, gets data updates cache timer object, rerenders
-    //and shows new timer values, we also remove the breaks from the cache 
-    //also timer is paused upon reset done in backend resolver
+
     const handleReset = () => {
         resetTimer({
             variables:{
                 timerId: timer.id,
                 startTime: new Date().toISOString()
-            },
-            onCompleted: () => {
-                timer.log.forEach(breakId => {
-                    client.cache.evict({ id: client.cache.identify({ __typename: "Break", id: breakId.id }) });
-                });
-
-                localStorage.setItem(`timer-${timer.id}-timeLeft`, timer.timeLeft)
             },
             onError: (error) => {
                 console.error("Reset Timer failed", error);
@@ -156,33 +175,49 @@ export default function Timer({timerID}) {
     if (resetLoading) return <p>Reseting Timer... </p>
     
     return (
-        <div>
-            <p>{formatTime(timer.timeLeft)}</p>
-            <button onClick={handlePause}>
-                {timer.isPaused ? "Resume" : "Pause"}
-            </button>
-            <button onClick={handleReset}>Reset</button>
-            <button>Edit</button>
-            <div>
-                <div>
-                    {/*Convert iso strings to date time objects*/}
-                    <p>Current Break:</p>
-                    {timer.currentBreak ? (
-                        <p>{new Date(Number(timer.currentBreak.pausedTime)).toLocaleTimeString()}</p>
-                    ) : (
-                        <p>No current break</p>
-                    )}
-                </div>
-                <div>
-                    <p>Break Log:</p>
-                    {timer.log.length > 0 ? timer.log.map(breakObj => (
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+            <Title order={3}>Timer</Title>
+            <Text size="xl" weight={700} align="center">
+                {formatTime(timer.timeLeft)}
+            </Text>
 
-                        <p key={breakObj.id}>{new Date(Number(breakObj.pausedTime)).toLocaleTimeString()} {new Date(Number(breakObj.resumedTime)).toLocaleTimeString()}:  {formatTime(breakObj.elapsedTime)}</p>
-                    )) : (
-                        <p>No breaks yet</p>
-                    )}
-                </div>
-            </div>
-        </div>
+            <Group position="center" mt="md">
+                <Button variant="filled" color="blue" onClick={handlePause}>
+                    {timer.isPaused ? "Resume" : "Pause"}
+                </Button>
+                <Button variant="filled" color="red" onClick={handleReset}>
+                    Reset
+                </Button>
+                <Button variant="outline" color="gray">
+                    Edit
+                </Button>
+            </Group>
+
+            <Card mt="md" shadow="xs" padding="md">
+                <Text size="sm" weight={600}>Current Break:</Text>
+                <Text size="sm">
+                    {timer.currentBreak
+                        ? new Date(Number(timer.currentBreak.pausedTime)).toLocaleTimeString()
+                        : "No current break"}
+                </Text>
+            </Card>
+
+            <Card mt="md" shadow="xs" padding="md">
+                <Text size="sm" weight={600}>Break Log:</Text>
+                {timer.log.length > 0 ? (
+                    <List size="sm" spacing="xs">
+                        {timer.log.map(breakObj => (
+                            <List.Item key={breakObj.id}>
+                                {new Date(Number(breakObj.pausedTime)).toLocaleTimeString()} -{" "}
+                                {new Date(Number(breakObj.resumedTime)).toLocaleTimeString()}:{" "}
+                                {formatTime(breakObj.elapsedTime)}
+                            </List.Item>
+                        ))}
+                    </List>
+                ) : (
+                    <Text size="sm">No breaks yet</Text>
+                )}
+            </Card>
+        </Card>
     )
 }

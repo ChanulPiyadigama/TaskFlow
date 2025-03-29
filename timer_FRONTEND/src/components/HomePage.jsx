@@ -1,10 +1,11 @@
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
-import CreateTimerForm from "./CreateTimerForm";
 import TimerList from "./TimerList";
 import Friends from "./Friends";
 import { AppShell, Button, Text, Group, Grid, Card, Stack, Modal } from '@mantine/core';
 import { IconClock, IconUsers, IconPlus, IconBook } from "@tabler/icons-react";
+import CreateStudySessionForm from "./CreatStudySessionForm";
+import PreviousStudySessionsList from "./PreviousStudySessionsList";
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -32,9 +33,7 @@ export default function HomePage() {
     switch (modelContent) {
       case "Study Session":
         return (
-          <Stack>
-            <Text size="sm">Here you can set up your study session details...</Text>
-          </Stack>
+          <CreateStudySessionForm />
         )
       case "Create Post":
         return (
@@ -66,6 +65,7 @@ export default function HomePage() {
         onClose={() => setModalOpened(false)}
         title={modelContent}
         centered
+        size="60%"
       >
         {displayModalContent()}
         <Button fullWidth onClick={closeModal}>Close</Button>
@@ -85,6 +85,7 @@ export default function HomePage() {
               <Stack mt="md">
                 <Button onClick={() => openModal(ModalType.CREATE_POST)} leftSection={<IconPlus />} fullWidth>Create Post</Button>
                 <Button onClick={() => openModal(ModalType.STUDY_SESSION)} leftSection={<IconBook />} fullWidth>Start Study Session</Button>
+                <PreviousStudySessionsList />
               </Stack>
             </Card>
           </Grid.Col>
@@ -93,7 +94,6 @@ export default function HomePage() {
           <Grid.Col span={6}>
             <Card shadow="sm" p="md">
               <Text fw={700} size="lg">📢 Study Feed</Text>
-              <CreateTimerForm />
               <TimerList />
               <Friends />
             </Card>

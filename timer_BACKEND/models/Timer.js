@@ -4,6 +4,18 @@ import { type } from 'os';
 const { Schema } = mongoose;
 
 const timerSchema = new Schema({
+    // the parentType field is used to determine the model the parent is in
+    parentType: {
+        type: String,
+        enum: ['StudySession', 'Challenge', 'GroupStudy'],
+        required: true
+    },
+    parentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        // tells what model to find the id in 
+        refPath: 'parentType'
+    },
     totalTime: {
         type: Number,
         required: true
@@ -21,11 +33,6 @@ const timerSchema = new Schema({
         ref: 'Break',
         default: []
     }],
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
     isPaused :{
         type: Boolean,
         default: false

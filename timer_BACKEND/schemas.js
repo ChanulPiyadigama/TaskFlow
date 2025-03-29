@@ -11,6 +11,15 @@ const typeDefs = `
         outgoingFriendRequests: [User]
     }
 
+    type StudySession{
+        id: ID!
+        title: String
+        description: String
+        user: User!
+        timer: Timer!
+        createdAt: String!
+        lastInteraction: String!
+    }
 
     type Timer{
         id: ID!
@@ -18,9 +27,10 @@ const typeDefs = `
         timeLeft: Int!
         startTime: String!
         log: [Break]
-        user: User!
         isPaused: Boolean!
         currentBreak: Break
+        parentType: String
+        parentId: ID
     }   
 
     type Break{
@@ -42,11 +52,13 @@ const typeDefs = `
         getUserFriends:[User]
         getUserIncomingFriendRequests:[User]
         getUserOutgoingFriendRequests:[User]
+        getSpecificTimer(timerID: ID!): Timer!
+        getSpecificStudySession(studySessionID: ID!): StudySession!
+        getUserStudySessions:[StudySession]
     }
     
     type Mutation{
         createUser(username: String!, password: String!, name: String!): String!
-        createTimer(totalTime: Int!, startTime: String!): Timer
         login(username: String!, password: String!): String!
         handleBreak(timerID: String, timeOfChange: String!, isPaused: Boolean!): Timer!
         clearBreaks: String!
@@ -56,6 +68,9 @@ const typeDefs = `
         deleteAllTimers:String!
         sendFriendRequest(receiverID:ID!):String!
         handleFriendRequest(senderID:ID!, action: Boolean!):String!
+        createStudySession(startTimeIsoString: String!, title: String, description: String, duration: Int): StudySession!
+        updateStudySessionInteractionDate(studySessionID: ID!, newTime: String!): StudySession!
+        deleteAllStudySessions: String!
     }
 
 `;

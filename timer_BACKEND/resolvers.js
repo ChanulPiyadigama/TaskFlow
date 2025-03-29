@@ -1,10 +1,13 @@
 import User from "./models/User.js";
 import Timer from "./models/Timer.js";
 import Break from "./models/Break.js";
+import StudySession from "./models/StudySession.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { SECRET } from "./util/config.js";
 import mongoose from "mongoose";
+
+import { createTimer } from "./resolverutils.js";
 import { get } from "http";
 
 const resolvers = {
@@ -68,6 +71,57 @@ const resolvers = {
             const user = await context.currentUser.populate('friends')
             return user.friends
             
+        },
+        getSpecificTimer: async (parent, args, context) => {
+            const timer = await Timer.findById(args.timerID);
+            if (!timer) {
+                throw new Error('No timer found');
+            }
+            const populatedTimer = await timer.populate(['log', 'currentBreak']);
+            return populatedTimer
+        },
+        getSpecificStudySession: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to view a study session');
+            }
+
+            const studySession = await StudySession.findById(args.studySessionID);
+            if (!studySession) {
+                throw new Error('No study session found');
+            }
+
+            const populatedStudySession = await studySession.populate({
+                path: 'timer',
+                populate: [
+                    { path: 'log' },       
+                    { path: 'currentBreak' }  
+                ]
+            });
+
+            return populatedStudySession
+        },
+        getUserStudySessions: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to view your study sessions');
+            }
+        
+            const studySessions = await StudySession.find({ user: context.currentUser.id });
+            
+            // Use Promise.all since map will return an array of promises, no point using await inside map is await unaware
+            const populatedStudySessions = await Promise.all(
+                studySessions.map(studySession =>
+                    studySession.populate({
+                        path: 'timer',
+                        populate: [
+                            { path: 'log' },
+                            { path: 'currentBreak' }
+                        ]
+                    })
+                )
+            );
+            
+        
+            return populatedStudySessions;
         }
     },
 
@@ -98,27 +152,6 @@ const resolvers = {
             throw new Error('Error creating user')
         }
         },
-        createTimer: async (parent, args, context) => {
-            //check if user exists then create timer and upload it to db
-            if(!context.currentUser){
-                throw new Error('You must be logged in to create a timer');
-            }
-            //creates a timer for user (id is from token), startTime is date obj created with given iso string
-            try {
-              const timer = new Timer({
-                totalTime: args.totalTime,
-                timeLeft: args.totalTime,
-                startTime: new Date(args.startTime),
-                user: context.currentUser.id
-              });
-      
-              await timer.save();
-              return timer.populate(['log', 'currentBreak'])
-            } catch (error) {
-              console.error("Error creating timer:", error);
-              throw new Error("Failed to create timer");
-            }
-        },
         login: async (parent, args) => {
             const user = await User.findOne({ username: args.username })
             if (!user) {
@@ -147,14 +180,15 @@ const resolvers = {
         handleBreak: async (parent, args, context) => {
             if (!context.currentUser) {
                 throw new Error('You must be logged in to handle a break');
+
             }
 
-            if (args.isPaused) {
-                //check if timer being paused exists 
-                const timer = await Timer.findById(args.timerID);
+            const timer = await Timer.findById(args.timerID);
                 if (!timer) {
                     throw new Error('No timer found');
                 }
+
+            if (args.isPaused) {
                 //create a break for specific timer
                 const newBreak = new Break({
                     pausedTime: args.timeOfChange,
@@ -173,17 +207,21 @@ const resolvers = {
                         populate: {
                             path: 'timer', // Populate the timer field inside currentBreak
                         },
-                    }, 'user','log'])
+                    },'log'])
 
 
             } else {
-                //check if timer being resumed exists
-                const timer = await Timer.findById(args.timerID);
-                if (!timer) {
-                    throw new Error('No timer found');
+                //special case when timer is reset and there is no current break, 
+                //hopefully this is the only case where a resume is called with no break to end
+                if (!timer.currentBreak) {
+                    timer.isPaused = false;
+                    await timer.save();
+                    return await timer.populate(['log']);
                 }
+
                 //check if current break exists within that timer
                 const currentBreak = await Break.findById(timer.currentBreak);
+                console.log(currentBreak)
                 if (!currentBreak) {
                     throw new Error('No break found');
                 }
@@ -203,7 +241,7 @@ const resolvers = {
                         populate: {
                             path: 'timer', // Populate the timer field inside currentBreak
                         },
-                    }, 'user','log'])
+                    },'log'])
             }
         },
         clearBreaks: async (parent, args, context) => {
@@ -262,7 +300,7 @@ const resolvers = {
                 timer.startTime = args.startTime
                 timer.timeLeft = timer.totalTime
                 timer.isPaused = true
-                
+                console.log(timer)
                 return await timer.save()
             } catch (error) {
                 console.error("Error resuming timer:", error);
@@ -366,7 +404,87 @@ const resolvers = {
             await sender.save();
 
             return `Friend request ${args.action? "accepted" : "rejected"} successfully!`;
+        },
+        createStudySession: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to create a study session');
+            }
+
+            // we use a session to ensure that both the study session and the timer are created together.
+            //if one messes up we can rollback everything, so for example the timer is created but the study session isn't due to error
+            //and then we wuold have a lone timer 
+            const session = await mongoose.startSession();
+            session.startTransaction();
+            try{
+                const studySession = new StudySession({
+                    title: args.title,
+                    description: args.description,
+                    createdAt: new Date(args.startTimeIsoString),
+                    user: context.currentUser.id
+                });
+
+                await studySession.save({ session, validateBeforeSave: false });
+
+                const timer = await createTimer(
+                    args.duration,
+                    args.startTimeIsoString,
+                    "StudySession",
+                    studySession._id,
+                    session
+                )
+
+                await timer.save({ session });
+
+                studySession.timer = timer._id;
+
+                await studySession.save({ session }); 
+
+                await session.commitTransaction();
+                
+                //once a timer is created, we have to return the timer of session populated with these fields
+                //so we can display the needed informatoin on the study session page
+                const populatedStudySession = await studySession.populate({
+                    path: 'timer',
+                    populate: [
+                        { path: 'log' },       
+                        { path: 'currentBreak' }  
+                    ]
+                });
+                return populatedStudySession;
+            }  catch (error) {
+                await session.abortTransaction();
+                console.error("Error creating study session:", error);
+                throw new Error("Failed to create study session");
+            } finally {
+                session.endSession();
+            }
+
+        },
+        updateStudySessionInteractionDate: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to update the interaction date of a study session');
+            }
+
+            const studySession = await StudySession.findById(args.studySessionID);
+            if (!studySession) {
+                throw new Error('No study session found');
+            }
+
+            studySession.lastInteraction = new Date(args.newTime);
+            await studySession.save();
+            
+            return studySession;
+        },
+        deleteAllStudySessions: async (parent, args, context) => {
+            try{
+                await StudySession.deleteMany({});
+                return "All study sessions have been deleted successfully!";
+            } catch (error) {
+                console.error("Error deleting all study sessions:", error);
+                throw new Error("Failed to delete all study sessions");
+            }
         }
+
 
     }
 }
