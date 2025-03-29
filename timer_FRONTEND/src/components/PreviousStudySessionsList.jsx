@@ -15,8 +15,9 @@ export default function PreviousStudySessionsList() {
     const userStudySessions = dataStudySessions?.getUserStudySessions || [];
 
     //sort then extract, also use a new array to avoid mutating the original array
-    const latestUserStudySessions = [...userStudySessions].sort((a, b) => new Date(b.lastInteraction) - new Date(a.lastInteraction))
-    .slice(0, 5);
+    const latestUserStudySessions = [...userStudySessions].sort((a, b) => new Date(parseInt(b.lastInteraction)) - new Date(parseInt(a.lastInteraction)))
+    .slice(0, 5); 
+
 
     return (
         <div>
@@ -31,6 +32,7 @@ export default function PreviousStudySessionsList() {
                         p="md"
                         radius="md"
                         withBorder
+                        mb="lg"
                         sx={{
                             cursor: "pointer",
                             transition: "transform 0.1s ease-in-out",

@@ -29,8 +29,8 @@ export default function StudySessionPage() {
         }
     });
 
-    //when page loads, add ane ven listenr to update latest iteraction time to the db when the user
-    //leaves the page
+    //when page loads, add an event listenr to update latest iteraction time to the db when the user
+    //leaves the page thruogh either leaving app, or going to another route
     useEffect(() => {
         const updateInteractionTime = () => {
             updateInteraction({
@@ -43,8 +43,10 @@ export default function StudySessionPage() {
         
         window.addEventListener("beforeunload", updateInteractionTime);
         
-        // Cleanup: remove listener 
+        // Cleanup: remove listener, and update interaction time when the component unmounts
+        //so when user goes back to the previous/other page, the interaction time is updated
         return () => {
+            updateInteractionTime();
             window.removeEventListener("beforeunload", updateInteractionTime);
         };
     }, [id, updateInteraction]);
