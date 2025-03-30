@@ -21,6 +21,17 @@ const typeDefs = `
         lastInteraction: String!
     }
 
+    type UserPost{
+        id:ID!
+        tite: String!
+        description: String
+        user: User!
+        postingObjType: String!
+        postingObjId: ID!
+        createdAt: String!
+        lastInteraction: String!
+    }
+
     type Timer{
         id: ID!
         totalTime: Int!
@@ -71,6 +82,8 @@ const typeDefs = `
         createStudySession(startTimeIsoString: String!, title: String, description: String, duration: Int): StudySession!
         updateStudySessionInteractionDate(studySessionID: ID!, newTime: String!): StudySession!
         deleteAllStudySessions: String!
+        createUserPost(title: String!, description: String, postingObjType: String!, postingObjId: ID!): UserPost!
+        
     }
 
 `;

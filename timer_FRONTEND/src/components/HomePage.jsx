@@ -6,6 +6,7 @@ import { AppShell, Button, Text, Group, Grid, Card, Stack, Modal } from '@mantin
 import { IconClock, IconUsers, IconPlus, IconBook } from "@tabler/icons-react";
 import CreateStudySessionForm from "./CreatStudySessionForm";
 import PreviousStudySessionsList from "./PreviousStudySessionsList";
+import CreateUserPost from "./CreateUserPost";
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -37,9 +38,7 @@ export default function HomePage() {
         )
       case "Create Post":
         return (
-          <Stack>
-            <Text size="sm">Here you can create a post...</Text>
-          </Stack>
+          <CreateUserPost />
         )
       default:
         return null
