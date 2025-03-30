@@ -2,9 +2,21 @@ import { Textarea, TextInput, Button, Stack, Title, Paper, Checkbox, Group, Text
 import { useQuery } from "@apollo/client"
 import { GET_ALL_USER_STUDY_SESSIONS } from "../queries"
 import { useState } from "react"
+import { CREATE_USER_STUDY_SESSION_POST } from "../queries"
+import { useMutation } from "@apollo/client"
 
 export default function StudySessionPostForm() {
     const { loading: loadingStudySessions, data: dataStudySessions, error: errorStudySessions } = useQuery(GET_ALL_USER_STUDY_SESSIONS)
+    const [createUserPost, { loading: loadingCreateUserPost, data: dataCreateUserPost, error: errorCreateUserPost }] = useMutation(CREATE_USER_STUDY_SESSION_POST, {
+        onCompleted: (data) => {
+            console.log("Post created:", data.createStudySessionPost)            
+        },
+        onError: (error) => {
+            console.error("Error creating post:", error)
+        }
+    }
+    )
+
     const [postingSession, setPostingSession] = useState(null)
     const [excludeTime, setExcludeTime] = useState(false)
     const [title, setTitle] = useState(postingSession?.title ||"")
@@ -20,7 +32,7 @@ export default function StudySessionPostForm() {
         }
         setPostingSession(session)
     }
-    
+
     const userStudySessions = dataStudySessions.getUserStudySessions.map((session) => (
         <Button 
             key={session.id}
@@ -32,6 +44,22 @@ export default function StudySessionPostForm() {
         </Button>
     ))
 
+    const handleSubmit = (e) => {
+        e.preventDefault()
+
+        createUserPost({
+            variables: {
+                title: title,
+                description: description,
+                exclusions: {
+                    excludeTime: excludeTime
+                },
+                studySessionId: postingSession.id
+            }
+        })
+        e.target.reset()
+    }
+
     return (
         <Stack gap="md">
             {!postingSession ? (
@@ -42,58 +70,60 @@ export default function StudySessionPostForm() {
                     </Stack>
                 </Paper>
             ) : (
-                <Stack gap="md">
-                    <Group justify="space-between" align="center">
-                        <Title order={3}>Posting {postingSession.title}</Title>
-                        <Button variant="subtle" onClick={() => setPostingSession(null)}>
-                            Back
-                        </Button>
-                    </Group>
+                <form onSubmit={handleSubmit}>
+                    <Stack gap="md">
+                        <Group justify="space-between" align="center">
+                            <Title order={3}>Posting {postingSession.title}</Title>
+                            <Button variant="subtle" onClick={() => setPostingSession(null)}>
+                                Back
+                            </Button>
+                        </Group>
 
-                    <Group align="flex-start">
-                        <TextInput
-                            placeholder="Enter post title"
-                            label="Title"
-                            required
-                            style={{ flex: 1 }}
-                            value={title}
-                            onChange={(e) => setTitle(e.currentTarget.value)}
-                        />
-
-                    </Group>
-
-                    <Group align="flex-start">
-                        <Textarea 
-                            placeholder="Description" 
-                            label="Description" 
-                            minRows={3}
-                            style={{ flex: 1 }}
-                            value={description}
-                            onChange={(e) => setDescription(e.currentTarget.value)}
-                            
-                        />
-
-                    </Group>
-
-                    <Paper p="md" withBorder>
-                        <Stack gap="sm">
-                            <Title order={4}>Session Stats</Title>
-                            <Group>
-                                <Text>{postingSession.timer.totalTime}</Text>
-                                <Checkbox 
-                                label="Exclude Time" 
-                                checked={excludeTime}
-                                onChange={(e) => setExcludeTime(e.currentTarget.checked)}
+                        <Group align="flex-start">
+                            <TextInput
+                                placeholder="Enter post title"
+                                label="Title"
+                                required
+                                style={{ flex: 1 }}
+                                value={title}
+                                onChange={(e) => setTitle(e.currentTarget.value)}
                             />
-                            </Group>
 
-                        </Stack>
-                    </Paper>
+                        </Group>
 
-                    <Button type="submit" fullWidth>
-                        Create Post
-                    </Button>
-                </Stack>
+                        <Group align="flex-start">
+                            <Textarea 
+                                placeholder="Description" 
+                                label="Description" 
+                                minRows={3}
+                                style={{ flex: 1 }}
+                                value={description}
+                                onChange={(e) => setDescription(e.currentTarget.value)}
+                                
+                            />
+
+                        </Group>
+
+                        <Paper p="md" withBorder>
+                            <Stack gap="sm">
+                                <Title order={4}>Session Stats</Title>
+                                <Group>
+                                    <Text>{postingSession.timer.totalTime}</Text>
+                                    <Checkbox 
+                                    label="Exclude Time" 
+                                    checked={excludeTime}
+                                    onChange={(e) => setExcludeTime(e.currentTarget.checked)}
+                                />
+                                </Group>
+
+                            </Stack>
+                        </Paper>
+
+                        <Button type="submit" fullWidth>
+                            Create Post
+                        </Button>
+                    </Stack>
+                </form>
             )}
         </Stack>
     )

@@ -245,3 +245,24 @@ mutation UpdateStudySessionInteractionDate($studySessionId: ID!, $newTime: Strin
   }
 }
 `
+
+export const CREATE_USER_STUDY_SESSION_POST = gql`
+mutation CreateStudySessionPost($title: String!, $description: String, $exclusions: StudySessionPostExclusions, $studySessionId: ID!) {
+  createStudySessionPost(title: $title, description: $description, exclusions: $exclusions, studySessionId: $studySessionId) {
+    id
+    createdAt
+    description
+    exclusions {
+      excludeTime
+    }
+    lastInteraction
+    likes
+    postType
+    studySession {
+      id
+    }
+    title
+  }
+}`
+
+

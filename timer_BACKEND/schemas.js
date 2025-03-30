@@ -21,9 +21,41 @@ const typeDefs = `
         lastInteraction: String!
     }
 
+    interface BasePost {
+        id: ID!
+        title: String!
+        description: String
+        user: User!
+        createdAt: String!
+        lastInteraction: String!
+        likes: Int!
+        postType: String!
+    }
+
+    type StudySessionPost implements BasePost {
+        id: ID!
+        title: String!
+        description: String
+        user: User!
+        createdAt: String!
+        lastInteraction: String!
+        likes: Int!
+        postType: String!
+        studySession: StudySession!
+        exclusions: exclusionDict
+    }
+
+    type exclusionDict {
+        excludeTime: Boolean!
+    }
+
+    input StudySessionPostExclusions {
+        excludeTime: Boolean!
+    }
+
     type UserPost{
         id:ID!
-        tite: String!
+        title: String!
         description: String
         user: User!
         postingObjType: String!
@@ -82,8 +114,7 @@ const typeDefs = `
         createStudySession(startTimeIsoString: String!, title: String, description: String, duration: Int): StudySession!
         updateStudySessionInteractionDate(studySessionID: ID!, newTime: String!): StudySession!
         deleteAllStudySessions: String!
-        createUserPost(title: String!, description: String, postingObjType: String!, postingObjId: ID!): UserPost!
-        
+        createStudySessionPost(title: String!, description: String, exclusions: StudySessionPostExclusions, studySessionId: ID! ): StudySessionPost!
     }
 
 `;

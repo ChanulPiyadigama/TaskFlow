@@ -9,8 +9,19 @@ import mongoose from "mongoose";
 
 import { createTimer } from "./resolverutils.js";
 import { get } from "http";
+import { BasePost } from "./models/basePost.js";
+import { StudySessionPost } from "./models/postStudySession.js";
 
 const resolvers = {
+    //helps graphql know what children type a document is within the post collection, for certain queries
+    BasePost: {
+        __resolveType(post) {
+            if (post.postType === 'StudySession') return 'StudySessionPost';
+            if (post.postType === 'General') return 'GeneralPost';
+            return null;
+        },
+    },
+
     Query: {
         //grabs objs from db and returns them
         allTimers: async () => {
@@ -483,6 +494,24 @@ const resolvers = {
                 console.error("Error deleting all study sessions:", error);
                 throw new Error("Failed to delete all study sessions");
             }
+        },
+        createStudySessionPost: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to create a study session post');
+            }
+
+            //we defined a an input type in schema which is a dict/obj with the stats we
+            //are excluding from a studysession
+            const post = new StudySessionPost({
+                title: args.title,
+                description: args.description,
+                user: context.currentUser.id,
+                exclusions: args.exclusions,
+                studySession: args.studySessionId,  
+            });
+            await post.save()
+            const populatedPost = await post.populate('studySession')
+            return populatedPost
         }
 
 

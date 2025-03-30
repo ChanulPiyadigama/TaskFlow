@@ -27,6 +27,10 @@ const studySessionSchema = new Schema({
         type: Date,
         default: Date.now
     },
+    postedID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'BasePost'
+    },
 });
 
 const StudySession = mongoose.model('StudySession', studySessionSchema);
