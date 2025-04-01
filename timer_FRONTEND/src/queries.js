@@ -265,4 +265,8 @@ mutation CreateStudySessionPost($title: String!, $description: String, $exclusio
   }
 }`
 
-
+export const SEND_FRIEND_REQUEST = gql`
+mutation SendFriendRequest($receiverId: ID!) {
+  sendFriendRequest(receiverID: $receiverId)
+}
+`

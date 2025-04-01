@@ -1,5 +1,5 @@
 import { useAuth } from "../context/AuthContext"
-import { CREATE_USER, LOGIN, CREATE_STUDY_SESSION, CREATE_USER_STUDY_SESSION_POST, GET_ALL_USER_STUDY_SESSIONS } from "../queries"
+import { CREATE_USER, LOGIN, CREATE_STUDY_SESSION, CREATE_USER_STUDY_SESSION_POST, GET_ALL_USER_STUDY_SESSIONS, SEND_FRIEND_REQUEST  } from "../queries"
 import { useMutation, useQuery } from "@apollo/client"
 import { studySessionData } from "./TestingData"
 import { useApolloClient } from "@apollo/client"
@@ -126,6 +126,17 @@ export default function AdminPage() {
       localStorage.removeItem("user-token");
       alert("Finished creating posts for all users!");
   };
+
+    const user1AddFriends = async () => {
+      const { data } = await login({
+          variables: {
+              username: "user1",
+              password: "1"
+          }
+      });
+      localStorage.setItem("user-token", data.login); // Store the token in local storage
+      
+    }
 
 
     return (
