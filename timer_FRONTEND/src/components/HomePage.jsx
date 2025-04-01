@@ -93,8 +93,7 @@ export default function HomePage() {
           <Grid.Col span={6}>
             <Card shadow="sm" p="md">
               <Text fw={700} size="lg">📢 Study Feed</Text>
-              <TimerList />
-              <Friends />
+
             </Card>
           </Grid.Col>
 

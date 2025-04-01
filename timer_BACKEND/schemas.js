@@ -62,6 +62,8 @@ const typeDefs = `
         postingObjId: ID!
         createdAt: String!
         lastInteraction: String!
+        studySessions: [StudySession]
+        allPosts: [BasePost]
     }
 
     type Timer{
@@ -98,6 +100,7 @@ const typeDefs = `
         getSpecificTimer(timerID: ID!): Timer!
         getSpecificStudySession(studySessionID: ID!): StudySession!
         getUserStudySessions:[StudySession]
+        getUserFriendsPosts:[BasePost]
     }
     
     type Mutation{

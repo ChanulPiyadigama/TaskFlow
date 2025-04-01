@@ -6,6 +6,7 @@ import TimerList from './components/TimerList'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import HomePage from './components/HomePage'
 import StudySessionPage from './components/StudySessionPage'
+import AdminPage from './components/AdminPage'
 
 function App() {
 
@@ -44,6 +45,7 @@ function App() {
         <Route path='/' element={token? <HomePage /> : <Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/StudySession/:id" element={<StudySessionPage />} />
+        <Route path="/admin" element={<AdminPage/>} />
       </Routes>
     </Router>
   )

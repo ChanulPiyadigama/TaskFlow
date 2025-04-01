@@ -22,6 +22,11 @@ const userSchema = new mongoose.Schema({
         ref: 'StudySession',
         default: []
     }],
+    allPosts: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'BasePost',
+        default: []
+    }],
     friends: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

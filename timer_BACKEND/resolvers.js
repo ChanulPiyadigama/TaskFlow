@@ -8,16 +8,14 @@ import { SECRET } from "./util/config.js";
 import mongoose from "mongoose";
 
 import { createTimer } from "./resolverutils.js";
-import { get } from "http";
-import { BasePost } from "./models/basePost.js";
 import { StudySessionPost } from "./models/postStudySession.js";
 
 const resolvers = {
     //helps graphql know what children type a document is within the post collection, for certain queries
     BasePost: {
         __resolveType(post) {
-            if (post.postType === 'StudySession') return 'StudySessionPost';
-            if (post.postType === 'General') return 'GeneralPost';
+            if (post.postType === 'StudySessionPost') return 'StudySessionPost';
+            if (post.postType === 'GeneralPost') return 'GeneralPost';
             return null;
         },
     },
@@ -133,6 +131,29 @@ const resolvers = {
             
         
             return populatedStudySessions;
+        },
+
+        getUserFriendsPosts: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to view your friends posts');
+            }
+
+            //exlcuing the sorting, this is the best time complex for getting the posts of all friends
+            //O(klogn) where k is the number of friends and n is the number of posts in collectoin, 
+            //logn since posts are in a binary tree
+            const friendIds = context.currentUser.friends 
+
+            if (friendIds.length === 0) {
+                return []; // No friends, return an empty array
+            }
+
+            const allFriendsPosts = await BasePost.find({
+                user: { $in: friendIds }
+            }) 
+            .sort({ createdAt: -1 })
+            .limit(10)
+
+            return allFriendsPosts;
         }
     },
 
@@ -510,6 +531,9 @@ const resolvers = {
                 studySession: args.studySessionId,  
             });
             await post.save()
+
+            //update the current user to add this new post to their allPosts array
+            await context.currentUser.updateOne({ $push: { allPosts: post._id } });
             const populatedPost = await post.populate('studySession')
             return populatedPost
         }
