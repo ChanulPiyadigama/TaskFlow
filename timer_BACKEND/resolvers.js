@@ -154,6 +154,22 @@ const resolvers = {
             .limit(10)
 
             return allFriendsPosts;
+        },
+        searchUsers: async (parent, args, context) => {
+
+            const regex = new RegExp(args.query, 'i'); // Case-insensitive regex
+            const users = await User.find({ username: regex }).limit(10); // Limit to 10 results
+            
+            return users 
+        },
+        getUserInfoById: async (parent, args, context) => {
+            const user = await User.findById(args.userID)
+            if (!user) {
+                throw new Error('No user found');
+            }
+
+
+            return user;
         }
     },
 

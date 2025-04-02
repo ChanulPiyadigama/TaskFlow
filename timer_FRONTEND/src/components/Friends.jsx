@@ -3,6 +3,7 @@ import { GET_USER_FRIENDS } from "../queries"
 import { useQuery } from "@apollo/client"
 import { IncomingFriendRequests } from "./IncomingFriendRequests"
 import { OutgoingFriendRequests } from "./OutgoingFriendRequests"
+import AddFriend from "./AddFriend"
 import { useState } from "react"
 export default function Friends(){
     //query to get the user's friends rerendering page to show the user's friends, when one of the buttons are clicked
@@ -31,6 +32,8 @@ export default function Friends(){
                 return <IncomingFriendRequests />;
             case "outgoing":
                 return <OutgoingFriendRequests />;
+            case "addFriend":
+                return <AddFriend />;
             default:
                 return null;
         }
@@ -47,6 +50,7 @@ export default function Friends(){
                 <button onClick={() => setActiveSection("friends")}>Friends</button>
                 <button onClick={() => setActiveSection("incoming")}>Incoming Requests</button>
                 <button onClick={() => setActiveSection("outgoing")}>Outgoing Requests</button>
+                <button onClick={() => setActiveSection("addFriend")}>Add Friend</button>
             </div>
             {renderContent()}
 

@@ -270,3 +270,13 @@ mutation SendFriendRequest($receiverId: ID!) {
   sendFriendRequest(receiverID: $receiverId)
 }
 `
+
+export const SEARCH_USERS = gql`
+query SearchUsers($query: String!) {
+  searchUsers(query: $query) {
+    name 
+    username
+    id
+  }
+}
+`

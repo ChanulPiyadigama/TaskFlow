@@ -101,6 +101,8 @@ const typeDefs = `
         getSpecificStudySession(studySessionID: ID!): StudySession!
         getUserStudySessions:[StudySession]
         getUserFriendsPosts:[BasePost]
+        searchUsers(query: String!): [User]
+        getUserInfoById(userID: ID!): User
     }
     
     type Mutation{

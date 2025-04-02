@@ -1,9 +1,8 @@
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
-import TimerList from "./TimerList";
 import Friends from "./Friends";
 import { AppShell, Button, Text, Group, Grid, Card, Stack, Modal } from '@mantine/core';
-import { IconClock, IconUsers, IconPlus, IconBook } from "@tabler/icons-react";
+import { IconClock, IconUsers, IconPlus, IconBook, IconUserPlus } from "@tabler/icons-react";
 import CreateStudySessionForm from "./CreatStudySessionForm";
 import PreviousStudySessionsList from "./PreviousStudySessionsList";
 import CreateUserPost from "./CreateUserPost";
@@ -17,6 +16,8 @@ export default function HomePage() {
   const ModalType = {
     STUDY_SESSION: "Study Session",
     CREATE_POST: "Create Post",
+    FRIENDS: "Friends",
+    ADD_FRIEND: "Add Friend",
   };
 
   const openModal = (type) => {
@@ -40,6 +41,12 @@ export default function HomePage() {
         return (
           <CreateUserPost />
         )
+      case "Friends":
+        return (
+          <Friends />
+        )
+      case "Add Friend":
+        return <Friends /> 
       default:
         return null
     } 
@@ -82,6 +89,8 @@ export default function HomePage() {
             <Card shadow="sm" p="md">
               <Text fw={700} size="lg">👋 Hey {user.user}</Text>
               <Stack mt="md">
+                <Button onClick={() => openModal(ModalType.FRIENDS)} leftSection={<IconUserPlus />} fullWidth>Friends</Button>
+                <Button onClick={() => openModal(ModalType.FRIENDS)} leftSection={<IconUserPlus />} fullWidth>Add Friend</Button>
                 <Button onClick={() => openModal(ModalType.CREATE_POST)} leftSection={<IconPlus />} fullWidth>Create Post</Button>
                 <Button onClick={() => openModal(ModalType.STUDY_SESSION)} leftSection={<IconBook />} fullWidth>Start Study Session</Button>
                 <PreviousStudySessionsList />
