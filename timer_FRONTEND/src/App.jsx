@@ -6,10 +6,15 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import HomePage from './components/HomePage'
 import StudySessionPage from './components/StudySessionPage'
 import AdminPage from './components/AdminPage'
+import UserPage from './components/UserPage'
+import AppLayout from './components/AppLayout'
+import { Loader } from '@mantine/core'
 
 function App() {
 
-  const { token, setToken, setUser } = useAuth()
+  const { token, user, setToken, setUser } = useAuth()
+  const [isLoading, setIsLoading] = useState(true)
+
   
   //set token and user from local storage if they exist, check token first tho
   useEffect(() => {
@@ -26,9 +31,12 @@ function App() {
       }
 
     }
+    setIsLoading(false)
   }, [])
 
-
+  if (isLoading) {
+    return  <Loader />
+  }
   
   const handleLogout = () => {
     setToken(null)
@@ -37,14 +45,20 @@ function App() {
   }
 
 
-  //when the app first starts we check if a token exists/is valid, if not the user must login 
+  //when the useEffect is done and checks for a user through the saved token, if no user go to login page
+  //else render layout and other pages
   return (
     <Router>
       <Routes>
-        <Route path='/' element={token? <HomePage /> : <Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/StudySession/:id" element={<StudySessionPage />} />
-        <Route path="/admin" element={<AdminPage/>} />
+        <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
+        <Route path="/admin" element={<AdminPage />} />
+        
+        {/* Protected Routes */}
+        <Route element={user ? <AppLayout /> : <Navigate to="/login" />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/StudySession/:id" element={<StudySessionPage />} />
+          <Route path="/UserPage/:userId" element={<UserPage />} />
+        </Route>
       </Routes>
     </Router>
   )

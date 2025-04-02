@@ -6,11 +6,13 @@ import { IconClock, IconUsers, IconPlus, IconBook, IconUserPlus } from "@tabler/
 import CreateStudySessionForm from "./CreatStudySessionForm";
 import PreviousStudySessionsList from "./PreviousStudySessionsList";
 import CreateUserPost from "./CreateUserPost";
+import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
   const { user } = useAuth();
   const [modalOpened, setModalOpened] = useState(false)
   const [modelContent, setModelContent] = useState("")
+  const navigate = useNavigate()
 
   //enum for modal types
   const ModalType = {
@@ -53,19 +55,9 @@ export default function HomePage() {
   }
 
   return (
-    <AppShell padding="md" header={{ height: 60 }}>
-      {/* HEADER */}
-      <AppShell.Header p="md">
-        <Group justify="space-between">
-          <Text size="xl" fw={700}>TaskFlow</Text>
-          <Group>
-            <Button leftSection={<IconClock />} variant="subtle">Timers</Button>
-            <Button leftSection={<IconUsers />} variant="subtle">Friends</Button>
-          </Group>
-        </Group>
-      </AppShell.Header>
-
-      {/* MODAL FOR STARTING STUDY SESSION */}
+    <div>
+      {/* side note: even though the modal will be placed inside the appshellmain because of 
+      homepage using Applayout, it uses reacts createportal and is not restricted by any parent container*/}
       <Modal
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
@@ -82,12 +74,11 @@ export default function HomePage() {
       each column had a card which is basically a container that you can style and within each container
       
       is a stack which automatically stacks the componenets with flex vertical, giving even spacing */}
-      <AppShell.Main>
         <Grid gutter="md">
           {/* LEFT SIDEBAR (User Info & Actions) */}
           <Grid.Col span={3}>
             <Card shadow="sm" p="md">
-              <Text fw={700} size="lg">👋 Hey {user.user}</Text>
+              <Text fw={700} size="lg">👋 Hey {user.name}</Text>
               <Stack mt="md">
                 <Button onClick={() => openModal(ModalType.FRIENDS)} leftSection={<IconUserPlus />} fullWidth>Friends</Button>
                 <Button onClick={() => openModal(ModalType.FRIENDS)} leftSection={<IconUserPlus />} fullWidth>Add Friend</Button>
@@ -114,7 +105,6 @@ export default function HomePage() {
             </Card>
           </Grid.Col>
         </Grid>
-      </AppShell.Main>
-    </AppShell>
+      </div>
   );
 }

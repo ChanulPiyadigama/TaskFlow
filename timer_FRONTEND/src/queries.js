@@ -280,3 +280,24 @@ query SearchUsers($query: String!) {
   }
 }
 `
+//currently curated for userPage
+export const GET_USERINFO_BYID = gql`
+query GetUserInfoById($userId: ID!) {
+  getUserInfoById(userID: $userId) {
+    id
+    name
+    username
+    allPosts {
+      id
+      description
+      likes
+      title
+    }
+    friends {
+      id
+      name
+      username
+    }
+  }
+}
+`

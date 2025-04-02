@@ -168,8 +168,11 @@ const resolvers = {
                 throw new Error('No user found');
             }
 
+            //for now this is used for the userpage which atm will just display the user's friends names
+            // and post title add on later
+            const populatedUser = await user.populate(['friends','allPosts'])
 
-            return user;
+            return populatedUser;
         }
     },
 
@@ -216,7 +219,7 @@ const resolvers = {
             //these verified tokens and change them. Anyone can decode them to get the info indide, but they can't change it
             //without the SECRET, if they try the token will be invalid when being verified in the request context
             const token = jwt.sign(
-              { id: user._id, username: user.username, user: user.name },
+              { id: user._id, username: user.username, name: user.name },
               SECRET,
               { expiresIn: '1h' }
             )

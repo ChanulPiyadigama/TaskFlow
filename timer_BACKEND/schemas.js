@@ -5,10 +5,12 @@ const typeDefs = `
         id: ID!
         username: String!
         name: String!
-        timers: [Timer]
         friends: [User]
         incomingFriendRequests: [User]
         outgoingFriendRequests: [User]
+        studySessions: [StudySession]
+        allPosts: [BasePost]
+        
     }
 
     type StudySession{
