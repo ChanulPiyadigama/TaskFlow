@@ -21,6 +21,51 @@ const typeDefs = `
         lastInteraction: String!
     }
 
+    interface BasePost {
+        id: ID!
+        title: String!
+        description: String
+        user: User!
+        createdAt: String!
+        lastInteraction: String!
+        likes: Int!
+        postType: String!
+    }
+
+    type StudySessionPost implements BasePost {
+        id: ID!
+        title: String!
+        description: String
+        user: User!
+        createdAt: String!
+        lastInteraction: String!
+        likes: Int!
+        postType: String!
+        studySession: StudySession!
+        exclusions: exclusionDict
+    }
+
+    type exclusionDict {
+        excludeTime: Boolean!
+    }
+
+    input StudySessionPostExclusions {
+        excludeTime: Boolean!
+    }
+
+    type UserPost{
+        id:ID!
+        title: String!
+        description: String
+        user: User!
+        postingObjType: String!
+        postingObjId: ID!
+        createdAt: String!
+        lastInteraction: String!
+        studySessions: [StudySession]
+        allPosts: [BasePost]
+    }
+
     type Timer{
         id: ID!
         totalTime: Int!
@@ -55,6 +100,9 @@ const typeDefs = `
         getSpecificTimer(timerID: ID!): Timer!
         getSpecificStudySession(studySessionID: ID!): StudySession!
         getUserStudySessions:[StudySession]
+        getUserFriendsPosts:[BasePost]
+        searchUsers(query: String!): [User]
+        getUserInfoById(userID: ID!): User
     }
     
     type Mutation{
@@ -71,6 +119,7 @@ const typeDefs = `
         createStudySession(startTimeIsoString: String!, title: String, description: String, duration: Int): StudySession!
         updateStudySessionInteractionDate(studySessionID: ID!, newTime: String!): StudySession!
         deleteAllStudySessions: String!
+        createStudySessionPost(title: String!, description: String, exclusions: StudySessionPostExclusions, studySessionId: ID! ): StudySessionPost!
     }
 
 `;
