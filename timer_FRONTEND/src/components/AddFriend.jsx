@@ -1,11 +1,10 @@
 import { useState, useCallback } from "react";
-import { useLazyQuery } from "@apollo/client";
-import { SEARCH_USERS} from "../queries";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { SEARCH_USERS, SEND_FRIEND_REQUEST, GET_USER_OUTGOING_FRIEND_REQUESTS} from "../queries";
 import { debounce } from "lodash";
 import { 
     TextInput, 
     Title, 
-    Paper, 
     Stack,
     Group, 
     Button, 
@@ -13,20 +12,47 @@ import {
     Loader,
     Card
   } from "@mantine/core";
-import { IconSearch, IconUserPlus } from "@tabler/icons-react";
+import { IconSearch, IconUserPlus, IconCheck } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 
+
+/*
+  This component is used to search for users through a search bar and add them, in the add friends section.
+  
+  First we use a uselazyquery which allows us to run the query when we want to, not when the component mounts. (1)
+
+  When the user types in the search bar, it sets the search term in state and begins a debounce timer (2),
+  which is in a usecallback so its remembered when the component rerenders. When the timer is up, it
+  runs whatever is inside, in this case that lazy query to search for users. (3)
+  
+  If the user types before the timer a new timer will be created, and the process will repeat. 
+
+  Now when a we click add friend we trigger the send friend mutation, and refetch the outgoing 
+  requests so that the page will rerender and show we have sent a request. (4)
+
+*/
 export default function AddFriend() {
   const [searchTerm, setSearchTerm] = useState("");
+  //(1)
+  const {loading: loadingOutgoingFriendRequests, data: dataOutgoingFriendRequests, error: errorOutgoingFriendRequests} = useQuery(GET_USER_OUTGOING_FRIEND_REQUESTS,
+    {
+      onCompleted: (data) => {
+        console.log("Hey")
+        console.log(data);
+      }
+    }
+  )
   const [searchUsers, { data, loading, error }] = useLazyQuery(SEARCH_USERS);
+  const [sendFriendRequest] = useMutation(SEND_FRIEND_REQUEST,{
+    //(4)
+    refetchQueries: [
+      { query: GET_USER_OUTGOING_FRIEND_REQUESTS }
+    ]
+  });
   const navigate = useNavigate();
 
-  //the debounce function returns a timer that once up will run a function in this case the
-  //search query
-  //
-  //its held in a usecallback so that when the componenet rerenders due to searchterm state, it will be
-  //remembered and so the timer will be running in this new reneder and if the user doesnt type
-  //within the given time, the search will be sent (700ms works best)
+  
+  //(3)
   const handleSearchChange = useCallback(
     debounce((term) => {
       searchUsers({ variables: { query: term } });
@@ -34,8 +60,7 @@ export default function AddFriend() {
     []
   );
 
-  //when user types in search we set in state and begin the debounce which is a timer that once up
-  //will send the search query, this prevents a query being sent with every type
+  //(2)
   const onInputChange = (e) => {
     setSearchTerm(e.target.value);
     handleSearchChange(e.target.value);
@@ -75,13 +100,27 @@ export default function AddFriend() {
                   {user.name}
                 </Text>
               </div>
-              <Button 
-                variant="light"
-                leftSection={<IconUserPlus size={16} />}
-                onClick={() => sendFriendRequest(user.id)}
-              >
-                Add Friend
-              </Button>
+              {dataOutgoingFriendRequests?.getUserOutgoingFriendRequests?.some(
+                requestUser => requestUser.id === user.id
+              ) ? (    
+                <Button 
+                  variant="light"
+                  leftSection={<IconCheck size={16} />}
+                  disabled
+                >
+                  Request Sent
+                </Button>
+              ) : (
+                <Button 
+                  variant="light"
+                  leftSection={<IconUserPlus size={16} />}
+                  onClick={() => sendFriendRequest({ variables: { receiverId: user.id } })}
+                >
+                  Add Friend
+                </Button>
+              )}
+
+
             </Group>
           </Card>
         ))}

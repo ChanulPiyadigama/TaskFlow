@@ -555,6 +555,15 @@ const resolvers = {
             await context.currentUser.updateOne({ $push: { allPosts: post._id } });
             const populatedPost = await post.populate('studySession')
             return populatedPost
+        },
+        clearUserOutgoingFriendRequests: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to clear outgoing friend requests');
+            }
+
+            context.currentUser.outgoingFriendRequests = []
+            await context.currentUser.save()
+            return "All outgoing friend requests have been cleared successfully!";
         }
 
 

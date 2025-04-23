@@ -15,7 +15,6 @@ import '@mantine/core/styles.css'
 //which lets us log the request parts.
 const authLink = setContext((operation, { headers }) => {
   const token = localStorage.getItem("user-token");
-  console.log(token)
   return {
     headers: {
       ...headers,

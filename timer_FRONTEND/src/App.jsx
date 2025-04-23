@@ -15,6 +15,11 @@ function App() {
   const { token, user, setToken, setUser } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
 
+  const handleLogout = () => {
+    setToken(null)
+    setUser(null)
+    localStorage.removeItem('user-token')
+  }
   
   //set token and user from local storage if they exist, check token first tho
   useEffect(() => {
@@ -38,11 +43,6 @@ function App() {
     return  <Loader />
   }
   
-  const handleLogout = () => {
-    setToken(null)
-    setUser(null)
-    localStorage.removeItem('user-token')
-  }
 
 
   //when the useEffect is done and checks for a user through the saved token, if no user go to login page

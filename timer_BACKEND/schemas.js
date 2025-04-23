@@ -122,6 +122,7 @@ const typeDefs = `
         updateStudySessionInteractionDate(studySessionID: ID!, newTime: String!): StudySession!
         deleteAllStudySessions: String!
         createStudySessionPost(title: String!, description: String, exclusions: StudySessionPostExclusions, studySessionId: ID! ): StudySessionPost!
+        clearUserOutgoingFriendRequests: String!
     }
 
 `;
