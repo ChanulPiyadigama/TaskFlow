@@ -301,3 +301,10 @@ query GetUserInfoById($userId: ID!) {
   }
 }
 `
+
+export const HANDLE_FRIEND_REQUEST = gql`
+mutation Mutation($senderId: ID!, $action: Boolean!) {
+  handleFriendRequest(senderID: $senderId, action: $action)
+}
+`
+

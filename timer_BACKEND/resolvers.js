@@ -564,6 +564,15 @@ const resolvers = {
             context.currentUser.outgoingFriendRequests = []
             await context.currentUser.save()
             return "All outgoing friend requests have been cleared successfully!";
+        },
+        clearUserIncomingFriendRequests: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to clear incoming friend requests');
+            }
+
+            context.currentUser.incomingFriendRequests = []
+            await context.currentUser.save()
+            return "All incoming friend requests have been cleared successfully!";
         }
 
 

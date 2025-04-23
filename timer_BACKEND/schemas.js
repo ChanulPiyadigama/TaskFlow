@@ -123,6 +123,7 @@ const typeDefs = `
         deleteAllStudySessions: String!
         createStudySessionPost(title: String!, description: String, exclusions: StudySessionPostExclusions, studySessionId: ID! ): StudySessionPost!
         clearUserOutgoingFriendRequests: String!
+        clearUserIncomingFriendRequests: String!
     }
 
 `;
