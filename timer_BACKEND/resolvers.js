@@ -2,6 +2,7 @@ import User from "./models/User.js";
 import Timer from "./models/Timer.js";
 import Break from "./models/Break.js";
 import StudySession from "./models/StudySession.js";
+import { BasePost } from "./models/BasePost.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { SECRET } from "./util/config.js";
@@ -138,21 +139,28 @@ const resolvers = {
                 throw new Error('You must be logged in to view your friends posts');
             }
 
-            //exlcuing the sorting, this is the best time complex for getting the posts of all friends
-            //O(klogn) where k is the number of friends and n is the number of posts in collectoin, 
-            //logn since posts are in a binary tree
             const friendIds = context.currentUser.friends 
 
             if (friendIds.length === 0) {
                 return []; // No friends, return an empty array
             }
+            
+            const query = {user : {$in: friendIds} };
+            
 
-            const allFriendsPosts = await BasePost.find({
-                user: { $in: friendIds }
-            }) 
+            if (args.cursor) {
+                //decode the base64 cursor string to original UNIX timestamp, which 
+                //is conv to Date for filtering
+                const decodedString = Buffer.from(args.cursor, 'base64').toString();
+                const decodedTime = new Date(Number(decodedString));
+                query.createdAt = { $lt: decodedTime };
+            }
+
+
+            const allFriendsPosts = await BasePost.find(query) 
+            .populate('user')
             .sort({ createdAt: -1 })
-            .limit(10)
-
+            .limit(args.limit)
             return allFriendsPosts;
         },
         searchUsers: async (parent, args, context) => {

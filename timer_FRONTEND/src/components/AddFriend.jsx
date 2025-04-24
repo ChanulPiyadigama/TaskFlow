@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
-import { SEARCH_USERS, SEND_FRIEND_REQUEST, GET_USER_OUTGOING_FRIEND_REQUESTS} from "../queries";
+import { SEARCH_USERS, SEND_FRIEND_REQUEST, GET_USER_OUTGOING_FRIEND_REQUESTS, GET_USER_FRIENDS} from "../queries";
 import { debounce } from "lodash";
 import { 
     TextInput, 
@@ -30,19 +30,19 @@ import { useNavigate } from "react-router-dom";
   Now when a we click add friend we trigger the send friend mutation, and refetch the outgoing 
   requests so that the page will rerender and show we have sent a request. (4)
 
+  Also we check the user's relation with each of the users we found, for example we search a found
+  user through the users sent requests data, and if matches we display a differnt button. (5)
+
 */
 export default function AddFriend() {
   const [searchTerm, setSearchTerm] = useState("");
+
   //(1)
-  const {loading: loadingOutgoingFriendRequests, data: dataOutgoingFriendRequests, error: errorOutgoingFriendRequests} = useQuery(GET_USER_OUTGOING_FRIEND_REQUESTS,
-    {
-      onCompleted: (data) => {
-        console.log("Hey")
-        console.log(data);
-      }
-    }
-  )
+  const {loading: loadingOutgoingFriendRequests, data: dataOutgoingFriendRequests, error: errorOutgoingFriendRequests} = useQuery(GET_USER_OUTGOING_FRIEND_REQUESTS)
+  const {loading: loadingUserFriends, data: dataUserFriends, error: errorUserFriends} = useQuery(GET_USER_FRIENDS)
   const [searchUsers, { data, loading, error }] = useLazyQuery(SEARCH_USERS);
+
+
   const [sendFriendRequest] = useMutation(SEND_FRIEND_REQUEST,{
     //(4)
     refetchQueries: [
@@ -65,6 +65,55 @@ export default function AddFriend() {
     setSearchTerm(e.target.value);
     handleSearchChange(e.target.value);
   };
+
+  //(5)
+  const renderRelationshipButton = (user) => {
+    const isFriend = dataUserFriends?.getUserFriends?.some(
+      friend => friend.id === user.id
+    );
+    
+    const isRequestSent = dataOutgoingFriendRequests?.getUserOutgoingFriendRequests?.some(
+      requestUser => requestUser.id === user.id
+    );
+    
+    if (isFriend) {
+      return (
+        <Button 
+          variant="filled"
+          color="green"
+          leftSection={<IconUserCheck size={16} />}
+          disabled
+        >
+          Friends
+        </Button>
+      );
+    }
+    
+    if (isRequestSent) {
+      return (
+        <Button 
+          variant="light"
+          leftSection={<IconCheck size={16} />}
+          disabled
+        >
+          Request Sent
+        </Button>
+      );
+    }
+    
+    return (
+      <Button 
+        variant="light"
+        leftSection={<IconUserPlus size={16} />}
+        onClick={() => sendFriendRequest({ variables: { receiverId: user.id } })}
+      >
+        Add Friend
+      </Button>
+    );
+  };
+
+  if (loadingOutgoingFriendRequests || loadingUserFriends) return <Loader size="sm" />;
+  if (errorOutgoingFriendRequests) return <Text c="red" size="sm">Error: {errorOutgoingFriendRequests.message}</Text>;
 
   return (
     <Stack spacing="md">
@@ -100,26 +149,7 @@ export default function AddFriend() {
                   {user.name}
                 </Text>
               </div>
-              {dataOutgoingFriendRequests?.getUserOutgoingFriendRequests?.some(
-                requestUser => requestUser.id === user.id
-              ) ? (    
-                <Button 
-                  variant="light"
-                  leftSection={<IconCheck size={16} />}
-                  disabled
-                >
-                  Request Sent
-                </Button>
-              ) : (
-                <Button 
-                  variant="light"
-                  leftSection={<IconUserPlus size={16} />}
-                  onClick={() => sendFriendRequest({ variables: { receiverId: user.id } })}
-                >
-                  Add Friend
-                </Button>
-              )}
-
+              {renderRelationshipButton(user)}
 
             </Group>
           </Card>

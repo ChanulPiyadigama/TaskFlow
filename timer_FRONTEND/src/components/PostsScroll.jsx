@@ -1,0 +1,186 @@
+import { GET_FRIENDS_POSTS } from "../queries";
+import { useQuery } from "@apollo/client";
+import { useState, useEffect, useRef } from "react";
+import { 
+    Loader, 
+    Text, 
+    Card, 
+    Title, 
+    Group, 
+    Stack, 
+    Container, 
+    Avatar, 
+    Badge, 
+    Divider,
+    Paper,
+    Box,
+    Grid,
+    Space
+} from "@mantine/core";
+import { IconCalendar, IconRefresh } from '@tabler/icons-react';
+
+
+/*
+
+This component displays posts with an infinte scroll
+
+the usequery grabs the first 10 posts, and on its second render (where loading is false), the 
+intersection observer will be set up by the useeffect again since loading is false now. Since now 
+the invisible div will be available to be set as ref.(1)
+
+It will be observed by the intersection observer, and when it is in view, the entries callback function
+we passed to the observer runs which will grab the target (invisible div), check if its in view,
+and then load more posts. (2)
+
+Loadmoreposts uses fetchmore which is a dedicated function for pagination that comes with apollo queries. 
+It takes in the variables needed to recall the query and a callback function that uses the 
+new data to update the cache. So we get the new posts and update the cache (3). We also use the 
+last post's time as the new cursor so the next posts we get are after that time. (4)
+If there are no more posts when we fetch, then set hasmore to false which will stop the observer,
+thus stopping the infinite scroll.
+
+*/
+export default function PostsScroll(){
+
+    const cursorRef = useRef(null);
+    const loaderRef = useRef(null);
+    const [hasMore, setHasMore] = useState(true);
+
+    const {loading: loadingPosts, data: dataPosts, error: errorPosts, fetchMore} = useQuery(GET_FRIENDS_POSTS, {
+        variables: { limit: 10 },
+        //(1)
+        onCompleted: (data) => {
+            if (data?.getUserFriendsPosts?.length > 0) {
+                const lastPost = data.getUserFriendsPosts[data.getUserFriendsPosts.length - 1];
+                cursorRef.current = btoa(lastPost.createdAt); 
+                console.log(cursorRef.current);
+              }    
+        },
+    })  
+
+    //(2)
+    useEffect(() => {
+        if (!hasMore) return;
+
+        const observer = new IntersectionObserver(
+        entries => {
+            const target = entries[0];
+            if (target.isIntersecting) {
+            loadMorePosts();
+            }
+        },
+        { threshold: 1.0 }
+        );
+        
+        if (loaderRef.current) {
+            observer.observe(loaderRef.current);
+        }
+        
+        return () => {
+        if (loaderRef.current) {
+            observer.unobserve(loaderRef.current);
+        }
+        };
+    }, [loadingPosts, hasMore]);
+
+
+    //(3)
+    const loadMorePosts = () => {
+        fetchMore({
+            variables: { cursor: cursorRef.current, limit: 10 },
+            updateQuery: (prev, { fetchMoreResult }) => {
+            if (!fetchMoreResult || fetchMoreResult.getUserFriendsPosts.length === 0) {
+                setHasMore(false);
+                return prev;
+            }
+            
+            const newPosts = fetchMoreResult.getUserFriendsPosts;
+            const lastPost = newPosts[newPosts.length - 1];
+            //(4) encodes to base 64 to use as cursor in backend 
+            cursorRef.current = btoa(lastPost.createdAt);             
+            return {
+                getUserFriendsPosts: [...prev.getUserFriendsPosts, ...newPosts]
+            };
+            }
+        });
+    };
+
+    if (loadingPosts && !dataPosts) return (
+        <Container p="md">
+          <Stack>
+            {[1, 2, 3].map(i => (
+              <Card key={i} withBorder shadow="sm" p="lg" radius="md">
+                <Loader size="sm" />
+              </Card>
+            ))}
+          </Stack>
+        </Container>
+      );
+    
+      if (errorPosts) return (
+        <Container p="md">
+          <Paper p="md" withBorder color="red">
+            <Title order={4} color="red">Error</Title>
+            <Text>{errorPosts.message}</Text>
+          </Paper>
+        </Container>
+      );
+    
+      return (
+        <Container p="md">
+          <Stack spacing="md">
+            {dataPosts?.getUserFriendsPosts?.map((post, index) => (
+              <Card key={post.id || index} withBorder shadow="sm" p="lg" radius="md">
+                <Stack spacing="xs">
+                  <Title order={3}>{post.title}</Title>
+                  
+                  <Text size="md" c="dimmed">
+                    {post.description}
+                  </Text>
+                  
+                  <Divider my="sm" />
+                  
+                  <Group position="apart" align="center">
+                    <Group>
+                      <Avatar radius="xl" color="blue">
+                        {post.user.name.charAt(0)}
+                      </Avatar>
+                      <Text fw={500}>{post.user.name}</Text>
+                    </Group>
+                    
+                    <Group spacing="xs">
+                      <Badge 
+                        color="blue" 
+                        variant="light"
+                        leftSection={<IconCalendar size={14} />}
+                      >
+                        {new Date(Number(post.createdAt)).toLocaleDateString()}
+
+                      </Badge>
+                      
+                      <Badge 
+                        color="grape" 
+                        variant="outline"
+                        leftSection={<IconRefresh size={14} />}
+                      >
+                        Last active: {new Date(Number(post.createdAt)).toLocaleDateString()}
+                      </Badge>
+                    </Group>
+                  </Group>
+                </Stack>
+              </Card>
+            ))}
+            
+            {hasMore && (
+              <Box ref={loaderRef} py="md" style={{ textAlign: 'center' }}>
+                {loadingPosts ? (
+                  <Loader size="sm" />
+                ) : (
+                  <Text size="sm" c="dimmed">Scroll for more</Text>
+                )}
+              </Box>
+            )}
+          </Stack>
+        </Container>
+      );
+}

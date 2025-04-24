@@ -6,6 +6,7 @@ import { IconClock, IconUsers, IconPlus, IconBook, IconUserPlus } from "@tabler/
 import CreateStudySessionForm from "./CreatStudySessionForm";
 import PreviousStudySessionsList from "./PreviousStudySessionsList";
 import CreateUserPost from "./CreateUserPost";
+import PostsScroll from "./PostsScroll";
 import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
@@ -93,7 +94,7 @@ export default function HomePage() {
           <Grid.Col span={6}>
             <Card shadow="sm" p="md">
               <Text fw={700} size="lg">📢 Study Feed</Text>
-
+              <PostsScroll/>
             </Card>
           </Grid.Col>
 

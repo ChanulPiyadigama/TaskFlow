@@ -308,3 +308,19 @@ mutation Mutation($senderId: ID!, $action: Boolean!) {
 }
 `
 
+export const GET_FRIENDS_POSTS = gql`
+query GetUserFriendsPosts($cursor: String, $limit: Int!) {
+  getUserFriendsPosts(cursor: $cursor, limit: $limit) {
+    description
+    id
+    createdAt
+    title
+    lastInteraction
+    user {
+      name
+      id
+      username
+    }
+  }
+}
+`

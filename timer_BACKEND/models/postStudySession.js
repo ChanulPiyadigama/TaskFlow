@@ -1,5 +1,5 @@
-import { BasePost } from './basePost.js';
 import mongoose from 'mongoose';
+import { BasePost } from './BasePost.js';
 
 //child of post interface, meaning it will be stored in the same collection as the basePost schema
 const studySessionPostSchema = new mongoose.Schema({

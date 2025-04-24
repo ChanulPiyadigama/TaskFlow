@@ -102,7 +102,7 @@ const typeDefs = `
         getSpecificTimer(timerID: ID!): Timer!
         getSpecificStudySession(studySessionID: ID!): StudySession!
         getUserStudySessions:[StudySession]
-        getUserFriendsPosts:[BasePost]
+        getUserFriendsPosts(cursor:String, limit: Int!):[BasePost]
         searchUsers(query: String!): [User]
         getUserInfoById(userID: ID!): User
     }
