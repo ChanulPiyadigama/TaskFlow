@@ -6,7 +6,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@ap
 import { setContext } from "@apollo/client/link/context"
 import { MantineProvider } from "@mantine/core";
 import '@mantine/core/styles.css'
-
+import { ModalProvider } from "./context/ModalContext.jsx";
 
 //links are like special middleware/functions that can be used to modify/log/etc requests
 
@@ -45,7 +45,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <AuthProvider>
         <MantineProvider 
           theme={{ colorScheme: "dark", primaryColor: "violet" }}>
-          <App />
+          <ModalProvider>
+            <App />
+          </ModalProvider>  
         </MantineProvider>
       </AuthProvider>
     </ApolloProvider>

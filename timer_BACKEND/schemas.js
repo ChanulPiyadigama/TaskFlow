@@ -10,7 +10,7 @@ const typeDefs = `
         outgoingFriendRequests: [User]
         studySessions: [StudySession]
         allPosts: [BasePost]
-        
+        comments: [Comment]
     }
 
     type StudySession{
@@ -32,6 +32,7 @@ const typeDefs = `
         lastInteraction: String!
         likes: Int!
         postType: String!
+        comments: [Comment]
     }
 
     type StudySessionPost implements BasePost {
@@ -45,6 +46,7 @@ const typeDefs = `
         postType: String!
         studySession: StudySession!
         exclusions: exclusionDict
+        comments: [Comment]
     }
 
     type exclusionDict {
@@ -88,6 +90,15 @@ const typeDefs = `
         timer: Timer!
     }
 
+    type Comment{
+        id: ID!
+        user: User!
+        post: BasePost!
+        content: String!
+        createdAt: String!
+        lastInteraction: String!
+    }
+
     type Query{
         allTimers: [Timer]
         allUsers: [User]
@@ -105,6 +116,7 @@ const typeDefs = `
         getUserFriendsPosts(cursor:String, limit: Int!):[BasePost]
         searchUsers(query: String!): [User]
         getUserInfoById(userID: ID!): User
+        getPostById(postID: ID!): BasePost
     }
     
     type Mutation{
@@ -124,6 +136,7 @@ const typeDefs = `
         createStudySessionPost(title: String!, description: String, exclusions: StudySessionPostExclusions, studySessionId: ID! ): StudySessionPost!
         clearUserOutgoingFriendRequests: String!
         clearUserIncomingFriendRequests: String!
+        createCommentForPost(postID: ID!, content: String!): Comment!
     }
 
 `;

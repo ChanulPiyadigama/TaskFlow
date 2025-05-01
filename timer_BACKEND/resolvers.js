@@ -1,6 +1,7 @@
 import User from "./models/User.js";
 import Timer from "./models/Timer.js";
 import Break from "./models/Break.js";
+import Comment from "./models/Comment.js";
 import StudySession from "./models/StudySession.js";
 import { BasePost } from "./models/BasePost.js";
 import bcrypt from 'bcrypt';
@@ -181,6 +182,15 @@ const resolvers = {
             const populatedUser = await user.populate(['friends','allPosts'])
 
             return populatedUser;
+        },
+        getPostById: async (parent, args, context) => {
+            const post = await BasePost.findById(args.postID)
+            if (!post) {
+                throw new Error('No post found');
+            }
+            //change here as you wish to populate other fields, for now we just want the comments
+            const populatedPost = await post.populate('comments')
+            return populatedPost;
         }
     },
 
@@ -581,6 +591,35 @@ const resolvers = {
             context.currentUser.incomingFriendRequests = []
             await context.currentUser.save()
             return "All incoming friend requests have been cleared successfully!";
+        },
+        createCommentForPost: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to create a comment');
+            }
+
+            const post = await BasePost.findById(args.postID);
+            if (!post) {
+                throw new Error('No post found');
+            }
+
+            if (!args.content || args.content.trim() === '') {
+                throw new Error('Comment content cannot be empty');
+            }
+
+            const comment = new Comment({
+                content: args.content,
+                user: context.currentUser.id,
+                post: post._id
+            });
+
+            await comment.save();
+            post.comments.push(comment._id);
+            await post.save();
+            
+            context.currentUser.comments.push(comment._id);
+            await context.currentUser.save();
+
+            return comment;
         }
 
 

@@ -12,7 +12,7 @@ import {
     Loader,
     Card
   } from "@mantine/core";
-import { IconSearch, IconUserPlus, IconCheck } from "@tabler/icons-react";
+import { IconSearch, IconUserPlus, IconCheck, IconUserCheck } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 
 

@@ -34,10 +34,11 @@ const basePostSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    likes: {
-        type: Number,
-        default: 0
-    }
+    comments : [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment',
+        default: []
+    }]
 }, baseOptions);
 
 export const BasePost = mongoose.model('BasePost', basePostSchema);

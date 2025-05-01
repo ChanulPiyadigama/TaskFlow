@@ -9,6 +9,7 @@ import AdminPage from './components/AdminPage'
 import UserPage from './components/UserPage'
 import AppLayout from './components/AppLayout'
 import { Loader } from '@mantine/core'
+import CustomModal from './components/CustomModal'
 
 function App() {
 
@@ -49,6 +50,7 @@ function App() {
   //else render layout and other pages
   return (
     <Router>
+      <CustomModal />
       <Routes>
         <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
         <Route path="/admin" element={<AdminPage />} />

@@ -1,4 +1,4 @@
-import { GET_FRIENDS_POSTS } from "../queries";
+import { GET_FRIENDS_POSTS, CREATE_COMMENT_FOR_POST } from "../queries";
 import { useQuery } from "@apollo/client";
 import { useState, useEffect, useRef } from "react";
 import { 
@@ -11,13 +11,14 @@ import {
     Container, 
     Avatar, 
     Badge, 
-    Divider,
+    Button,
     Paper,
     Box,
-    Grid,
-    Space
+    Modal 
 } from "@mantine/core";
 import { IconCalendar, IconRefresh } from '@tabler/icons-react';
+import { useModal } from "../context/ModalContext";
+import PostComments from "./PostComments";
 
 
 /*
@@ -45,6 +46,7 @@ export default function PostsScroll(){
     const cursorRef = useRef(null);
     const loaderRef = useRef(null);
     const [hasMore, setHasMore] = useState(true);
+    const {openModal} = useModal()
 
     const {loading: loadingPosts, data: dataPosts, error: errorPosts, fetchMore} = useQuery(GET_FRIENDS_POSTS, {
         variables: { limit: 10 },
@@ -132,15 +134,8 @@ export default function PostsScroll(){
             {dataPosts?.getUserFriendsPosts?.map((post, index) => (
               <Card key={post.id || index} withBorder shadow="sm" p="lg" radius="md">
                 <Stack spacing="xs">
-                  <Title order={3}>{post.title}</Title>
-                  
-                  <Text size="md" c="dimmed">
-                    {post.description}
-                  </Text>
-                  
-                  <Divider my="sm" />
-                  
-                  <Group position="apart" align="center">
+                  {/* User info and date at the top */}
+                  <Group position="apart" mb="xs">
                     <Group>
                       <Avatar radius="xl" color="blue">
                         {post.user.name.charAt(0)}
@@ -148,24 +143,22 @@ export default function PostsScroll(){
                       <Text fw={500}>{post.user.name}</Text>
                     </Group>
                     
-                    <Group spacing="xs">
-                      <Badge 
-                        color="blue" 
-                        variant="light"
-                        leftSection={<IconCalendar size={14} />}
-                      >
-                        {new Date(Number(post.createdAt)).toLocaleDateString()}
-
-                      </Badge>
-                      
-                      <Badge 
-                        color="grape" 
-                        variant="outline"
-                        leftSection={<IconRefresh size={14} />}
-                      >
-                        Last active: {new Date(Number(post.createdAt)).toLocaleDateString()}
-                      </Badge>
-                    </Group>
+                    <Badge 
+                      color="blue" 
+                      variant="light"
+                      leftSection={<IconCalendar size={14} />}
+                    >
+                      {new Date(Number(post.createdAt)).toLocaleDateString()}
+                    </Badge>
+                  </Group>
+                  
+                  <Title order={3}>{post.title}</Title>
+                  
+                  <Text size="md" c="dimmed">
+                    {post.description}
+                  </Text>
+                  <Group>
+                    <Button onClick={() => openModal(<PostComments/>, "Comments")}>Comments</Button>
                   </Group>
                 </Stack>
               </Card>

@@ -8,83 +8,30 @@ import PreviousStudySessionsList from "./PreviousStudySessionsList";
 import CreateUserPost from "./CreateUserPost";
 import PostsScroll from "./PostsScroll";
 import { useNavigate } from "react-router-dom";
+import { useModal } from "../context/ModalContext";
+import AddFriend from "./AddFriend";
 
 export default function HomePage() {
   const { user } = useAuth();
-  const [modalOpened, setModalOpened] = useState(false)
-  const [modelContent, setModelContent] = useState("")
   const navigate = useNavigate()
-
-  //enum for modal types
-  const ModalType = {
-    STUDY_SESSION: "Study Session",
-    CREATE_POST: "Create Post",
-    FRIENDS: "Friends",
-    ADD_FRIEND: "Add Friend",
-  };
-
-  const openModal = (type) => {
-    setModelContent(type);
-    setModalOpened(true);
-  };
-
-
-  const closeModal = () => {
-    setModelContent("")
-    setModalOpened(false)
-  }
-
-  const displayModalContent = () => {
-    switch (modelContent) {
-      case "Study Session":
-        return (
-          <CreateStudySessionForm />
-        )
-      case "Create Post":
-        return (
-          <CreateUserPost />
-        )
-      case "Friends":
-        return (
-          <Friends />
-        )
-      case "Add Friend":
-        return <Friends /> 
-      default:
-        return null
-    } 
-  }
+  const { openModal } = useModal()
 
   return (
     <div>
-      {/* side note: even though the modal will be placed inside the appshellmain because of 
-      homepage using Applayout, it uses reacts createportal and is not restricted by any parent container*/}
-      <Modal
-        opened={modalOpened}
-        onClose={() => setModalOpened(false)}
-        title={modelContent}
-        centered
-        size="60%"
-      >
-        {displayModalContent()}
-        <Button fullWidth onClick={closeModal}>Close</Button>
-      </Modal>
-
       {/*we use a grid, it has fixed 12 columns so the middle takes 6 of them since it will be largest
-
       each column had a card which is basically a container that you can style and within each container
-      
       is a stack which automatically stacks the componenets with flex vertical, giving even spacing */}
+
         <Grid gutter="md">
           {/* LEFT SIDEBAR (User Info & Actions) */}
           <Grid.Col span={3}>
             <Card shadow="sm" p="md">
               <Text fw={700} size="lg">👋 Hey {user.name}</Text>
               <Stack mt="md">
-                <Button onClick={() => openModal(ModalType.FRIENDS)} leftSection={<IconUserPlus />} fullWidth>Friends</Button>
-                <Button onClick={() => openModal(ModalType.FRIENDS)} leftSection={<IconUserPlus />} fullWidth>Add Friend</Button>
-                <Button onClick={() => openModal(ModalType.CREATE_POST)} leftSection={<IconPlus />} fullWidth>Create Post</Button>
-                <Button onClick={() => openModal(ModalType.STUDY_SESSION)} leftSection={<IconBook />} fullWidth>Start Study Session</Button>
+                <Button onClick={() => openModal(<Friends/>)} leftSection={<IconUserPlus />} fullWidth>Friends</Button>
+                <Button onClick={() => openModal(<AddFriend/>)} leftSection={<IconUserPlus />} fullWidth>Add Friend</Button>
+                <Button onClick={() => openModal(<CreateUserPost/>)} leftSection={<IconPlus />} fullWidth>Create Post</Button>
+                <Button onClick={() => openModal(<CreateStudySessionForm/>)} leftSection={<IconBook />} fullWidth>Start Study Session</Button>
                 <PreviousStudySessionsList />
               </Stack>
             </Card>

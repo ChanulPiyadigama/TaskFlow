@@ -324,3 +324,15 @@ query GetUserFriendsPosts($cursor: String, $limit: Int!) {
   }
 }
 `
+
+export const CREATE_COMMENT_FOR_POST =  gql`
+mutation CreateCommentForPost($content: String!, $postId: ID!) {
+  createCommentForPost(content: $content, postID: $postId) {
+    content
+    createdAt
+    id
+    lastInteraction
+
+  }
+}
+`
