@@ -183,7 +183,7 @@ const resolvers = {
 
             return populatedUser;
         },
-        getPostById: async (parent, args, context) => {
+        getPostCommentsById: async (parent, args, context) => {
             const post = await BasePost.findById(args.postID)
             if (!post) {
                 throw new Error('No post found');

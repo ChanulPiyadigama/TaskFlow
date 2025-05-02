@@ -16,16 +16,14 @@ export function ModalProvider({children}){
 
     const [modalState, setModalState] = useState({
         isOpen: false,
-        content: null,
-        title: null
+        content: null
     })
 
-    const openModal = (content, title) => {
+    const openModal = (content, ) => {
 
         setModalState({
             isOpen: true,
-            content,
-            title
+            content
         })
     }
 

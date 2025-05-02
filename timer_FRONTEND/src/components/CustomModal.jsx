@@ -21,15 +21,16 @@ export default function CustomModal() {
     <Modal
       opened={modalState.isOpen}
       onClose={closeModal}
-      title={modalState.title}
       centered
-      size="60%"
+      size="75%"
+      withCloseButton={true}
+      closeButtonProps={{ 
+        "aria-label": "Close modal",
+        size: "lg" 
+      }}
     >
       {modalState.content}
-      {/* (2) */}
-      <Button fullWidth onClick={closeModal} mt="md">
-        Close
-      </Button>
+
     </Modal>
   );
 }

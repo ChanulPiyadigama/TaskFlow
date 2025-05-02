@@ -116,7 +116,7 @@ const typeDefs = `
         getUserFriendsPosts(cursor:String, limit: Int!):[BasePost]
         searchUsers(query: String!): [User]
         getUserInfoById(userID: ID!): User
-        getPostById(postID: ID!): BasePost
+        getPostCommentsById(postID: ID!): BasePost
     }
     
     type Mutation{

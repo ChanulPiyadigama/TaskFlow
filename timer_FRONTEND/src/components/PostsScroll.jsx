@@ -55,7 +55,6 @@ export default function PostsScroll(){
             if (data?.getUserFriendsPosts?.length > 0) {
                 const lastPost = data.getUserFriendsPosts[data.getUserFriendsPosts.length - 1];
                 cursorRef.current = btoa(lastPost.createdAt); 
-                console.log(cursorRef.current);
               }    
         },
     })  
@@ -129,7 +128,7 @@ export default function PostsScroll(){
       );
     
       return (
-        <Container p="md">
+        <Box p="md" w="80%" mx="auto">
           <Stack spacing="md">
             {dataPosts?.getUserFriendsPosts?.map((post, index) => (
               <Card key={post.id || index} withBorder shadow="sm" p="lg" radius="md">
@@ -153,12 +152,12 @@ export default function PostsScroll(){
                   </Group>
                   
                   <Title order={3}>{post.title}</Title>
-                  
+                  <Text>{post.id}</Text>
                   <Text size="md" c="dimmed">
                     {post.description}
                   </Text>
                   <Group>
-                    <Button onClick={() => openModal(<PostComments/>, "Comments")}>Comments</Button>
+                    <Button onClick={() => openModal(<PostComments postId = {post.id} postData = {post}/>)}>Comments</Button>
                   </Group>
                 </Stack>
               </Card>
@@ -174,6 +173,6 @@ export default function PostsScroll(){
               </Box>
             )}
           </Stack>
-        </Container>
+        </Box>
       );
 }

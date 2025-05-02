@@ -336,3 +336,17 @@ mutation CreateCommentForPost($content: String!, $postId: ID!) {
   }
 }
 `
+
+export const GET_COMMENTS_FOR_POST = gql`
+query Query($postId: ID!) {
+  getPostCommentsById(postID: $postId) {
+    comments {
+      id
+      createdAt
+      content
+      lastInteraction
+    }
+    id
+  }
+}
+`
