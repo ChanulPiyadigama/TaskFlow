@@ -5,7 +5,7 @@ import { AppShell, Button, Text, Group, Grid, Card, Stack, Modal } from '@mantin
 import { IconClock, IconUsers, IconPlus, IconBook, IconUserPlus } from "@tabler/icons-react";
 import CreateStudySessionForm from "./CreatStudySessionForm";
 import PreviousStudySessionsList from "./PreviousStudySessionsList";
-import CreateUserPost from "./CreateUserPost";
+import CreateUserPost from "./CreatingUserPost/CreateUserPost";
 import PostsScroll from "./PostsScroll";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../context/ModalContext";

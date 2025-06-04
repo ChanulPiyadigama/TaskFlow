@@ -11,6 +11,7 @@ const typeDefs = `
         studySessions: [StudySession]
         allPosts: [BasePost]
         comments: [Comment]
+        likedPosts: [BasePost]
     }
 
     type StudySession{
@@ -30,7 +31,6 @@ const typeDefs = `
         user: User!
         createdAt: String!
         lastInteraction: String!
-        likes: Int!
         postType: String!
         comments: [Comment]
     }
@@ -42,7 +42,6 @@ const typeDefs = `
         user: User!
         createdAt: String!
         lastInteraction: String!
-        likes: Int!
         postType: String!
         studySession: StudySession!
         exclusions: exclusionDict
@@ -137,6 +136,8 @@ const typeDefs = `
         clearUserOutgoingFriendRequests: String!
         clearUserIncomingFriendRequests: String!
         createCommentForPost(postID: ID!, content: String!): Comment!
+        likeUserPost(postID: ID!): BasePost!
+        clearUserLikedPosts: String!
     }
 
 `;

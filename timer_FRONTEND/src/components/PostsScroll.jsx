@@ -13,12 +13,12 @@ import {
     Badge, 
     Button,
     Paper,
-    Box,
-    Modal 
+    Box 
 } from "@mantine/core";
-import { IconCalendar, IconRefresh } from '@tabler/icons-react';
+import { IconCalendar, IconMessage, IconHeart } from '@tabler/icons-react';
 import { useModal } from "../context/ModalContext";
 import PostComments from "./PostComments";
+import { useAuth } from "../context/AuthContext";
 
 
 /*
@@ -42,7 +42,7 @@ thus stopping the infinite scroll.
 
 */
 export default function PostsScroll(){
-
+    const { user } = useAuth();
     const cursorRef = useRef(null);
     const loaderRef = useRef(null);
     const [hasMore, setHasMore] = useState(true);
@@ -126,12 +126,22 @@ export default function PostsScroll(){
           </Paper>
         </Container>
       );
-    
+      console.log("dataPosts", dataPosts);
       return (
         <Box p="md" w="80%" mx="auto">
           <Stack spacing="md">
             {dataPosts?.getUserFriendsPosts?.map((post, index) => (
-              <Card key={post.id || index} withBorder shadow="sm" p="lg" radius="md">
+              <Card 
+                key={post.id || index} 
+                withBorder 
+                shadow="sm" 
+                p="lg" 
+                radius="md"
+                style={{ 
+                  borderColor: post.user.id === user?.id ? '#9370DB' : undefined,
+                  borderWidth: post.user.id === user?.id ? '2px' : '1px'
+                }}
+              >
                 <Stack spacing="xs">
                   {/* User info and date at the top */}
                   <Group position="apart" mb="xs">
@@ -157,7 +167,20 @@ export default function PostsScroll(){
                     {post.description}
                   </Text>
                   <Group>
-                    <Button onClick={() => openModal(<PostComments postId = {post.id} postData = {post}/>)}>Comments</Button>
+                    <Button 
+                      variant="subtle"
+                      onClick={() => openModal(<PostComments postId={post.id} postData={post}/>)}
+                      leftSection={<IconMessage size={16} />}  
+                    >
+                      {post.comments?.length || 0}
+                    </Button>
+                    <Button
+                      variant="subtle"
+                      leftSection={<IconHeart size={16} />}
+                      onClick={() => handleLike(post.id)}
+                    >
+                      {post.likes || 0}
+                    </Button>
                   </Group>
                 </Stack>
               </Card>

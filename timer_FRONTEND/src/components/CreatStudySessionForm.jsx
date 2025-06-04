@@ -2,12 +2,13 @@ import { CREATE_STUDY_SESSION, GET_ALL_USER_STUDY_SESSIONS } from "../queries"
 import { useMutation } from "@apollo/client"
 import { TextInput, Textarea, NumberInput, Stack, Button, Text } from '@mantine/core'
 import { useNavigate } from "react-router-dom"
-
+import { useModal } from "../context/ModalContext"
 
 //creates a study session and redirects to the study session page, on creation mutation loads page, and loads page
 //again with study session obj that been saved to cache along with timer obj 
 export default function CreateStudySessionForm() {
     const navigate = useNavigate()
+    const {closeModal} = useModal()
     
     const [createStudySession, {loading: loadingCreateStudySession, data: dataCreateStudySession, error: errorCreateStudySession}] = useMutation(CREATE_STUDY_SESSION, {
         //we have to manually update the cache with the new timer, specfically for the query that 
@@ -31,6 +32,7 @@ export default function CreateStudySessionForm() {
             });
         },
         onCompleted: (dataCreateStudySession) => {
+            closeModal() // close the modal after creating the study session
             navigate(`/StudySession/${dataCreateStudySession.createStudySession.id}`)
         },
         onError: (errorCreateStudySession) => {

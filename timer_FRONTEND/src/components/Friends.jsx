@@ -3,7 +3,10 @@ import { GET_USER_FRIENDS } from "../queries"
 import { IncomingFriendRequests } from "./IncomingFriendRequests"
 import { OutgoingFriendRequests } from "./OutgoingFriendRequests"
 import AddFriend from "./AddFriend"
-import { Tabs, Text, Loader, Paper } from "@mantine/core"
+import { 
+    Tabs, Text, Loader, Paper, Card, 
+    Group, Avatar, Stack, Button 
+} from "@mantine/core"
 import { IconUsers, IconUserPlus, IconUserCheck, IconUserExclamation } from "@tabler/icons-react"
 
 export default function Friends() {
@@ -47,11 +50,44 @@ export default function Friends() {
                 </Tabs.List>
 
                 <Tabs.Panel value="friends" p="md">
-                    {dataUserFriends?.getUserFriends.map((friend) => (
-                        <Text key={friend.id}>
-                            Name: {friend.name} | Username: {friend.username}
-                        </Text>
-                    ))}
+                    {dataUserFriends?.getUserFriends.length > 0 ? (
+                        <Stack spacing="xs">
+                            {dataUserFriends.getUserFriends.map((friend) => (
+                                <Card key={friend.id} withBorder shadow="sm" p="sm">
+                                    <Group position="apart">
+                                        <Group>
+                                            <Avatar 
+                                                src={null} 
+                                                color="blue" 
+                                                radius="xl"
+                                            >
+                                                {friend.name.charAt(0)}
+                                            </Avatar>
+                                            <div>
+                                                <Text fw={500}>{friend.name}</Text>
+                                                <Text size="xs" c="dimmed">@{friend.username}</Text>
+                                            </div>
+                                        </Group>
+                                        <Button 
+                                            variant="subtle" 
+                                            color="blue" 
+                                            size="xs"
+                                        >
+                                            View Profile
+                                        </Button>
+                                    </Group>
+                                </Card>
+                            ))}
+                        </Stack>
+                    ) : (
+                        <Paper p="md" withBorder>
+                            <Stack align="center" spacing="sm">
+                                <IconUsers size={32} color="gray" />
+                                <Text c="dimmed" size="sm">No friends yet</Text>
+                                <Text size="xs" c="dimmed">Add friends to see them here</Text>
+                            </Stack>
+                        </Paper>
+                    )}
                 </Tabs.Panel>
 
                 <Tabs.Panel value="incoming" p="md">

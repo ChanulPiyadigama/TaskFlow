@@ -2,12 +2,16 @@ import { Fragment, useEffect, useState } from "react";
 import { HANDLE_BREAK, RESET_TIMER } from "../queries";
 import { useApolloClient, useFragment, useMutation } from "@apollo/client";
 import { gql } from "@apollo/client";
-import { Button, Card, Group, List, Loader, Text, Title } from "@mantine/core";
+import { Button, Card, Group, List, Stack, Text, Title, Collapse } from "@mantine/core";
+import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
+
 
 //the usefragment gets the timer obj from the cache using id
 //every time the cache timer object is updated, the timer obj will rerender since usefragment is a subsriber
 //and then we get the newest timer obj and its updated values are displayed on the screen
 export default function Timer({timerID}) {
+    const [breakLogVisible, setBreakLogVisible] = useState(false);
+
     //all breaks, resets and edits are saved to db upon happening, execpt timeleft which is saved ot localstorage
     //since saving to db every second is inefficent, it will be saved to db at certain times. 
     const client = useApolloClient()
@@ -169,55 +173,119 @@ export default function Timer({timerID}) {
         return `${hrs}:${mins}:${secs}`;
     }
     
+    function formatTimeWithUnits(seconds) {
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      
+      const parts = [];
+      if (hrs > 0) parts.push(`${hrs} hrs`);
+      if (mins > 0) parts.push(`${mins} mins`);
+      if (secs > 0 || parts.length === 0) parts.push(`${secs} secs`);
+      
+      return parts.join(', ');
+    }
 
     if (timersLoading) return <p>Loading timers...</p>;
     if (errorGettingTimers) return <p>Error fetching timers: {error.message}</p>;
     if (resetLoading) return <p>Reseting Timer... </p>
     
     return (
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Title order={3}>Timer</Title>
-            <Text size="xl" weight={700} align="center">
+    <Card shadow="sm" padding="xl" radius="md" withBorder style={{ maxWidth: '80%', margin: '0 auto' }}>
+        <Stack align="center" spacing="xl">
+            {/* Main Timer Display */}
+            <Text 
+                size="8rem" 
+                fw={700} 
+                align="center" 
+                style={{ 
+                    fontFamily: 'monospace',
+                    letterSpacing: '4px'
+                }}
+            >
                 {formatTime(timer.timeLeft)}
             </Text>
 
-            <Group position="center" mt="md">
-                <Button variant="filled" color="blue" onClick={handlePause}>
-                    {timer.isPaused ? "Resume" : "Pause"}
+            {/* Main Control Buttons */}
+            <Button 
+                size="xl" 
+                radius="md" 
+                fullWidth
+                variant="filled" 
+                color="blue" 
+                onClick={handlePause}
+                mb="md"
+                style={{ maxWidth: '300px' }}
+            >
+                {timer.isPaused ? "Resume" : "Pause"}
+            </Button>
+
+            {/* Secondary Buttons */}
+            <Group justify="center" grow style={{ maxWidth: '300px', width: '100%' }}>
+                <Button variant="light" color="red" onClick={handleReset}>
+                    Reset Timer
                 </Button>
-                <Button variant="filled" color="red" onClick={handleReset}>
-                    Reset
-                </Button>
-                <Button variant="outline" color="gray">
-                    Edit
+                <Button variant="light" color="red" onClick={handleReset}>
+                    End Session
                 </Button>
             </Group>
 
-            <Card mt="md" shadow="xs" padding="md">
-                <Text size="sm" weight={600}>Current Break:</Text>
-                <Text size="sm">
-                    {timer.currentBreak
-                        ? new Date(Number(timer.currentBreak.pausedTime)).toLocaleTimeString()
-                        : "No current break"}
-                </Text>
+            {/* Break Information */}
+            <Card withBorder shadow="sm" p="md" radius="md" style={{ width: '100%', marginTop: '2rem' }}>
+                <Stack align="center" spacing="md">
+                    <Title order={4}>Current Break Started</Title>
+                    <Text size="lg" c={timer.currentBreak ? "blue" : "dimmed"}>
+                        {timer.currentBreak
+                            ? new Date(Number(timer.currentBreak.pausedTime)).toLocaleTimeString()
+                            : "No current break"}
+                    </Text>
+                </Stack>
             </Card>
 
-            <Card mt="md" shadow="xs" padding="md">
-                <Text size="sm" weight={600}>Break Log:</Text>
-                {timer.log.length > 0 ? (
-                    <List size="sm" spacing="xs">
-                        {timer.log.map(breakObj => (
-                            <List.Item key={breakObj.id}>
-                                {new Date(Number(breakObj.pausedTime)).toLocaleTimeString()} -{" "}
-                                {new Date(Number(breakObj.resumedTime)).toLocaleTimeString()}:{" "}
-                                {formatTime(breakObj.elapsedTime)}
-                            </List.Item>
-                        ))}
-                    </List>
-                ) : (
-                    <Text size="sm">No breaks yet</Text>
-                )}
-            </Card>
-        </Card>
+            {/* Break Log */}
+            <Card withBorder shadow="sm" p="md" radius="md" style={{ width: '100%' }}>
+                    <Group position="apart" mb="xs">
+                        <Title order={4}>Break Log</Title>
+                        <Button 
+                            variant="subtle" 
+                            compact
+                            rightIcon={breakLogVisible ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
+                            onClick={() => setBreakLogVisible(!breakLogVisible)}
+                        >
+                            {breakLogVisible ? "Hide" : "Show"}
+                        </Button>
+                    </Group>
+                    
+                    <Collapse in={breakLogVisible}>
+                        {timer.log.length > 0 ? (
+                            <List spacing="md" center style={{ width: '100%' }}>
+                                {timer.log.map(breakObj => (
+                                    <List.Item 
+                                        key={breakObj.id}
+                                        style={{ 
+                                            textAlign: 'center',
+                                            fontSize: '1rem',
+                                            padding: '8px',
+                                            borderBottom: '1px solid #eee'
+                                        }}
+                                    >
+                                        <Text>
+                                            {new Date(Number(breakObj.pausedTime)).toLocaleTimeString()}
+                                            {" → "}
+                                            {new Date(Number(breakObj.resumedTime)).toLocaleTimeString()}
+                                        </Text>
+                                        <Text size="sm" c="dimmed" mt={4}>
+                                            Duration: {formatTimeWithUnits(breakObj.elapsedTime)}
+                                        </Text>
+                                    </List.Item>
+                                ))}
+                            </List>
+                        ) : (
+                            <Text c="dimmed">No breaks yet</Text>
+                        )}
+                    </Collapse>
+                </Card>
+        </Stack>
+    </Card>
     )
 }

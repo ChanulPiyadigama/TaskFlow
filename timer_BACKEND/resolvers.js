@@ -12,6 +12,7 @@ import mongoose from "mongoose";
 import { createTimer } from "./resolverutils.js";
 import { StudySessionPost } from "./models/postStudySession.js";
 
+
 const resolvers = {
     //helps graphql know what children type a document is within the post collection, for certain queries
     BasePost: {
@@ -21,6 +22,7 @@ const resolvers = {
             return null;
         },
     },
+
 
     Query: {
         //grabs objs from db and returns them
@@ -146,7 +148,10 @@ const resolvers = {
                 return []; // No friends, return an empty array
             }
             
-            const query = {user : {$in: friendIds} };
+            //also grab user's own posts, so we can display them in the feed
+            const userIds = [...friendIds, context.currentUser.id];
+
+            const query = {user : {$in: userIds} };
             
 
             if (args.cursor) {
@@ -159,7 +164,7 @@ const resolvers = {
 
 
             const allFriendsPosts = await BasePost.find(query) 
-            .populate('user')
+            .populate(['user', 'comments'])
             .sort({ createdAt: -1 })
             .limit(args.limit)
             return allFriendsPosts;
@@ -296,7 +301,8 @@ const resolvers = {
                 }
                 //set resumed time and elapsed time for break, add its id to timer's log, and set current break to null, break over
                 currentBreak.resumedTime = args.timeOfChange;
-                currentBreak.elapsedTime = new Date(args.timeOfChange) - new Date(currentBreak.pausedTime);
+                currentBreak.elapsedTime = Math.round((new Date(args.timeOfChange).getTime() - 
+                           new Date(currentBreak.pausedTime).getTime()) / 1000);
                 await currentBreak.save();
                 timer.log.push(currentBreak._id);
                 timer.currentBreak = null;
@@ -565,7 +571,7 @@ const resolvers = {
                 description: args.description,
                 user: context.currentUser.id,
                 exclusions: args.exclusions,
-                studySession: args.studySessionId,  
+                studySession: args.studySessionId
             });
             await post.save()
 
@@ -621,8 +627,6 @@ const resolvers = {
 
             return comment;
         }
-
-
     }
 }
 

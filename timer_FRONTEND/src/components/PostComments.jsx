@@ -96,6 +96,7 @@ export default function PostComments({ postId, postData }) {
                     onClick={handleSubmitComment}
                     disabled={!commentText.trim()}
                   >
+                    {/* FIX THIS ICON NOT APPEARING */}
                     <IconSend size={16} />
                   </Button>
                 }

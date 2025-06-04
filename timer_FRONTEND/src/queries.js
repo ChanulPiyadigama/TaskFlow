@@ -247,8 +247,8 @@ mutation UpdateStudySessionInteractionDate($studySessionId: ID!, $newTime: Strin
 `
 
 export const CREATE_USER_STUDY_SESSION_POST = gql`
-mutation CreateStudySessionPost($title: String!, $description: String, $exclusions: StudySessionPostExclusions, $studySessionId: ID!) {
-  createStudySessionPost(title: $title, description: $description, exclusions: $exclusions, studySessionId: $studySessionId) {
+mutation CreateStudySessionPost($title: String!, $studySessionId: ID!, $exclusions: StudySessionPostExclusions, $description: String) {
+  createStudySessionPost(title: $title, studySessionId: $studySessionId, exclusions: $exclusions, description: $description) {
     id
     createdAt
     description
@@ -256,11 +256,7 @@ mutation CreateStudySessionPost($title: String!, $description: String, $exclusio
       excludeTime
     }
     lastInteraction
-    likes
     postType
-    studySession {
-      id
-    }
     title
   }
 }`
@@ -316,6 +312,9 @@ query GetUserFriendsPosts($cursor: String, $limit: Int!) {
     createdAt
     title
     lastInteraction
+    comments {
+      id
+    }
     user {
       name
       id

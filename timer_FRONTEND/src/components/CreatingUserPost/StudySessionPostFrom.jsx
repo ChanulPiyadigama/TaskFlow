@@ -1,14 +1,39 @@
 import { Textarea, TextInput, Button, Stack, Title, Paper, Checkbox, Group, Text } from "@mantine/core"
 import { useQuery } from "@apollo/client"
-import { GET_ALL_USER_STUDY_SESSIONS } from "../queries"
+import { GET_ALL_USER_STUDY_SESSIONS } from "../../queries"
 import { useState } from "react"
-import { CREATE_USER_STUDY_SESSION_POST } from "../queries"
+import { CREATE_USER_STUDY_SESSION_POST, GET_FRIENDS_POSTS } from "../../queries"
 import { useMutation } from "@apollo/client"
+import { useModal } from "../../context/ModalContext"
 
 export default function StudySessionPostForm() {
+    const { closeModal } = useModal()
+
     const { loading: loadingStudySessions, data: dataStudySessions, error: errorStudySessions } = useQuery(GET_ALL_USER_STUDY_SESSIONS)
     const [createUserPost, { loading: loadingCreateUserPost, data: dataCreateUserPost, error: errorCreateUserPost }] = useMutation(CREATE_USER_STUDY_SESSION_POST, {
+        update: (cache, { data: { createStudySessionPost } }) => {
+            // Read existing posts
+            const existingData = cache.readQuery({ 
+                query: GET_FRIENDS_POSTS,
+                variables: { limit: 10 }
+            });
+
+            if (existingData) {
+                // Add new post at the beginning of the array
+                cache.writeQuery({
+                    query: GET_FRIENDS_POSTS,
+                    variables: { limit: 10 },
+                    data: {
+                        getUserFriendsPosts: [
+                            createStudySessionPost,
+                            ...existingData.getUserFriendsPosts
+                        ]
+                    }
+                });
+            }
+        },
         onCompleted: (data) => {
+            closeModal()
             console.log("Post created:", data.createStudySessionPost)            
         },
         onError: (error) => {
