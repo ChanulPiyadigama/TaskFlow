@@ -1,8 +1,8 @@
-import { CREATE_STUDY_SESSION, GET_ALL_USER_STUDY_SESSIONS } from "../queries"
+import { CREATE_STUDY_SESSION, GET_ALL_USER_STUDY_SESSIONS } from "../../data/queries"
 import { useMutation } from "@apollo/client"
 import { TextInput, Textarea, NumberInput, Stack, Button, Text } from '@mantine/core'
 import { useNavigate } from "react-router-dom"
-import { useModal } from "../context/ModalContext"
+import { useModal } from "../../context/ModalContext"
 
 //creates a study session and redirects to the study session page, on creation mutation loads page, and loads page
 //again with study session obj that been saved to cache along with timer obj 

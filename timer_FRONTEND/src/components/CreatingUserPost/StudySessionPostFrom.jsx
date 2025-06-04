@@ -1,8 +1,8 @@
 import { Textarea, TextInput, Button, Stack, Title, Paper, Checkbox, Group, Text } from "@mantine/core"
 import { useQuery } from "@apollo/client"
-import { GET_ALL_USER_STUDY_SESSIONS } from "../../queries"
+import { GET_ALL_USER_STUDY_SESSIONS } from "../../data/queries"
 import { useState } from "react"
-import { CREATE_USER_STUDY_SESSION_POST, GET_FRIENDS_POSTS } from "../../queries"
+import { CREATE_USER_STUDY_SESSION_POST, GET_FRIENDS_POSTS } from "../../data/queries"
 import { useMutation } from "@apollo/client"
 import { useModal } from "../../context/ModalContext"
 

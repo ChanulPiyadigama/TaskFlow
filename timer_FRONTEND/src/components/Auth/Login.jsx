@@ -1,6 +1,6 @@
-import { LOGIN } from "../queries";
+import { LOGIN } from "../../data/queries";
 import { useMutation } from "@apollo/client";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { TextInput, PasswordInput, Button, Card, Title, Text, Loader, Stack } from "@mantine/core";

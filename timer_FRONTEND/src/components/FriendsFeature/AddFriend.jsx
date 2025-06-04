@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
-import { SEARCH_USERS, SEND_FRIEND_REQUEST, GET_USER_OUTGOING_FRIEND_REQUESTS, GET_USER_FRIENDS} from "../queries";
+import { SEARCH_USERS, SEND_FRIEND_REQUEST, GET_USER_OUTGOING_FRIEND_REQUESTS, GET_USER_FRIENDS} from "../../data/queries";
 import { debounce } from "lodash";
 import { 
     TextInput, 

@@ -1,5 +1,5 @@
 import { Box, Text, Paper, Stack, ScrollArea, Title, Grid, TextInput, Button, Divider } from '@mantine/core';
-import { GET_COMMENTS_FOR_POST, CREATE_COMMENT_FOR_POST } from '../queries';
+import { GET_COMMENTS_FOR_POST, CREATE_COMMENT_FOR_POST } from '../../data/queries';
 import { useQuery, useMutation } from '@apollo/client';
 import { useState } from 'react';
 import { IconSend } from '@tabler/icons-react';

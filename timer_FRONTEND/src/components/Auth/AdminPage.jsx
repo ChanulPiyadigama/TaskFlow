@@ -1,7 +1,7 @@
-import { useAuth } from "../context/AuthContext"
-import { CREATE_USER, LOGIN, CREATE_STUDY_SESSION, CREATE_USER_STUDY_SESSION_POST, GET_ALL_USER_STUDY_SESSIONS, SEND_FRIEND_REQUEST  } from "../queries"
+import { useAuth } from "../../context/AuthContext"
+import { CREATE_USER, LOGIN, CREATE_STUDY_SESSION, CREATE_USER_STUDY_SESSION_POST, GET_ALL_USER_STUDY_SESSIONS, SEND_FRIEND_REQUEST  } from "../../data/queries"
 import { useMutation, useQuery } from "@apollo/client"
-import { studySessionData } from "./TestingData"
+import { studySessionData } from "../../data/TestingData"
 import { useApolloClient } from "@apollo/client"
 
 export default function AdminPage() {

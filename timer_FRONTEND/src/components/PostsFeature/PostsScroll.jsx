@@ -1,4 +1,4 @@
-import { GET_FRIENDS_POSTS, CREATE_COMMENT_FOR_POST } from "../queries";
+import { GET_FRIENDS_POSTS, CREATE_COMMENT_FOR_POST } from "../../data/queries";
 import { useQuery } from "@apollo/client";
 import { useState, useEffect, useRef } from "react";
 import { 
@@ -16,9 +16,9 @@ import {
     Box 
 } from "@mantine/core";
 import { IconCalendar, IconMessage, IconHeart } from '@tabler/icons-react';
-import { useModal } from "../context/ModalContext";
+import { useModal } from "../../context/ModalContext";
 import PostComments from "./PostComments";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 
 /*

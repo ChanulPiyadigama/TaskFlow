@@ -1,4 +1,4 @@
-import { GET_ALL_USER_STUDY_SESSIONS } from "../queries";
+import { GET_ALL_USER_STUDY_SESSIONS } from "../../data/queries";
 import { useQuery } from "@apollo/client";
 import { List, Loader, Text, Title, Paper } from "@mantine/core";
 import { useNavigate } from "react-router-dom";

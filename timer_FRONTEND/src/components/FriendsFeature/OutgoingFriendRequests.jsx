@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { GET_USER_OUTGOING_FRIEND_REQUESTS } from "../queries";
+import { GET_USER_OUTGOING_FRIEND_REQUESTS } from "../../data/queries";
 import { 
   Text, 
   Stack, 

@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from './context/AuthContext'
-import Login from './components/Login'
+import Login from './components/Auth/Login'
 import {jwtDecode} from 'jwt-decode'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import HomePage from './components/HomePage'
-import StudySessionPage from './components/StudySessionPage'
-import AdminPage from './components/AdminPage'
-import UserPage from './components/UserPage'
-import AppLayout from './components/AppLayout'
+import StudySessionPage from './components/CreatingStudySession/StudySessionPage'
+import AdminPage from './components/Auth/AdminPage'
+import UserPage from './components/UserPage/UserPage'
+import AppLayout from './Layouts/AppLayout'
 import { Loader } from '@mantine/core'
-import CustomModal from './components/CustomModal'
+import CustomModal from './Layouts/CustomModal'
 
 function App() {
 

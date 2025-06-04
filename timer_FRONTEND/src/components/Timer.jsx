@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import { HANDLE_BREAK, RESET_TIMER } from "../queries";
+import { HANDLE_BREAK, RESET_TIMER } from "../data/queries";
 import { useApolloClient, useFragment, useMutation } from "@apollo/client";
 import { gql } from "@apollo/client";
 import { Button, Card, Group, List, Stack, Text, Title, Collapse } from "@mantine/core";

@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
-import Timer from "./Timer";
-import { GET_STUDY_SESSION_BYID } from "../queries";
+import Timer from "../Timer";
+import { GET_STUDY_SESSION_BYID } from "../../data/queries";
 import { useMutation, useQuery } from "@apollo/client";
 import { useEffect } from "react";
-import { UPDATE_STUDY_SESSION_INTERACTION_TIME } from "../queries";
+import { UPDATE_STUDY_SESSION_INTERACTION_TIME } from "../../data/queries";
 import { Loader } from "@mantine/core";
 
 export default function StudySessionPage() {

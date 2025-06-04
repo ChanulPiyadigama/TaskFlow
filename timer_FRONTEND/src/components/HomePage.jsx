@@ -1,15 +1,15 @@
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
-import Friends from "./Friends";
+import Friends from "./FriendsFeature/Friends";
 import { AppShell, Button, Text, Group, Grid, Card, Stack, Modal } from '@mantine/core';
 import { IconClock, IconUsers, IconPlus, IconBook, IconUserPlus } from "@tabler/icons-react";
-import CreateStudySessionForm from "./CreatStudySessionForm";
-import PreviousStudySessionsList from "./PreviousStudySessionsList";
+import CreateStudySessionForm from "./CreatingStudySession/CreatStudySessionForm";
+import PreviousStudySessionsList from "./CreatingStudySession/PreviousStudySessionsList";
 import CreateUserPost from "./CreatingUserPost/CreateUserPost";
-import PostsScroll from "./PostsScroll";
+import PostsScroll from "./PostsFeature/PostsScroll";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../context/ModalContext";
-import AddFriend from "./AddFriend";
+import AddFriend from "./FriendsFeature/AddFriend";
 
 export default function HomePage() {
   const { user } = useAuth();

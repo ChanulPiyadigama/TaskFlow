@@ -1,4 +1,4 @@
-import { GET_USER_INCOMING_FRIEND_REQUESTS, HANDLE_FRIEND_REQUEST, GET_USER_FRIENDS } from "../queries"
+import { GET_USER_INCOMING_FRIEND_REQUESTS, HANDLE_FRIEND_REQUEST, GET_USER_FRIENDS } from "../../data/queries"
 import { useQuery, useMutation } from "@apollo/client"
 import { 
   Text, 

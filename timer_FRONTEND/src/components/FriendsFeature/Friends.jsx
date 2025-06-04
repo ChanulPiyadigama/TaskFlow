@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client"
-import { GET_USER_FRIENDS } from "../queries"
+import { GET_USER_FRIENDS } from "../../data/queries"
 import { IncomingFriendRequests } from "./IncomingFriendRequests"
 import { OutgoingFriendRequests } from "./OutgoingFriendRequests"
 import AddFriend from "./AddFriend"

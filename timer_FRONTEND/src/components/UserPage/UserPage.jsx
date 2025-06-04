@@ -1,4 +1,4 @@
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { Container, Title, Paper, Text, Group, Button, Tabs, Loader, Alert } from "@mantine/core";
 import { useNavigate, useParams } from "react-router-dom";
 import { IconPencil, IconUser, IconClock, IconNote } from "@tabler/icons-react";
@@ -6,7 +6,7 @@ import { useState } from "react";
 import UserPageAbout from "./UserPageAbout";
 import UserPagePosts from "./UserPagePosts";
 import UserPageStudySessions from "./UserPageStudySessions";
-import { GET_USERINFO_BYID } from "../queries";
+import { GET_USERINFO_BYID } from "../../data/queries";
 import { useQuery } from "@apollo/client";
 
 export default function UserPage() {
