@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import Timer from "../Timer";
+import Timer from "../Timer/Timer";
 import { GET_STUDY_SESSION_BYID } from "../../data/queries";
 import { useMutation, useQuery } from "@apollo/client";
 import { useEffect } from "react";

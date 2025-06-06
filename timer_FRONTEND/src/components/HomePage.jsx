@@ -33,6 +33,7 @@ export default function HomePage() {
                 <Button onClick={() => openModal(<CreateUserPost/>)} leftSection={<IconPlus />} fullWidth>Create Post</Button>
                 <Button onClick={() => openModal(<CreateStudySessionForm/>)} leftSection={<IconBook />} fullWidth>Start Study Session</Button>
                 <PreviousStudySessionsList />
+                
               </Stack>
             </Card>
           </Grid.Col>

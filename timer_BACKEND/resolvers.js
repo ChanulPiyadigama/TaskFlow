@@ -162,9 +162,9 @@ const resolvers = {
                 query.createdAt = { $lt: decodedTime };
             }
 
-
+            
             const allFriendsPosts = await BasePost.find(query) 
-            .populate(['user', 'comments'])
+            .populate(['user', 'comments', 'likes'])
             .sort({ createdAt: -1 })
             .limit(args.limit)
             return allFriendsPosts;
@@ -626,6 +626,61 @@ const resolvers = {
             await context.currentUser.save();
 
             return comment;
+        },
+        completeStudySessionForUser: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to complete a study session');
+            }
+
+            // Get study session and populate timer
+            const studySession = await StudySession.findById(args.studySessionID).populate('timer');
+            if (!studySession) {
+                throw new Error('No study session found');
+            }
+            const timer = studySession.timer;
+            if (!timer) {
+                throw new Error('No timer found for this study session');
+            }
+            // Update study session
+            studySession.studiedTime = args.studiedTime;
+            studySession.lastInteraction = new Date();
+            await studySession.save();
+
+            // Update timer
+            timer.finished = true;
+            await timer.save();
+            
+            return studySession.populate('timer');
+        },
+        userLikesPost: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to like a post');
+            }
+
+            const post = await BasePost.findById(args.postID);
+            if (!post) {
+                throw new Error('No post found');
+            }
+            // Check if user already liked the post, if so then remove the like
+            if (post.likes.includes(context.currentUser.id)) {
+                post.likes = post.likes.filter(userId => !userId.equals(context.currentUser.id));
+                context.currentUser.likedPosts = context.currentUser.likedPosts.filter(postId => !postId.equals(args.postID));
+            } else{
+                // Add user to post likes
+                post.likes.push(context.currentUser.id);
+                // Add post to user's liked posts
+                context.currentUser.likedPosts.push(args.postID);
+            }
+            await post.save();
+            await context.currentUser.save();
+            // Return the updated post and updated user
+            const populatedPost = await post.populate('likes');
+            const populatedUser = await context.currentUser.populate('likedPosts');
+            return {
+                post: populatedPost,
+                user: populatedUser
+            };
+
         }
     }
 }

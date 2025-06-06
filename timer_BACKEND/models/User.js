@@ -47,6 +47,11 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Comment',
         default: []
+    }],
+    likedPosts: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'BasePost',
+        default: []
     }]
 });
 

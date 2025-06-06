@@ -22,6 +22,7 @@ const typeDefs = `
         timer: Timer!
         createdAt: String!
         lastInteraction: String!
+        studiedTime: Int
     }
 
     interface BasePost {
@@ -33,6 +34,7 @@ const typeDefs = `
         lastInteraction: String!
         postType: String!
         comments: [Comment]
+        likes: [User]
     }
 
     type StudySessionPost implements BasePost {
@@ -46,6 +48,7 @@ const typeDefs = `
         studySession: StudySession!
         exclusions: exclusionDict
         comments: [Comment]
+        likes: [User]
     }
 
     type exclusionDict {
@@ -54,19 +57,6 @@ const typeDefs = `
 
     input StudySessionPostExclusions {
         excludeTime: Boolean!
-    }
-
-    type UserPost{
-        id:ID!
-        title: String!
-        description: String
-        user: User!
-        postingObjType: String!
-        postingObjId: ID!
-        createdAt: String!
-        lastInteraction: String!
-        studySessions: [StudySession]
-        allPosts: [BasePost]
     }
 
     type Timer{
@@ -79,6 +69,7 @@ const typeDefs = `
         currentBreak: Break
         parentType: String
         parentId: ID
+        finished: Boolean!
     }   
 
     type Break{
@@ -96,6 +87,11 @@ const typeDefs = `
         content: String!
         createdAt: String!
         lastInteraction: String!
+    }
+
+    type LikeResponse {
+        post: BasePost!
+        user: User!
     }
 
     type Query{
@@ -136,8 +132,9 @@ const typeDefs = `
         clearUserOutgoingFriendRequests: String!
         clearUserIncomingFriendRequests: String!
         createCommentForPost(postID: ID!, content: String!): Comment!
-        likeUserPost(postID: ID!): BasePost!
-        clearUserLikedPosts: String!
+        completeStudySessionForUser(studySessionID: ID!, studiedTime: Int!): StudySession!
+        userLikesPost(postID: ID!): LikeResponse!
+
     }
 
 `;

@@ -1,4 +1,4 @@
-import { GET_FRIENDS_POSTS, CREATE_COMMENT_FOR_POST } from "../../data/queries";
+import { GET_FRIENDS_POSTS, CREATE_COMMENT_FOR_POST, LIKE_POST } from "../../data/queries";
 import { useQuery } from "@apollo/client";
 import { useState, useEffect, useRef } from "react";
 import { 
@@ -15,10 +15,11 @@ import {
     Paper,
     Box 
 } from "@mantine/core";
-import { IconCalendar, IconMessage, IconHeart } from '@tabler/icons-react';
+import { IconCalendar, IconMessage, IconHeart, IconHeartFilled } from '@tabler/icons-react';
 import { useModal } from "../../context/ModalContext";
 import PostComments from "./PostComments";
 import { useAuth } from "../../context/AuthContext";
+import { useMutation } from "@apollo/client";
 
 
 /*
@@ -59,6 +60,15 @@ export default function PostsScroll(){
         },
     })  
 
+    const [likePost] = useMutation(LIKE_POST, {
+    });
+
+    const handleLike = (postId) => {
+        likePost({
+            variables: { postID : postId }
+        });
+    }
+
     //(2)
     useEffect(() => {
         if (!hasMore) return;
@@ -83,7 +93,7 @@ export default function PostsScroll(){
         }
         };
     }, [loadingPosts, hasMore]);
-
+    
 
     //(3)
     const loadMorePosts = () => {
@@ -126,11 +136,11 @@ export default function PostsScroll(){
           </Paper>
         </Container>
       );
-      console.log("dataPosts", dataPosts);
       return (
         <Box p="md" w="80%" mx="auto">
           <Stack spacing="md">
             {dataPosts?.getUserFriendsPosts?.map((post, index) => (
+            
               <Card 
                 key={post.id || index} 
                 withBorder 
@@ -175,12 +185,17 @@ export default function PostsScroll(){
                       {post.comments?.length || 0}
                     </Button>
                     <Button
-                      variant="subtle"
-                      leftSection={<IconHeart size={16} />}
-                      onClick={() => handleLike(post.id)}
-                    >
-                      {post.likes || 0}
-                    </Button>
+                    variant="subtle"
+                    color={post.likes.some(like => like.id === user?.id) ? "red" : "gray"}
+                    leftSection={
+                      post.likes.some(like => like.id === user?.id)
+                        ? <IconHeartFilled size={16} /> 
+                        : <IconHeart size={16} />
+                    }
+                    onClick={() => handleLike(post.id)}
+                  >
+                    {post.likes.length || 0}
+                  </Button>
                   </Group>
                 </Stack>
               </Card>

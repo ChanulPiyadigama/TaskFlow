@@ -91,7 +91,7 @@ export default function CreateStudySessionForm() {
                     name="duration"
                     description="How long do you want to study?"
                     placeholder="1800 = 30 minutes"
-                    min={60}
+                    min={1}
                     max={7200}
                     required
                 />

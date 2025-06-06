@@ -233,6 +233,7 @@ query GetUserStudySessions {
     createdAt
     description
     id
+    studiedTime
   }
 }
 `
@@ -315,6 +316,9 @@ query GetUserFriendsPosts($cursor: String, $limit: Int!) {
     comments {
       id
     }
+    likes{
+      id
+    }
     user {
       name
       id
@@ -349,3 +353,35 @@ query Query($postId: ID!) {
   }
 }
 `
+
+export const COMPLETE_STUDY_SESSION = gql`
+mutation CompleteStudySessionForUser($studySessionId: ID!, $studiedTime: Int!) {
+  completeStudySessionForUser(studySessionID: $studySessionId, studiedTime: $studiedTime) {
+    id
+    studiedTime
+    timer {
+      id
+      finished
+    }
+  }
+}
+`
+
+export const LIKE_POST = gql`
+  mutation LikePost($postID: ID!) {
+    userLikesPost(postID: $postID) {
+      post {
+        id
+        likes {
+          id
+        }
+      }
+      user {
+        id
+        likedPosts {
+          id
+        }
+      }
+    }
+  }
+`;

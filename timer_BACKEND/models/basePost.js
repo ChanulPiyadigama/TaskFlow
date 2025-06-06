@@ -38,6 +38,11 @@ const basePostSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Comment',
         default: []
+    }],
+    likes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: []
     }]
 }, baseOptions);
 

@@ -31,6 +31,10 @@ const studySessionSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'BasePost'
     },
+    studiedTime: {
+        type: Number,
+        default: -1 //-1 indicates that the time has not been set yet
+    }
 });
 
 const StudySession = mongoose.model('StudySession', studySessionSchema);

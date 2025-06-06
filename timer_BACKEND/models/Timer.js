@@ -41,7 +41,11 @@ const timerSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Break',
         default: null
-    }
+    },
+    finished: {
+        type: Boolean,
+        default: false
+    },
 });
 
 const Timer = mongoose.model('Timer', timerSchema);
