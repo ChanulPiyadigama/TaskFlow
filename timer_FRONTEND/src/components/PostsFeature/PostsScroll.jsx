@@ -170,12 +170,24 @@ export default function PostsScroll(){
                       {new Date(Number(post.createdAt)).toLocaleDateString()}
                     </Badge>
                   </Group>
-                  
+                  <Text size="sm" c="dimmed" fs="italic" mb="xs">
+                    {post.user.name} has completed a study session!
+                  </Text>
                   <Title order={3}>{post.title}</Title>
                   <Text size="md" c="dimmed">
                     {post.description}
                   </Text>
-
+                  {post.postType === 'StudySessionPost' && (
+                  <>
+                  
+                    {/* Only show studied time if excludeTime is false (meaning time is NOT excluded) */}
+                    {!post.exclusions?.excludeTime && (
+                      <Text size="xl" fw={700} c='#9370DB' ta="center" mt="md">
+                        Studied for: {Math.floor(post.studiedTime / 60)}m {post.studiedTime % 60}s
+                      </Text>
+                    )}
+                  </>
+                )}
                   <Group>
                     <Button 
                       variant="subtle"

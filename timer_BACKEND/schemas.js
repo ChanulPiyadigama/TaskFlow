@@ -135,6 +135,7 @@ const typeDefs = `
         createCommentForPost(postID: ID!, content: String!): Comment!
         completeStudySessionForUser(studySessionID: ID!, studiedTime: Int!): StudySession!
         userLikesPost(postID: ID!): LikeResponse!
+        updatestudiedTimeforStudySessionPost: String!
 
     }
 

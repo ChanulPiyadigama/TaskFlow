@@ -325,6 +325,12 @@ query GetUserFriendsPosts($cursor: String, $limit: Int!) {
       username
     }
     postType
+    ... on StudySessionPost {
+      studiedTime
+      exclusions {
+        excludeTime
+      }
+    }
   }
 }
 `
