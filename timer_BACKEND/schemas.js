@@ -136,7 +136,7 @@ const typeDefs = `
         completeStudySessionForUser(studySessionID: ID!, studiedTime: Int!): StudySession!
         userLikesPost(postID: ID!): LikeResponse!
         updatestudiedTimeforStudySessionPost: String!
-
+        resetAllLikesOnPosts: String!
     }
 
 `;

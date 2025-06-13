@@ -581,20 +581,6 @@ const resolvers = {
             const populatedPost = await post.populate('studySession')
             return populatedPost
         },
-        updatestudiedTimeforStudySessionPost: async (parent, args, context) => {
-            try {
-                // Update all StudySessionPost documents to set studiedTime to 10
-                const result = await StudySessionPost.updateMany(
-                    {}, // Empty filter means all documents
-                    { $set: { studiedTime: 10 } }
-                );
-
-                return `Successfully updated ${result.modifiedCount} study session posts with studied time of 10 seconds.`;
-            } catch (error) {
-                console.error("Error updating studied time for study session posts:", error);
-                throw new Error("Failed to update studied time for study session posts");
-            }
-        },
         clearUserOutgoingFriendRequests: async (parent, args, context) => {
             if (!context.currentUser) {
                 throw new Error('You must be logged in to clear outgoing friend requests');
@@ -696,7 +682,52 @@ const resolvers = {
                 user: populatedUser
             };
 
+        },
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //Admin mutations 
+        updatestudiedTimeforStudySessionPost: async (parent, args, context) => {
+            try {
+                // Update all StudySessionPost documents to set studiedTime to 10
+                const result = await StudySessionPost.updateMany(
+                    {}, // Empty filter means all documents
+                    { $set: { studiedTime: 10 } }
+                );
+
+                return `Successfully updated ${result.modifiedCount} study session posts with studied time of 10 seconds.`;
+            } catch (error) {
+                console.error("Error updating studied time for study session posts:", error);
+                throw new Error("Failed to update studied time for study session posts");
+            }
+        },
+        resetAllLikesOnPosts: async (parent, args, context) => {
+            // This mutation will reset all likes on all posts, setting the likes back to an empty array
+            //and removing the likedPosts from all users
+            try {
+                // Reset likes on all posts
+                await BasePost.updateMany({}, { $set: { likes: [] } });
+
+                // Reset likedPosts for all users
+                await User.updateMany({}, { $set: { likedPosts: [] } });
+
+                return "All likes on posts have been reset successfully!";
+            } catch (error) {
+                console.error("Error resetting likes on posts:", error);
+                throw new Error("Failed to reset likes on posts");
+            }
         }
+
     }
 }
 
