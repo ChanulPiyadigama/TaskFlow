@@ -324,6 +324,7 @@ query GetUserFriendsPosts($cursor: String, $limit: Int!) {
       id
       username
     }
+    postType
   }
 }
 `

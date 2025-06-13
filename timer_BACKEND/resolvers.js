@@ -571,7 +571,8 @@ const resolvers = {
                 description: args.description,
                 user: context.currentUser.id,
                 exclusions: args.exclusions,
-                studySession: args.studySessionId
+                studySession: args.studySessionId,
+                studiedTime: args.studySessionId.studiedTime,
             });
             await post.save()
 

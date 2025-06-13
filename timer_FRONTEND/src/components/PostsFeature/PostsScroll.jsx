@@ -115,7 +115,7 @@ export default function PostsScroll(){
             }
         });
     };
-
+    console.log(dataPosts)
     if (loadingPosts && !dataPosts) return (
         <Container p="md">
           <Stack>
@@ -172,10 +172,10 @@ export default function PostsScroll(){
                   </Group>
                   
                   <Title order={3}>{post.title}</Title>
-                  <Text>{post.id}</Text>
                   <Text size="md" c="dimmed">
                     {post.description}
                   </Text>
+
                   <Group>
                     <Button 
                       variant="subtle"

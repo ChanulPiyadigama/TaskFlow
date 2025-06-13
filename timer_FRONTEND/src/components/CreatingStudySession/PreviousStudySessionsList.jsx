@@ -1,13 +1,15 @@
 import { GET_ALL_USER_STUDY_SESSIONS } from "../../data/queries";
 import { useQuery } from "@apollo/client";
-import { List, Loader, Text, Title, Paper, Stack, Group } from "@mantine/core";
+import { List, Loader, Text, Title, Paper, Stack, Group, Button } from "@mantine/core";
+import { IconClock, IconArrowRight } from '@tabler/icons-react';
 import { useNavigate } from "react-router-dom";
-import { IconClock } from '@tabler/icons-react';
+import { useAuth } from "../../context/AuthContext";
 
 export default function PreviousStudySessionsList() {
     const { loading: loadingStudySessions, data: dataStudySessions, error: errorStudySessions } = useQuery(GET_ALL_USER_STUDY_SESSIONS);
     const navigate = useNavigate();
-
+    const { user } = useAuth(); 
+    console.log(user.id)
     //mantine loader, deafult to small spinner
     if (loadingStudySessions) return <Loader />;
     if (errorStudySessions) return <Text c="red">Error loading study sessions</Text>;
@@ -28,13 +30,13 @@ export default function PreviousStudySessionsList() {
         .slice(0, 5);
 
     const SessionList = ({ sessions, title }) => (
-        <Stack mb="xl">
+        <Stack mb="sm">
             <Title order={2} mb="md">
                 {title}
             </Title>
             <List spacing="sm" styles={{ itemWrapper: { listStyleType: "none" } }}>
                 {sessions.length > 0 ? (
-                    sessions.map((session) => (
+                    sessions.slice(0, 5).map((session) => (
                         <Paper
                             key={session.id}
                             shadow="xs"
@@ -76,9 +78,20 @@ export default function PreviousStudySessionsList() {
     );
 
     return (
-        <div>
+        <Stack>
             <SessionList sessions={activeSessions} title="Active Study Sessions" />
             <SessionList sessions={completedSessions} title="Completed Study Sessions" />
-        </div>
+            <Button
+                variant="subtle"
+                rightSection={<IconArrowRight size={16} />}
+                onClick={() => navigate(`/UserPage/${user.id}`)}
+                sx={(theme) => ({
+                    marginTop: theme.spacing.md,
+                    alignSelf: 'center'
+                })}
+            >
+                View All Study Sessions
+            </Button>
+        </Stack>
     );
 }

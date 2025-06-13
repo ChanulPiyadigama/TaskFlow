@@ -46,6 +46,7 @@ const typeDefs = `
         lastInteraction: String!
         postType: String!
         studySession: StudySession!
+        studiedTime: Int!
         exclusions: exclusionDict
         comments: [Comment]
         likes: [User]

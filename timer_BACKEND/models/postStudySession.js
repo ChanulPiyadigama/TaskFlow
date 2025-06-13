@@ -8,6 +8,10 @@ const studySessionPostSchema = new mongoose.Schema({
         ref: 'StudySession',
         required: true
     },
+    studiedTime: {
+        type: Number,
+        required: true
+    },
     exclusions: {
         type: {
             excludeTime: {
