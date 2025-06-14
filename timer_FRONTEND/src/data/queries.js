@@ -308,20 +308,19 @@ mutation Mutation($senderId: ID!, $action: Boolean!) {
 export const GET_FRIENDS_POSTS = gql`
 query GetUserFriendsPosts($cursor: String, $limit: Int!) {
   getUserFriendsPosts(cursor: $cursor, limit: $limit) {
-    description
     id
+    __typename
+    description
     createdAt
     title
-    lastInteraction
-    comments {
+    likes {
       id
-    }
-    likes{
-      id
+      __typename
     }
     user {
-      name
       id
+      __typename
+      name
       username
     }
     postType
@@ -331,9 +330,12 @@ query GetUserFriendsPosts($cursor: String, $limit: Int!) {
         excludeTime
       }
     }
+    ... on GeneralPost {
+      category
+    }
   }
 }
-`
+`;
 
 export const CREATE_COMMENT_FOR_POST =  gql`
 mutation CreateCommentForPost($content: String!, $postId: ID!) {

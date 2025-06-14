@@ -115,6 +115,18 @@ export default function PostsScroll(){
             }
         });
     };
+
+    //function to get category color based on post category
+    const getCategoryColor = (category) => {
+      const categoryColors = {
+        'announcement': 'blue',
+        'question': 'orange', 
+        'discussion': 'green',
+        'misc': 'gray'
+      };
+      return categoryColors[category] || 'grape'; // fallback color
+    };
+
     console.log(dataPosts)
     if (loadingPosts && !dataPosts) return (
         <Container p="md">
@@ -170,9 +182,25 @@ export default function PostsScroll(){
                       {new Date(Number(post.createdAt)).toLocaleDateString()}
                     </Badge>
                   </Group>
+
+                  {post.postType === 'StudySessionPost' && 
                   <Text size="sm" c="dimmed" fs="italic" mb="xs">
                     {post.user.name} has completed a study session!
                   </Text>
+                  }
+
+                  {post.postType === 'GeneralPost' && (
+                    <Badge 
+                      size="sm" 
+                      variant="filled" 
+                      color={getCategoryColor(post.category)} 
+                      mb="xs"
+                      style={{ textTransform: 'capitalize' }}
+                    >
+                      {post.category}
+                    </Badge>
+                  )}
+                  
                   <Title order={3}>{post.title}</Title>
                   <Text size="md" c="dimmed">
                     {post.description}
