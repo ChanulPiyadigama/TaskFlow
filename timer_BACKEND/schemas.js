@@ -52,6 +52,19 @@ const typeDefs = `
         likes: [User]
     }
 
+    type GeneralPost implements BasePost {
+        id: ID!
+        title: String!
+        description: String
+        user: User!
+        createdAt: String!
+        lastInteraction: String!
+        postType: String!
+        comments: [Comment]
+        likes: [User]
+        category: String
+    }
+
     type exclusionDict {
         excludeTime: Boolean!
     }

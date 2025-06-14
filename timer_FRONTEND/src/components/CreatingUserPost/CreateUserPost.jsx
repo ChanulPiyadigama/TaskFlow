@@ -14,12 +14,7 @@ export default function CreateUserPost() {
                     <StudySessionPostForm />
                 )}
                 {postChoice === "General Post" && (
-                    <Textarea 
-                        label="Content" 
-                        placeholder="What's on your mind?" 
-                        minRows={3}
-                        required 
-                    />
+                    <GeneralPostForm />
                 )}
             </Stack>
         );

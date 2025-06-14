@@ -3,6 +3,7 @@ import Timer from "./models/Timer.js";
 import Break from "./models/Break.js";
 import Comment from "./models/Comment.js";
 import StudySession from "./models/StudySession.js";
+import { GeneralPost } from "./models/postGeneral.js";
 import { BasePost } from "./models/BasePost.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -682,6 +683,25 @@ const resolvers = {
                 user: populatedUser
             };
 
+        },
+        createGeneralPost: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to create a general post');
+            }
+
+            const post = new GeneralPost({
+                title: args.title,
+                description: args.description,
+                user: context.currentUser.id,
+                postType: 'GeneralPost',
+                category: args.category
+            });
+            await post.save();
+
+            //update the current user to add this new post to their allPosts array
+            await context.currentUser.updateOne({ $push: { allPosts: post._id } });
+            const populatedPost = await post.populate('user');
+            return populatedPost;
         },
 
 
