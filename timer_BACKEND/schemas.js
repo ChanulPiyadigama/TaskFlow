@@ -150,6 +150,7 @@ const typeDefs = `
         userLikesPost(postID: ID!): LikeResponse!
         updatestudiedTimeforStudySessionPost: String!
         resetAllLikesOnPosts: String!
+        createGeneralPost(title: String!, description: String, category: String!): GeneralPost!
     }
 
 `;

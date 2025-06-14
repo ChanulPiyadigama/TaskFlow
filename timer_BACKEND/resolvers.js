@@ -579,7 +579,7 @@ const resolvers = {
 
             //update the current user to add this new post to their allPosts array
             await context.currentUser.updateOne({ $push: { allPosts: post._id } });
-            const populatedPost = await post.populate('studySession')
+            const populatedPost = await post.populate(['studysession', 'comments', 'likes'])
             return populatedPost
         },
         clearUserOutgoingFriendRequests: async (parent, args, context) => {
@@ -700,7 +700,7 @@ const resolvers = {
 
             //update the current user to add this new post to their allPosts array
             await context.currentUser.updateOne({ $push: { allPosts: post._id } });
-            const populatedPost = await post.populate('user');
+            const populatedPost = await post.populate(['user', 'comments', 'likes']);
             return populatedPost;
         },
 

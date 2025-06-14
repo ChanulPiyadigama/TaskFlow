@@ -392,3 +392,26 @@ export const LIKE_POST = gql`
     }
   }
 `;
+
+export const CREATE_GENERAL_POST = gql`
+mutation Mutation($category: String!, $description: String, $title: String!) {
+  createGeneralPost(category: $category, description: $description, title: $title) {
+    id
+    description
+    createdAt
+    comments {
+      id
+      createdAt
+      content
+    }
+    category
+    likes {
+      id
+      name
+    }
+    title
+    postType
+    lastInteraction
+  }
+}
+`
