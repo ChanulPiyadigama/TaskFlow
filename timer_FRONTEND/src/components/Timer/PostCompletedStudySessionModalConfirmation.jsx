@@ -42,6 +42,7 @@ export default function PostCompletedStudySessionModalConfirmation({ studiedTime
         closeModal();
         navigate('/'); 
     };
+    console.log("Study session data:", studySessionData);
 
     if (loading) {
         return (

@@ -46,7 +46,7 @@ export default function StudySessionPostForm({preSelectedSession}) {
     useEffect(() => {
         if (preSelectedSession) {
             console.log("Pre-selected session:", preSelectedSession);
-            
+
             // Use the pre-selected session data
             setPostingSession(preSelectedSession);
             setTitle(preSelectedSession.title || "");
@@ -83,6 +83,8 @@ export default function StudySessionPostForm({preSelectedSession}) {
 
     const handleSubmit = (e) => {
         e.preventDefault()
+
+        console.log(postingSession)
 
         createUserPost({
             variables: {

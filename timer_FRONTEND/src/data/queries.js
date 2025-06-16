@@ -169,6 +169,7 @@ mutation CreateStudySession($startTimeIsoString: String!, $title: String, $descr
       timeLeft
       totalTime
     }
+    studiedTime
   }
 }
 `
@@ -180,6 +181,7 @@ query GetSpecificStudySession($studySessionId: ID!) {
     description
     id
     title
+    studiedTime
     timer {
       currentBreak {
         elapsedTime
