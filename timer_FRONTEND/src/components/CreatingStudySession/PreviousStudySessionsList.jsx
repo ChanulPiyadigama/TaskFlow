@@ -9,7 +9,6 @@ export default function PreviousStudySessionsList() {
     const { loading: loadingStudySessions, data: dataStudySessions, error: errorStudySessions } = useQuery(GET_ALL_USER_STUDY_SESSIONS);
     const navigate = useNavigate();
     const { user } = useAuth(); 
-    console.log(user.id)
     //mantine loader, deafult to small spinner
     if (loadingStudySessions) return <Loader />;
     if (errorStudySessions) return <Text c="red">Error loading study sessions</Text>;

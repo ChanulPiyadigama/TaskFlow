@@ -48,6 +48,8 @@ export default function PostsScroll(){
     const loaderRef = useRef(null);
     const [hasMore, setHasMore] = useState(true);
     const {openModal} = useModal()
+    const [expandedPosts, setExpandedPosts] = useState(new Set());
+
 
     const {loading: loadingPosts, data: dataPosts, error: errorPosts, fetchMore} = useQuery(GET_FRIENDS_POSTS, {
         variables: { limit: 10 },
@@ -127,7 +129,34 @@ export default function PostsScroll(){
       return categoryColors[category] || 'grape'; // fallback color
     };
 
-    console.log(dataPosts)
+    const toggleExpanded = (postId) => {
+      setExpandedPosts(prev => {
+        const newSet = new Set(prev);
+        if (newSet.has(postId)) {
+          newSet.delete(postId);
+        } else {
+          newSet.add(postId);
+        }
+        return newSet;
+      });
+    };
+
+    const getDescriptionDisplay = (description, postId) => {
+      const words = description.split(' ');
+      const isExpanded = expandedPosts.has(postId);
+      
+      if (words.length <= 30) {
+        return description;
+      }
+      
+      if (isExpanded) {
+        return description;
+      }
+      
+      return words.slice(0, 30).join(' ') + '...';
+    };
+
+
     if (loadingPosts && !dataPosts) return (
         <Container p="md">
           <Stack>
@@ -149,8 +178,8 @@ export default function PostsScroll(){
         </Container>
       );
       return (
-        <Box p="md" w="80%" mx="auto">
-          <Stack spacing="md">
+        <Box p="md" w="90%" mx="auto">
+          <Stack spacing="lg">
             {dataPosts?.getUserFriendsPosts?.map((post, index) => (
             
               <Card 
@@ -161,81 +190,140 @@ export default function PostsScroll(){
                 radius="md"
                 style={{ 
                   borderColor: post.user.id === user?.id ? '#9370DB' : undefined,
-                  borderWidth: post.user.id === user?.id ? '2px' : '1px'
+                  borderWidth: post.user.id === user?.id ? '2px' : '1px',
+                  marginTop: '1rem',
+                  marginBottom: '1rem'
                 }}
               >
-                <Stack spacing="xs">
+                <Stack spacing="lg">
                   {/* User info and date at the top */}
                   <Group position="apart" mb="xs">
                     <Group>
-                      <Avatar radius="xl" color="blue">
+                      <Avatar radius="xl" size = 'lg' color="blue">
                         {post.user.name.charAt(0)}
                       </Avatar>
-                      <Text fw={500}>{post.user.name}</Text>
+                      <Text fw={500} size= 'lg'>{post.user.name}</Text>
                     </Group>
                     
                     <Badge 
                       color="blue" 
                       variant="light"
-                      leftSection={<IconCalendar size={14} />}
+                      size="lg"
+                      leftSection={<IconCalendar size={18} />}
                     >
                       {new Date(Number(post.createdAt)).toLocaleDateString()}
                     </Badge>
                   </Group>
 
                   {post.postType === 'StudySessionPost' && 
-                  <Text size="sm" c="dimmed" fs="italic" mb="xs">
+                  <Text size="lg" c="dimmed" fs="italic" mb="lg">
                     {post.user.name} has completed a study session!
                   </Text>
                   }
 
                   {post.postType === 'GeneralPost' && (
                     <Badge 
-                      size="sm" 
+                      size="lg" 
                       variant="filled" 
                       color={getCategoryColor(post.category)} 
-                      mb="xs"
-                      style={{ textTransform: 'capitalize' }}
+                      mb="lg"
+                      style={{ textTransform: 'capitalize', fontSize: '16px' }} 
                     >
                       {post.category}
                     </Badge>
                   )}
-                  
-                  <Title order={3}>{post.title}</Title>
-                  <Text size="md" c="dimmed">
-                    {post.description}
-                  </Text>
+
+
+                  <Title order={1} size="3rem" mb="lg">{post.title}</Title>
+
+
                   {post.postType === 'StudySessionPost' && (
                   <>
-                  
-                    {/* Only show studied time if excludeTime is false (meaning time is NOT excluded) */}
+                    {/* Show studied time first */}
                     {!post.exclusions?.excludeTime && (
-                      <Text size="xl" fw={700} c='#9370DB' ta="center" mt="md">
-                        Studied for: {Math.floor(post.studiedTime / 60)}m {post.studiedTime % 60}s
-                      </Text>
+                        <Stack spacing={8} align="flex-start" mt="xl" mb="xl">
+                          <Text size="lg" c="dimmed">
+                            Studied for:
+                          </Text>
+                          <Text size="4.5rem" fw={700} c='#9370DB'>
+                            {Math.floor(post.studiedTime / 3600)}h {Math.floor((post.studiedTime % 3600) / 60)}m {post.studiedTime % 60}s
+                          </Text>
+                        </Stack>
                     )}
+                    
+                    {/* Then show description */}
+                    <Text size="s" c="dimmed" mb="xl">
+                      {getDescriptionDisplay(post.description, post.id)}
+                      {post.description.split(' ').length > 30 && (
+                        <Button
+                          variant="subtle"
+                          size="sm"
+                          p={0}
+                          style={{ 
+                            textDecoration: 'underline',
+                            fontWeight: 'normal',
+                            fontSize: 'inherit',
+                            color: 'inherit',
+                            height: 'auto',
+                            minHeight: 'auto'
+                          }}
+                          onClick={() => toggleExpanded(post.id)}
+                        >
+                          {expandedPosts.has(post.id) ? ' show less' : ' read more'}
+                        </Button>
+                      )}
+                    </Text>
                   </>
-                )}
-                  <Group>
+                  )}
+
+                  {/* For GeneralPost, keep description in original position */}
+                  {post.postType === 'GeneralPost' && (
+                    <Text size="s" c="dimmed" mb="xl">
+                      {getDescriptionDisplay(post.description, post.id)}
+                      {post.description.split(' ').length > 30 && (
+                        <Button
+                          variant="subtle"
+                          size="sm"
+                          p={0}
+                          style={{ 
+                            textDecoration: 'underline',
+                            fontWeight: 'normal',
+                            fontSize: 'inherit',
+                            color: 'inherit',
+                            height: 'auto',
+                            minHeight: 'auto'
+                          }}
+                          onClick={() => toggleExpanded(post.id)}
+                        >
+                          {expandedPosts.has(post.id) ? ' show less' : ' read more'}
+                        </Button>
+                      )}
+                    </Text>
+                  )}
+                  
+                
+                  <Group spacing="lg" mt="xl"> 
                     <Button 
                       variant="subtle"
+                      size="lg"  
                       onClick={() => openModal(<PostComments postId={post.id} postData={post}/>)}
-                      leftSection={<IconMessage size={16} />}  
+                      leftSection={<IconMessage size={20} />}  
                     >
-                      {post.comments?.length || 0}
+                      <Text size="lg">{post.comments?.length || 0}</Text> 
                     </Button>
                     <Button
-                    variant="subtle"
-                    color={post.likes.some(like => like.id === user?.id) ? "red" : "gray"}
-                    leftSection={
-                      post.likes.some(like => like.id === user?.id)
-                        ? <IconHeartFilled size={16} /> 
-                        : <IconHeart size={16} />
-                    }
-                    onClick={() => handleLike(post.id)}
-                  >
-                    {post.likes.length || 0}
-                  </Button>
+                      variant="subtle"
+                      size="lg"  
+                      color={post.likes.some(like => like.id === user?.id) ? "red" : "gray"}
+                      leftSection={
+                        post.likes.some(like => like.id === user?.id)
+                          ? <IconHeartFilled size={20} /> 
+                          : <IconHeart size={20} />
+                      }
+                      onClick={() => handleLike(post.id)}
+                    >
+                      <Text size="lg">{post.likes.length || 0}</Text>  
+                    </Button>
                   </Group>
                 </Stack>
               </Card>

@@ -3,15 +3,28 @@ import { IconAlertCircle } from '@tabler/icons-react';
 import { useModal } from '../../context/ModalContext';
 import { COMPLETE_STUDY_SESSION } from '../../data/queries';
 import { useMutation } from '@apollo/client';
+import { data, useNavigate } from 'react-router-dom';
+import PostCompletedStudySessionModalConfirmation from './PostCompletedStudySessionModalConfirmation';
 
 //this modal checks if the user is sure they want to end the study session, if so we send a mutation to the server
 //and update both the timer and study session data first in the server, then the client's cache
 export default function EndStudySessionModal({studySessionId, studiedTime}) {
     const { closeModal } = useModal();
+    const navigate = useNavigate();
+    const { openModal } = useModal();
+   
 
     const [completeSession, {loading: loadingStudySesssionCompletion, data: dataStudySessionCompletition, error: errorStudySessionCompleition}] = useMutation(COMPLETE_STUDY_SESSION, {
-        onCompleted: () => {
+        onCompleted: (data) => {
             closeModal();
+            navigate("/")
+            openModal(
+                <PostCompletedStudySessionModalConfirmation 
+                    studiedTime={studiedTime}
+                    studySessionId = {studySessionId}
+                />
+            );
+
         },
         onError: (error) => {
             console.error("Error completing study session:", error);
@@ -25,7 +38,6 @@ export default function EndStudySessionModal({studySessionId, studiedTime}) {
             }
         });
     }
-
 
     if (loadingStudySesssionCompletion) {
         return (

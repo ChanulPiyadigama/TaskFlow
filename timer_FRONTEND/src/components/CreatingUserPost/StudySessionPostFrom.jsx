@@ -5,8 +5,9 @@ import { useState } from "react"
 import { CREATE_USER_STUDY_SESSION_POST, GET_FRIENDS_POSTS } from "../../data/queries"
 import { useMutation } from "@apollo/client"
 import { useModal } from "../../context/ModalContext"
+import { useEffect } from "react"
 
-export default function StudySessionPostForm() {
+export default function StudySessionPostForm({preSelectedSession}) {
     const { closeModal } = useModal()
 
     const { loading: loadingStudySessions, data: dataStudySessions, error: errorStudySessions } = useQuery(GET_ALL_USER_STUDY_SESSIONS)
@@ -41,6 +42,17 @@ export default function StudySessionPostForm() {
         }
     }
     )
+
+    useEffect(() => {
+        if (preSelectedSession) {
+            console.log("Pre-selected session:", preSelectedSession);
+            
+            // Use the pre-selected session data
+            setPostingSession(preSelectedSession);
+            setTitle(preSelectedSession.title || "");
+            setDescription(preSelectedSession.description || "");
+        }
+    }, [])
 
     const [postingSession, setPostingSession] = useState(null)
     const [excludeTime, setExcludeTime] = useState(false)

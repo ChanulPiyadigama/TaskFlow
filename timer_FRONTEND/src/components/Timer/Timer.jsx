@@ -293,7 +293,6 @@ export default function Timer({timerID}) {
                         <Title order={4}>Break Log</Title>
                         <Button 
                             variant="subtle" 
-                            compact
                             rightSection={breakLogVisible ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
                             onClick={() => setBreakLogVisible(!breakLogVisible)}
                         >

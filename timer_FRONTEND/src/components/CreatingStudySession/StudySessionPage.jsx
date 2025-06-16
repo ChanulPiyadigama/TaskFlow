@@ -20,10 +20,6 @@ export default function StudySessionPage() {
     });
 
     const [updateInteraction] = useMutation(UPDATE_STUDY_SESSION_INTERACTION_TIME, {
-        onCompleted: (data) => {
-            console.log("Interaction time updated:", data.updateStudySessionInteractionDate
-            );},
-
         onError: (error) => {
             console.error("Error updating interaction time:", error);
         }
