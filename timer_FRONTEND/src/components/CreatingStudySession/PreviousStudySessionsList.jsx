@@ -35,40 +35,45 @@ export default function PreviousStudySessionsList() {
             </Title>
             <List spacing="sm" styles={{ itemWrapper: { listStyleType: "none" } }}>
                 {sessions.length > 0 ? (
-                    sessions.slice(0, 5).map((session) => (
-                        <Paper
-                            key={session.id}
-                            shadow="xs"
-                            p="md"
-                            radius="md"
-                            withBorder
-                            mb="lg"
-                            sx={{
-                                cursor: "pointer",
-                                transition: "transform 0.1s ease-in-out",
-                                "&:hover": { transform: "scale(1.02)" },
-                            }}
-                            onClick={() => navigate(`/StudySession/${session.id}`)}
-                        >
-                            <Group position="apart" mb="xs">
-                                <Text size="sm" fw={500}>{session.title}</Text>
-                                <Group spacing="xs">
-                                    <IconClock size={16} />
-                                    <Text size="sm" c="dimmed">
-                                        {session.studiedTime > 0 
-                                            ? `${Math.floor(session.studiedTime / 60)}m ${session.studiedTime % 60}s`
-                                            : `${session.timer.timeLeft}s left`
-                                        }
-                                    </Text>
+                    sessions.slice(0, 5).map((session) => {
+                        const isCompleted = session.studiedTime > 0;
+                        
+                        return (
+                            <Paper
+                                key={session.id}
+                                shadow="xs"
+                                p="md"
+                                radius="md"
+                                withBorder
+                                mb="lg"
+                                sx={{
+                                    cursor: isCompleted ? "default" : "pointer",
+                                    transition: isCompleted ? "none" : "transform 0.1s ease-in-out",
+                                    "&:hover": isCompleted ? {} : { transform: "scale(1.02)" }, 
+                                    opacity: isCompleted ? 0.7 : 1, 
+                                }}
+                                onClick={isCompleted ? undefined : () => navigate(`/StudySession/${session.id}`)}
+                            >
+                                <Group position="apart" mb="xs">
+                                    <Text size="sm" fw={500}>{session.title}</Text>
+                                    <Group spacing="xs">
+                                        <IconClock size={16} />
+                                        <Text size="sm" c="dimmed">
+                                            {session.studiedTime > 0 
+                                                ? `${Math.floor(session.studiedTime / 60)}m ${session.studiedTime % 60}s`
+                                                : `${session.timer.timeLeft}s left`
+                                            }
+                                        </Text>
+                                    </Group>
                                 </Group>
-                            </Group>
-                            {session.description && (
-                                <Text size="xs" c="dimmed" lineClamp={2}>
-                                    {session.description}
-                                </Text>
-                            )}
-                        </Paper>
-                    ))
+                                {session.description && (
+                                    <Text size="xs" c="dimmed" lineClamp={2}>
+                                        {session.description}
+                                    </Text>
+                                )}
+                            </Paper>
+                        );
+                    })
                 ) : (
                     <Text c="dimmed" size="sm">No {title.toLowerCase()} found</Text>
                 )}

@@ -142,10 +142,9 @@ export default function PostsScroll(){
     };
 
     const getDescriptionDisplay = (description, postId) => {
-      const words = description.split(' ');
       const isExpanded = expandedPosts.has(postId);
       
-      if (words.length <= 30) {
+      if (description.length <= 100) {
         return description;
       }
       
@@ -153,7 +152,7 @@ export default function PostsScroll(){
         return description;
       }
       
-      return words.slice(0, 30).join(' ') + '...';
+      return description.slice(0, 100) + '...';
     };
 
 
@@ -250,37 +249,13 @@ export default function PostsScroll(){
                           </Text>
                         </Stack>
                     )}
-                    
-                    {/* Then show description */}
-                    <Text size="s" c="dimmed" mb="xl">
-                      {getDescriptionDisplay(post.description, post.id)}
-                      {post.description.split(' ').length > 30 && (
-                        <Button
-                          variant="subtle"
-                          size="sm"
-                          p={0}
-                          style={{ 
-                            textDecoration: 'underline',
-                            fontWeight: 'normal',
-                            fontSize: 'inherit',
-                            color: 'inherit',
-                            height: 'auto',
-                            minHeight: 'auto'
-                          }}
-                          onClick={() => toggleExpanded(post.id)}
-                        >
-                          {expandedPosts.has(post.id) ? ' show less' : ' read more'}
-                        </Button>
-                      )}
-                    </Text>
                   </>
                   )}
 
-                  {/* For GeneralPost, keep description in original position */}
-                  {post.postType === 'GeneralPost' && (
-                    <Text size="s" c="dimmed" mb="xl">
+                  <Text size="s" c="dimmed" mb="xl">
                       {getDescriptionDisplay(post.description, post.id)}
-                      {post.description.split(' ').length > 30 && (
+                      {console.log(post.description.length)}
+                      {post.description.length > 100 && (
                         <Button
                           variant="subtle"
                           size="sm"
@@ -299,9 +274,6 @@ export default function PostsScroll(){
                         </Button>
                       )}
                     </Text>
-                  )}
-                  
-                
                   <Group spacing="lg" mt="xl"> 
                     <Button 
                       variant="subtle"
