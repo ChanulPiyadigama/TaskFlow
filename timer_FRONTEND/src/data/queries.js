@@ -261,6 +261,15 @@ mutation CreateStudySessionPost($title: String!, $studySessionId: ID!, $exclusio
     lastInteraction
     postType
     title
+    user{
+      id
+      name
+      username
+    }
+    likes{
+      id
+    }
+    studiedTime
   }
 }`
 

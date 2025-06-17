@@ -564,8 +564,6 @@ const resolvers = {
             if (!context.currentUser) {
                 throw new Error('You must be logged in to create a study session post');
             }
-            console.log("yo")
-
             //check if the study session has been completed first, by checking if the studiedTime value 
             //is not -1
             const studySession = await StudySession.findById(args.studySessionId);
@@ -575,8 +573,6 @@ const resolvers = {
             if (studySession.studiedTime === -1) {
                 throw new Error('Study session has not been completed yet');
             }
-
-            console.log(studySession)
 
             //we defined a an input type in schema which is a dict/obj with the stats we
             //are excluding from a studysession
@@ -592,7 +588,7 @@ const resolvers = {
 
             //update the current user to add this new post to their allPosts array
             await context.currentUser.updateOne({ $push: { allPosts: post._id } });
-            const populatedPost = await post.populate(['studySession', 'comments', 'likes'])
+            const populatedPost = await post.populate(['studySession', 'comments', 'likes', 'user'])
             return populatedPost
         },
         clearUserOutgoingFriendRequests: async (parent, args, context) => {
