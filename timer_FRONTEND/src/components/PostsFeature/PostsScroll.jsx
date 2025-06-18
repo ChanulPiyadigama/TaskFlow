@@ -240,7 +240,7 @@ export default function PostsScroll(){
                   <>
                     {!post.exclusions?.excludeTime && (
                         <Stack spacing={8} align="flex-start" mb="xl">
-                          <Text size="lg" c="dimmed">
+                          <Text size="s" c="dimmed">
                             Studied for:
                           </Text>
                           <Text size="4.5rem" fw={700} c='#9370DB'>
@@ -251,7 +251,7 @@ export default function PostsScroll(){
                   </>
                   )}
 
-                  <Text size="s" c="dimmed" mb="xl">
+                  <Text size="s" c="dimmed" mb="lg">
                       {getDescriptionDisplay(post.description, post.id)}
                       {console.log(post.description.length)}
                       {post.description.length > 100 && (
@@ -273,7 +273,7 @@ export default function PostsScroll(){
                         </Button>
                       )}
                     </Text>
-                  <Group spacing="lg" mt="xl"> 
+                  <Group spacing="lg" mt="lg"> 
                     <Button 
                       variant="subtle"
                       size="lg"  

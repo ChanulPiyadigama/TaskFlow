@@ -23,6 +23,7 @@ const typeDefs = `
         createdAt: String!
         lastInteraction: String!
         studiedTime: Int
+        postedID: BasePost
     }
 
     interface BasePost {

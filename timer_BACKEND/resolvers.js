@@ -124,13 +124,18 @@ const resolvers = {
             // Use Promise.all since map will return an array of promises, no point using await inside map is await unaware
             const populatedStudySessions = await Promise.all(
                 studySessions.map(studySession =>
-                    studySession.populate({
-                        path: 'timer',
-                        populate: [
-                            { path: 'log' },
-                            { path: 'currentBreak' }
-                        ]
-                    })
+                    studySession.populate([
+                        {
+                            path: 'timer',
+                            populate: [
+                                { path: 'log' },
+                                { path: 'currentBreak' }
+                            ]
+                        },
+                        {
+                            path: 'postedID'
+                        }
+                    ])
                 )
             );
             
@@ -588,6 +593,10 @@ const resolvers = {
 
             //update the current user to add this new post to their allPosts array
             await context.currentUser.updateOne({ $push: { allPosts: post._id } });
+
+            //update the study session to add this post to its postedID field, marking it as posted 
+            studySession.postedID = post._id;
+            await studySession.save();
             const populatedPost = await post.populate(['studySession', 'comments', 'likes', 'user'])
             return populatedPost
         },

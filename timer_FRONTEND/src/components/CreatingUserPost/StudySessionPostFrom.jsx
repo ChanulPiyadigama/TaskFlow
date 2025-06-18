@@ -70,7 +70,13 @@ export default function StudySessionPostForm({preSelectedSession}) {
         setPostingSession(session)
     }
 
-    const userStudySessions = dataStudySessions.getUserStudySessions.map((session) => (
+    const unPostedSessions = dataStudySessions.getUserStudySessions.filter((session) => 
+        !session.postedID && session.studiedTime > 0
+    )
+
+
+    const userStudySessions = unPostedSessions.map((session) => (
+        
         <Button 
             key={session.id}
             variant="light"
@@ -79,6 +85,7 @@ export default function StudySessionPostForm({preSelectedSession}) {
         >
             {session.title}
         </Button>
+        
     ))
 
     const handleSubmit = (e) => {
@@ -104,6 +111,7 @@ export default function StudySessionPostForm({preSelectedSession}) {
                 <Paper p="md">
                     <Stack gap="md">
                         <Title order={3}>Choose a study session</Title>
+                        <Text>(you can only post completed study sessions)</Text>
                         {userStudySessions}
                     </Stack>
                 </Paper>

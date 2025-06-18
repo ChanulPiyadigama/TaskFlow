@@ -212,6 +212,9 @@ query GetUserStudySessions {
   getUserStudySessions {
     title
     lastInteraction
+    postedID{
+      id
+    }
     timer {
       currentBreak {
         elapsedTime
