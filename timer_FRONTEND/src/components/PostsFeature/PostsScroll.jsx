@@ -238,9 +238,8 @@ export default function PostsScroll(){
 
                   {post.postType === 'StudySessionPost' && (
                   <>
-                    {/* Show studied time first */}
                     {!post.exclusions?.excludeTime && (
-                        <Stack spacing={8} align="flex-start" mt="xl" mb="xl">
+                        <Stack spacing={8} align="flex-start" mb="xl">
                           <Text size="lg" c="dimmed">
                             Studied for:
                           </Text>

@@ -6,6 +6,7 @@ import { CREATE_USER_STUDY_SESSION_POST, GET_FRIENDS_POSTS } from "../../data/qu
 import { useMutation } from "@apollo/client"
 import { useModal } from "../../context/ModalContext"
 import { useEffect } from "react"
+import PostInputs from "../../Layouts/PostInputs"
 
 export default function StudySessionPostForm({preSelectedSession}) {
     const { closeModal } = useModal()
@@ -116,30 +117,12 @@ export default function StudySessionPostForm({preSelectedSession}) {
                             </Button>
                         </Group>
 
-                        <Group align="flex-start">
-                            <TextInput
-                                placeholder="Enter post title"
-                                label="Title"
-                                required
-                                style={{ flex: 1 }}
-                                value={title}
-                                onChange={(e) => setTitle(e.currentTarget.value)}
-                            />
-
-                        </Group>
-
-                        <Group align="flex-start">
-                            <Textarea 
-                                placeholder="Description" 
-                                label="Description" 
-                                minRows={3}
-                                style={{ flex: 1 }}
-                                value={description}
-                                onChange={(e) => setDescription(e.currentTarget.value)}
-                                
-                            />
-
-                        </Group>
+                        <PostInputs 
+                            title={title}
+                            setTitle={setTitle}
+                            description={description}
+                            setDescription={setDescription}
+                        />
 
                         <Paper p="md" withBorder>
                             <Stack gap="sm">

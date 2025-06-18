@@ -3,6 +3,7 @@ import { useMutation } from "@apollo/client";
 import { useState } from "react";
 import { Textarea, Button, TextInput, Select, Stack, Text } from '@mantine/core';
 import { useModal } from "../../context/ModalContext";
+import PostInputs from "../../Layouts/PostInputs";
 
 export default function GeneralPostForm() {
     const { closeModal } = useModal();
@@ -68,21 +69,11 @@ export default function GeneralPostForm() {
                     withAsterisk
                 />
 
-                <TextInput
-                    label="Title"
-                    placeholder="Enter your post title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                    withAsterisk
-                />
-
-                <Textarea
-                    label="Description"
-                    placeholder="What's on your mind?"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    minRows={4}
+                <PostInputs 
+                    title={title}
+                    setTitle={setTitle}
+                    description={description}
+                    setDescription={setDescription}
                 />
 
                 {errorCreatePost && (
