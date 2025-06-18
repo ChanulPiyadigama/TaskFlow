@@ -1,7 +1,7 @@
 import { GET_ALL_USER_STUDY_SESSIONS } from "../../data/queries";
 import { useQuery } from "@apollo/client";
-import { List, Loader, Text, Title, Paper, Stack, Group, Button } from "@mantine/core";
-import { IconClock, IconArrowRight } from '@tabler/icons-react';
+import { List, Loader, Text, Title, Paper, Stack, Group, Button, Menu, ActionIcon } from "@mantine/core";
+import { IconClock, IconArrowRight, IconDots, IconTrash } from '@tabler/icons-react';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -55,8 +55,10 @@ export default function PreviousStudySessionsList() {
                                 onClick={isCompleted ? undefined : () => navigate(`/StudySession/${session.id}`)}
                             >
                                 <Group position="apart" mb="xs">
-                                    <Text size="sm" fw={500}>{session.title}</Text>
-                                    <Group spacing="xs">
+                                    <Text size="sm" fw={500} lineClamp={1} style={{ flex: 1, marginRight: '8px' }}>
+                                        {session.title}
+                                    </Text>
+                                    <Group spacing="xs" style={{ flexShrink: 0 }}>
                                         <IconClock size={16} />
                                         <Text size="sm" c="dimmed">
                                             {session.studiedTime > 0 
@@ -64,6 +66,30 @@ export default function PreviousStudySessionsList() {
                                                 : `${session.timer.timeLeft}s left`
                                             }
                                         </Text>
+                                        <Menu shadow="md" width={120}>
+                                            <Menu.Target>
+                                                <ActionIcon 
+                                                    variant="subtle" 
+                                                    size="sm"
+                                                    //stops the click event from propagating to the Paper onClick
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <IconDots size={16} />
+                                                </ActionIcon>
+                                            </Menu.Target>
+                                            <Menu.Dropdown>
+                                                <Menu.Item 
+                                                    icon={<IconTrash size={14} />} 
+                                                    color="red"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        
+                                                    }}
+                                                >
+                                                    Delete
+                                                </Menu.Item>
+                                            </Menu.Dropdown>
+                                        </Menu>
                                     </Group>
                                 </Group>
                                 {session.description && (

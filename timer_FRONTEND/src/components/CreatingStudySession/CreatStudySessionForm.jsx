@@ -76,6 +76,7 @@ export default function CreateStudySessionForm() {
                     name="title"
                     placeholder="What are you studying today?"
                     required
+                    maxLength = {120}
                 />
                 
                 <Textarea
@@ -84,6 +85,7 @@ export default function CreateStudySessionForm() {
                     placeholder="Add some details about your study session..."
                     autosize
                     minRows={2}
+                    maxLength = {400}
                 />
                 
                 <NumberInput

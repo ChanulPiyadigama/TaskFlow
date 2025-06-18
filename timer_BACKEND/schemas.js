@@ -152,6 +152,7 @@ const typeDefs = `
         updatestudiedTimeforStudySessionPost: String!
         resetAllLikesOnPosts: String!
         createGeneralPost(title: String!, description: String, category: String!): GeneralPost!
+        deletePostById(postID: ID!): String!
     }
 
 `;

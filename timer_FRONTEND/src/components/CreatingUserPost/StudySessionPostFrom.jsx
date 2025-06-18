@@ -111,7 +111,7 @@ export default function StudySessionPostForm({preSelectedSession}) {
                 <Paper p="md">
                     <Stack gap="md">
                         <Title order={3}>Choose a study session</Title>
-                        <Text>(you can only post completed study sessions)</Text>
+                        <Text size="sm" c="dimmed">(you can only post completed study sessions)</Text>
                         {userStudySessions}
                     </Stack>
                 </Paper>

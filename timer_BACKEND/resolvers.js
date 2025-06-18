@@ -721,6 +721,60 @@ const resolvers = {
             const populatedPost = await post.populate(['user', 'comments', 'likes']);
             return populatedPost;
         },
+        deletePostById: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to delete a post');
+            }
+
+            const post = await BasePost.findById(args.postID);
+            if (!post) {
+                throw new Error('No post found');
+            }
+
+            if (!post.user.equals(context.currentUser.id)) {
+                throw new Error('You can only delete your own posts');
+            }
+
+            //delete all things related to the post 
+            try{
+                const comments = await Comment.find({ post: post._id });
+                const commentIds = comments.map(comment => comment._id);
+
+                if (commentIds.length > 0){
+                    await User.updateMany(
+                        {comments: {$in: commentIds}},
+                        {$pull: {comments: {$in: commentIds}}}
+                    )
+
+                    await Comment.deleteMany({ post: post._id });
+                }
+
+                await User.updateMany(
+                    { likedPosts: post._id },
+                    { $pull: { likedPosts: post._id } }
+                )
+
+                await User.findByIdAndUpdate(
+                    context.currentUser.id,
+                    { $pull: { allPosts: post._id} }
+                );
+
+                if (post.postType === 'StudySessionPost') {
+                    await StudySession.findByIdAndUpdate(
+                        post.studySession,
+                        { $unset: { postedID: 1 } }
+                    );
+                }
+                
+                await BasePost.findByIdAndDelete(args.postID);
+
+                return "Post deleted successfully!";
+            } catch (error) {
+                console.error("Error deleting post:", error);
+                throw new Error("Failed to delete post");
+            }
+        },
+
 
 
 
