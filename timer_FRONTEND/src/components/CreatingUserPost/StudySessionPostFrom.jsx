@@ -6,7 +6,7 @@ import { CREATE_USER_STUDY_SESSION_POST, GET_FRIENDS_POSTS } from "../../data/qu
 import { useMutation } from "@apollo/client"
 import { useModal } from "../../context/ModalContext"
 import { useEffect } from "react"
-import PostInputs from "../../Layouts/PostInputs"
+import PostInputs from "./PostInputs"
 
 export default function StudySessionPostForm({preSelectedSession}) {
     const { closeModal } = useModal()

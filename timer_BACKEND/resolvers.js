@@ -202,6 +202,41 @@ const resolvers = {
             //change here as you wish to populate other fields, for now we just want the comments
             const populatedPost = await post.populate('comments')
             return populatedPost;
+        },
+        getUserPosts: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to view your posts');
+            }
+
+            const user = await User.findById(context.currentUser.id).populate('allPosts');
+            if (!user) {
+                throw new Error('No user found');
+            }
+            //populate each post's likes and comments
+            const populatedPosts = await Promise.all(
+                user.allPosts.map(post => 
+                    post.populate([
+                        'likes',
+                        {
+                            path: 'comments',
+                            populate: {
+                                path: 'user'  // This populates the user field in each comment
+                            }
+                        }
+                    ])
+                )
+            )
+
+            return populatedPosts;
+        },
+        getPostById: async (parent, args, context) => {
+            const post = await BasePost.findById(args.postID);
+            if (!post) {
+                throw new Error('No post found');
+            }
+            //populate the post with likes and comments
+            const populatedPost = await post.populate(['likes', 'comments','user']);
+            return populatedPost;
         }
     },
 
@@ -765,7 +800,7 @@ const resolvers = {
                         { $unset: { postedID: 1 } }
                     );
                 }
-                
+
                 await BasePost.findByIdAndDelete(args.postID);
 
                 return "Post deleted successfully!";

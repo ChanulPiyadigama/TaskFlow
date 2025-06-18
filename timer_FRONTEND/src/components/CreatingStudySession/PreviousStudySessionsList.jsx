@@ -7,8 +7,12 @@ import { useAuth } from "../../context/AuthContext";
 
 export default function PreviousStudySessionsList() {
     const { loading: loadingStudySessions, data: dataStudySessions, error: errorStudySessions } = useQuery(GET_ALL_USER_STUDY_SESSIONS);
+    
+    
     const navigate = useNavigate();
     const { user } = useAuth(); 
+
+
     //mantine loader, deafult to small spinner
     if (loadingStudySessions) return <Loader />;
     if (errorStudySessions) return <Text c="red">Error loading study sessions</Text>;
@@ -83,7 +87,6 @@ export default function PreviousStudySessionsList() {
                                                     color="red"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        
                                                     }}
                                                 >
                                                     Delete

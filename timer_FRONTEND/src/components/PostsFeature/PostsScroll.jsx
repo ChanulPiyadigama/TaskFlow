@@ -1,4 +1,4 @@
-import { GET_FRIENDS_POSTS, CREATE_COMMENT_FOR_POST, LIKE_POST } from "../../data/queries";
+import { GET_FRIENDS_POSTS} from "../../data/queries";
 import { useQuery } from "@apollo/client";
 import { useState, useEffect, useRef } from "react";
 import { 
@@ -15,12 +15,12 @@ import {
     Paper,
     Box 
 } from "@mantine/core";
-import { IconCalendar, IconMessage, IconHeart, IconHeartFilled } from '@tabler/icons-react';
+import { IconCalendar, IconMessage} from '@tabler/icons-react';
 import { useModal } from "../../context/ModalContext";
 import PostComments from "./PostComments";
 import { useAuth } from "../../context/AuthContext";
-import { useMutation } from "@apollo/client";
-
+import { getCategoryColor } from "../HelperFunctions/mainFeatureFunctions";
+import LikeButton from "./LikeButton";
 
 /*
 
@@ -61,16 +61,6 @@ export default function PostsScroll(){
               }    
         },
     })  
-
-    const [likePost] = useMutation(LIKE_POST, {
-    });
-
-    const handleLike = (postId) => {
-        likePost({
-            variables: { postID : postId }
-        });
-    }
-
     //(2)
     useEffect(() => {
         if (!hasMore) return;
@@ -118,16 +108,7 @@ export default function PostsScroll(){
         });
     };
 
-    //function to get category color based on post category
-    const getCategoryColor = (category) => {
-      const categoryColors = {
-        'announcement': 'blue',
-        'question': 'orange', 
-        'discussion': 'green',
-        'misc': 'gray'
-      };
-      return categoryColors[category] || 'grape'; // fallback color
-    };
+
 
     const toggleExpanded = (postId) => {
       setExpandedPosts(prev => {
@@ -282,19 +263,7 @@ export default function PostsScroll(){
                     >
                       <Text size="lg">{post.comments?.length || 0}</Text> 
                     </Button>
-                    <Button
-                      variant="subtle"
-                      size="lg"  
-                      color={post.likes.some(like => like.id === user?.id) ? "red" : "gray"}
-                      leftSection={
-                        post.likes.some(like => like.id === user?.id)
-                          ? <IconHeartFilled size={20} /> 
-                          : <IconHeart size={20} />
-                      }
-                      onClick={() => handleLike(post.id)}
-                    >
-                      <Text size="lg">{post.likes.length || 0}</Text>  
-                    </Button>
+                    <LikeButton post={post}/>
                   </Group>
                 </Stack>
               </Card>

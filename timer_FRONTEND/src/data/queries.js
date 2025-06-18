@@ -431,3 +431,71 @@ mutation Mutation($category: String!, $description: String, $title: String!) {
   }
 }
 `
+
+export const DELETE_POST_BY_ID = gql`
+mutation DeletePostById($postId: ID!) {
+  deletePostById(postID: $postId)
+}
+`
+
+export const GET_ALL_USER_POSTS = gql`
+query Query {
+  getUserPosts {
+    title
+    postType
+    id
+    description
+    createdAt
+    lastInteraction
+    likes {
+      id
+    }
+    comments {
+      id
+      createdAt
+      content
+      user {
+        id
+        name
+        username
+      }
+    }
+  }
+}
+`
+
+export const GET_POST_BY_ID = gql`
+query Query($postId: ID!) {
+  getPostById(postID: $postId) {
+    comments {
+      id
+      content
+      createdAt
+      lastInteraction
+    }
+    createdAt
+    description
+    id
+    lastInteraction
+    likes {
+      id
+    }
+    postType
+    ... on StudySessionPost {
+      studiedTime
+      exclusions {
+        excludeTime
+      }
+    }
+    ... on GeneralPost {
+      category
+    }
+    title
+    user {
+      id
+      name
+      username
+    }
+  }
+}
+`

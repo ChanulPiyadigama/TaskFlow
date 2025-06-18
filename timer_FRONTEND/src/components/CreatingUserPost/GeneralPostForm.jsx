@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/client";
 import { useState } from "react";
 import { Textarea, Button, TextInput, Select, Stack, Text } from '@mantine/core';
 import { useModal } from "../../context/ModalContext";
-import PostInputs from "../../Layouts/PostInputs";
+import PostInputs from "./PostInputs";
 
 export default function GeneralPostForm() {
     const { closeModal } = useModal();

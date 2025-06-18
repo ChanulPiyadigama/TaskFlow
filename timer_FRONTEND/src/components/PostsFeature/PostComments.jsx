@@ -1,12 +1,21 @@
-import { Box, Text, Paper, Stack, ScrollArea, Title, Grid, TextInput, Button, Divider } from '@mantine/core';
-import { GET_COMMENTS_FOR_POST, CREATE_COMMENT_FOR_POST } from '../../data/queries';
+import { Box, Text, Paper, Stack, ScrollArea, Title, Grid, TextInput, Button, Divider, Group, Badge, Avatar } from '@mantine/core';
+import { GET_COMMENTS_FOR_POST, CREATE_COMMENT_FOR_POST, GET_POST_BY_ID } from '../../data/queries';
 import { useQuery, useMutation } from '@apollo/client';
 import { useState } from 'react';
-import { IconSend } from '@tabler/icons-react';
+import { IconSend, IconCalendar, IconMessage, IconHeart, IconHeartFilled } from '@tabler/icons-react';
+import { getCategoryColor } from '../HelperFunctions/mainFeatureFunctions';
+import LikeButton from './LikeButton';
 
 //displays the commetns for the post in a modal, grabs the commetns form the network and updates the post in the cache (1), 
 //we also use mutation to create a comment and refetch to display (2)
-export default function PostComments({ postId, postData }) {
+export default function PostComments({ postId }) {
+  
+  const { loading: loadingpost, data: PostData, error: errorpost } = useQuery(GET_POST_BY_ID,{
+    variables: { postId: postId },
+    onError: (error) => {
+      console.error('Error fetching post data:', error.message);
+    }
+  })
   
   //(2)
   const [commentText, setCommentText] = useState('');
@@ -36,23 +45,79 @@ export default function PostComments({ postId, postData }) {
     setCommentText('');
   };
 
-  if (loadingPostComments) return <Text>Loading comments...</Text>;
+  if (loadingPostComments || loadingpost) return <Text>Loading comments...</Text>;
   if (errorPostComments) return <Text c="red">Error loading comments</Text>;
+
+  const post = PostData.getPostById;
+  console.log(post)
 
   return (
     <Grid gutter="md" style={{ height: '76vh' }}>
       {/* Left 2/3 - Post Content */}
       <Grid.Col span={8}>
-        <Paper p="xl" withBorder style={{ height: '70vh' }}>
-          <Stack spacing="md">
-            <Title order={2}>{postData.title}</Title>
-            <Divider />
-            <Text size="lg">{postData.description}</Text>
-            
-            {/* Additional post details can go here */}
-            <Text size="sm" c="dimmed">
-              Posted by {postData.user.name} on {new Date(Number(postData.createdAt)).toLocaleDateString()}
+        <Paper p="xl" withBorder style={{ minHeight: '70vh', height: 'auto' }}>
+          <Stack spacing="lg">
+            {/* User info and date at the top */}
+            <Group position="apart" mb="xs">
+              <Group>
+                <Avatar radius="xl" size='lg' color="blue">
+                  {post.user.name.charAt(0)}
+                </Avatar>
+                <Text fw={500} size='lg'>{post.user.name}</Text>
+              </Group>
+              
+              <Badge 
+                color="blue" 
+                variant="light"
+                size="lg"
+                leftSection={<IconCalendar size={18} />}
+              >
+                {new Date(Number(post.createdAt)).toLocaleDateString()}
+              </Badge>
+            </Group>
+
+            {post.postType === 'StudySessionPost' && 
+              <Text size="lg" c="dimmed" fs="italic" mb="lg">
+                {post.user.name} has completed a study session!
+              </Text>
+            }
+
+            {post.postType === 'GeneralPost' && (
+              <Badge 
+                size="lg" 
+                variant="filled" 
+                color={getCategoryColor(post.category)} 
+                mb="lg"
+                style={{ textTransform: 'capitalize', fontSize: '16px' }} 
+              >
+                {post.category}
+              </Badge>
+            )}
+
+            <Title order={1} size="3rem" mb="lg">{post.title}</Title>
+
+            {post.postType === 'StudySessionPost' && (
+              <>
+                {!post.exclusions?.excludeTime && (
+                  <Stack spacing={8} align="flex-start" mb="xl">
+                    <Text size="s" c="dimmed">
+                      Studied for:
+                    </Text>
+                    <Text size="4.5rem" fw={700} c='#9370DB'>
+                      {Math.floor(post.studiedTime / 3600)}h {Math.floor((post.studiedTime % 3600) / 60)}m {post.studiedTime % 60}s
+                    </Text>
+                  </Stack>
+                )}
+              </>
+            )}
+
+            <Text size="s" c="dimmed" mb="lg">
+              {post.description}
             </Text>
+            <Group>
+              <LikeButton post ={post}/>
+            </Group>
+            
           </Stack>
         </Paper>
       </Grid.Col>
@@ -96,7 +161,6 @@ export default function PostComments({ postId, postData }) {
                     onClick={handleSubmitComment}
                     disabled={!commentText.trim()}
                   >
-                    {/* FIX THIS ICON NOT APPEARING */}
                     <IconSend size={16} />
                   </Button>
                 }

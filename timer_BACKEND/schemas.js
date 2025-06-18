@@ -127,6 +127,8 @@ const typeDefs = `
         searchUsers(query: String!): [User]
         getUserInfoById(userID: ID!): User
         getPostCommentsById(postID: ID!): BasePost
+        getUserPosts: [BasePost]
+        getPostById(postID: ID!): BasePost
     }
     
     type Mutation{
