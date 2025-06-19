@@ -1,7 +1,8 @@
 import { Stack, Text, Title } from "@mantine/core";
+import { useAuth } from "../../context/AuthContext";
 
-export default function UserPageAbout({user}) {
-
+export default function UserPageAbout() {
+    const { user} = useAuth();
     return (
         <Stack spacing="md">
             <div>

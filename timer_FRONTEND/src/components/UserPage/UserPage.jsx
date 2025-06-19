@@ -91,15 +91,15 @@ export default function UserPage() {
                     </Tabs.List>
 
                     <Tabs.Panel value="about" p="md">
-                        <UserPageAbout user ={user}/>
+                        <UserPageAbout/>
                     </Tabs.Panel>
 
                     <Tabs.Panel value="sessions" p="md">
-                        <UserPageStudySessions user ={user}/>
+                        <UserPageStudySessions/>
                     </Tabs.Panel>
 
                     <Tabs.Panel value="posts" p="md">
-                        <UserPagePosts user ={user}/>
+                        <UserPagePosts/>
                     </Tabs.Panel>
                 </Tabs>
             </Paper>

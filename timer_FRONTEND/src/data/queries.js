@@ -447,8 +447,8 @@ mutation DeletePostById($postId: ID!) {
 `
 
 export const GET_ALL_USER_POSTS = gql`
-query Query {
-  getUserPosts {
+query GetUserPosts($cursor: String, $limit: Int!) {
+  getUserPosts(cursor: $cursor, limit: $limit) {
     title
     postType
     id
@@ -467,6 +467,15 @@ query Query {
         name
         username
       }
+    }
+    ... on StudySessionPost {
+      studiedTime
+      exclusions {
+        excludeTime
+      }
+    }
+    ... on GeneralPost {
+      category
     }
   }
 }

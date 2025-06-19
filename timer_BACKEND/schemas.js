@@ -127,7 +127,7 @@ const typeDefs = `
         searchUsers(query: String!): [User]
         getUserInfoById(userID: ID!): User
         getPostCommentsById(postID: ID!): BasePost
-        getUserPosts: [BasePost]
+        getUserPosts(cursor:String, limit:Int!): [BasePost]
         getPostById(postID: ID!): BasePost
     }
     

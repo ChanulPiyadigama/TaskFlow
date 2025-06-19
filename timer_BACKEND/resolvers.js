@@ -208,26 +208,32 @@ const resolvers = {
                 throw new Error('You must be logged in to view your posts');
             }
 
-            const user = await User.findById(context.currentUser.id).populate('allPosts');
-            if (!user) {
-                throw new Error('No user found');
+            // Build the query object
+            const query = { user: context.currentUser.id };
+            
+            if (args.cursor) {
+                // Decode the base64 cursor string to original UNIX timestamp
+                const decodedString = Buffer.from(args.cursor, 'base64').toString();
+                const decodedTime = new Date(Number(decodedString));
+                query.createdAt = { $lt: decodedTime };
             }
-            //populate each post's likes and comments
-            const populatedPosts = await Promise.all(
-                user.allPosts.map(post => 
-                    post.populate([
-                        'likes',
-                        {
-                            path: 'comments',
-                            populate: {
-                                path: 'user'  // This populates the user field in each comment
-                            }
-                        }
-                    ])
-                )
-            )
 
-            return populatedPosts;
+            // Query posts directly from BasePost collection
+            const userPosts = await BasePost.find(query)
+                .populate([
+                    'user',
+                    'likes',
+                    {
+                        path: 'comments',
+                        populate: {
+                            path: 'user'
+                        }
+                    }
+                ])
+                .sort({ createdAt: -1 })  // Sort by newest first
+                .limit(args.limit || 10); // Default limit of 10
+
+            return userPosts;
         },
         getPostById: async (parent, args, context) => {
             const post = await BasePost.findById(args.postID);

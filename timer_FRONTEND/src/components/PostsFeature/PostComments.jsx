@@ -1,8 +1,8 @@
-import { Box, Text, Paper, Stack, ScrollArea, Title, Grid, TextInput, Button, Divider, Group, Badge, Avatar } from '@mantine/core';
+import { Box, Text, Paper, Stack, ScrollArea, Title, Grid, TextInput, ActionIcon, Divider, Group, Badge, Avatar } from '@mantine/core';
 import { GET_COMMENTS_FOR_POST, CREATE_COMMENT_FOR_POST, GET_POST_BY_ID } from '../../data/queries';
 import { useQuery, useMutation } from '@apollo/client';
 import { useState } from 'react';
-import { IconSend, IconCalendar, IconMessage, IconHeart, IconHeartFilled } from '@tabler/icons-react';
+import { IconSend, IconCalendar } from '@tabler/icons-react';
 import { getCategoryColor } from '../HelperFunctions/mainFeatureFunctions';
 import LikeButton from './LikeButton';
 
@@ -155,14 +155,14 @@ export default function PostComments({ postId }) {
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 rightSection={
-                  <Button 
-                    size='xs' 
-                    variant="subtle" 
-                    onClick={handleSubmitComment}
-                    disabled={!commentText.trim()}
+                  <ActionIcon 
+                      variant="subtle" 
+                      onClick={handleSubmitComment}
+                      disabled={!commentText.trim()}
+                      size="md"
                   >
-                    <IconSend size={16} />
-                  </Button>
+                      <IconSend size={18} />
+                  </ActionIcon>
                 }
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && commentText.trim()) {
