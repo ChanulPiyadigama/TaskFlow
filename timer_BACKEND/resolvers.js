@@ -680,7 +680,8 @@ const resolvers = {
             context.currentUser.comments.push(comment._id);
             await context.currentUser.save();
 
-            return comment;
+            const populatedPost = await post.populate(['comments'])
+            return populatedPost;
         },
         completeStudySessionForUser: async (parent, args, context) => {
             if (!context.currentUser) {

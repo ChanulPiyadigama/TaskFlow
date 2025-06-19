@@ -148,7 +148,7 @@ const typeDefs = `
         createStudySessionPost(title: String!, description: String, exclusions: StudySessionPostExclusions, studySessionId: ID! ): StudySessionPost!
         clearUserOutgoingFriendRequests: String!
         clearUserIncomingFriendRequests: String!
-        createCommentForPost(postID: ID!, content: String!): Comment!
+        createCommentForPost(postID: ID!, content: String!): BasePost!
         completeStudySessionForUser(studySessionID: ID!, studiedTime: Int!): StudySession!
         userLikesPost(postID: ID!): LikeResponse!
         updatestudiedTimeforStudySessionPost: String!

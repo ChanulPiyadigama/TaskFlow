@@ -331,6 +331,12 @@ query GetUserFriendsPosts($cursor: String, $limit: Int!) {
       id
       __typename
     }
+    comments {
+      id
+      content
+      lastInteraction
+      createdAt
+    }
     user {
       id
       __typename
@@ -352,13 +358,15 @@ query GetUserFriendsPosts($cursor: String, $limit: Int!) {
 `;
 
 export const CREATE_COMMENT_FOR_POST =  gql`
-mutation CreateCommentForPost($content: String!, $postId: ID!) {
-  createCommentForPost(content: $content, postID: $postId) {
-    content
-    createdAt
+mutation Mutation($postId: ID!, $content: String!) {
+  createCommentForPost(postID: $postId, content: $content) {
     id
-    lastInteraction
-
+    comments {
+      id
+      content
+      lastInteraction
+      createdAt
+    }
   }
 }
 `
