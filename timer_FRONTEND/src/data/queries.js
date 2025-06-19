@@ -518,3 +518,11 @@ query Query($postId: ID!) {
   }
 }
 `
+
+export const DELETE_STUDY_SESSION_BY_ID = gql`
+mutation Mutation($studySessionId: ID!) {
+  deleteStudySessionById(studySessionID: $studySessionId) {
+    id
+  }
+}
+`

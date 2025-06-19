@@ -155,6 +155,7 @@ const typeDefs = `
         resetAllLikesOnPosts: String!
         createGeneralPost(title: String!, description: String, category: String!): GeneralPost!
         deletePostById(postID: ID!): BasePost
+        deleteStudySessionById(studySessionID: ID!): StudySession
     }
 
 `;

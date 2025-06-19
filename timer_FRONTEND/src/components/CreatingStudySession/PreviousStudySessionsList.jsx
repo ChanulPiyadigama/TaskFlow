@@ -1,16 +1,37 @@
-import { GET_ALL_USER_STUDY_SESSIONS } from "../../data/queries";
-import { useQuery } from "@apollo/client";
+import { GET_ALL_USER_STUDY_SESSIONS, DELETE_STUDY_SESSION_BY_ID } from "../../data/queries";
+import { useQuery, useMutation } from "@apollo/client";
 import { List, Loader, Text, Title, Paper, Stack, Group, Button, Menu, ActionIcon } from "@mantine/core";
 import { IconClock, IconArrowRight, IconDots, IconTrash } from '@tabler/icons-react';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
+
 export default function PreviousStudySessionsList() {
     const { loading: loadingStudySessions, data: dataStudySessions, error: errorStudySessions } = useQuery(GET_ALL_USER_STUDY_SESSIONS);
     
+    const [deleteStudySession, {data: deleteData, loading: deleteLoading, error: deleteError}] = useMutation(DELETE_STUDY_SESSION_BY_ID, {
+    update(cache, { data }) {
+        if (data?.deleteStudySessionById) {
+            // Remove from cache without network request since its more efficient than doing a full refetch
+            cache.evict({ 
+                id: cache.identify(data.deleteStudySessionById) 
+            });
+            cache.gc();
+        }
+    },
+    onError: (error) => {
+        console.error('Error deleting study session:', error.message);
+    }
+});
     
     const navigate = useNavigate();
     const { user } = useAuth(); 
+
+    const handleDeleteSession = (sessionId) => {
+        deleteStudySession({
+            variables: { studySessionId: sessionId }
+        })
+    }
 
 
     //mantine loader, deafult to small spinner
@@ -87,6 +108,7 @@ export default function PreviousStudySessionsList() {
                                                     color="red"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
+                                                        handleDeleteSession(session.id);
                                                     }}
                                                 >
                                                     Delete

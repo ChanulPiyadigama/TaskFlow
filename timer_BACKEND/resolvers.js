@@ -815,6 +815,41 @@ const resolvers = {
                 throw new Error("Failed to delete post");
             }
         },
+        deleteStudySessionById: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to delete a study session');
+            }
+
+            const studySession = await StudySession.findById(args.studySessionID);
+            if (!studySession) {
+                throw new Error('No study session found');
+            }
+
+            if (!studySession.user.equals(context.currentUser.id)) {
+                throw new Error('You can only delete your own study sessions');
+            }
+
+            //delete all things related to the study session
+            try{
+                //delete the timer associated with the study session
+                if (studySession.timer) {
+                    await Timer.findByIdAndDelete(studySession.timer);
+                }
+                
+                //remove the study session from the user's allPosts array
+                await User.findByIdAndUpdate(
+                    context.currentUser.id,
+                    { $pull: { allPosts: studySession._id } }
+                );
+
+                await StudySession.findByIdAndDelete(args.studySessionID);
+
+                return studySession;
+            } catch (error) {
+                console.error("Error deleting study session:", error);
+                throw new Error("Failed to delete study session");
+            }
+        },
 
 
 
