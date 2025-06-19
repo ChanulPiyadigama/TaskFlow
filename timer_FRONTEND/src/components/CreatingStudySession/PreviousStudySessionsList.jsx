@@ -6,36 +6,19 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useModal } from "../../context/ModalContext";
 import StudySessionPostForm from "../CreatingUserPost/StudySessionPostFrom";
+import { useDeleteStudySession } from "../HelperFunctions/deleteStudySessionById";
 
 
 export default function PreviousStudySessionsList() {
     const { loading: loadingStudySessions, data: dataStudySessions, error: errorStudySessions } = useQuery(GET_ALL_USER_STUDY_SESSIONS);
-    
-    const [deleteStudySession, {data: deleteData, loading: deleteLoading, error: deleteError}] = useMutation(DELETE_STUDY_SESSION_BY_ID, {
-        update(cache, { data }) {
-            if (data?.deleteStudySessionById) {
-                // Remove from cache without network request since its more efficient than doing a full refetch
-                cache.evict({ 
-                    id: cache.identify(data.deleteStudySessionById) 
-                });
-                cache.gc();
-            }
-        },
-        onError: (error) => {
-            console.error('Error deleting study session:', error.message);
-        }
-    });
+
     
     const { openModal } = useModal();
     const navigate = useNavigate();
     const { user } = useAuth(); 
+    const { handleDeleteSession, deleteLoading } = useDeleteStudySession();
 
-    const handleDeleteSession = (sessionId) => {
-        deleteStudySession({
-            variables: { studySessionId: sessionId }
-        })
-    }
-
+    
     const handlePostSession = (sessionId) => {
         openModal(<StudySessionPostForm preSelectedSessionId={sessionId}/>)
     }
@@ -55,7 +38,7 @@ export default function PreviousStudySessionsList() {
         .sort((a, b) => new Date(parseInt(b.lastInteraction)) - new Date(parseInt(a.lastInteraction)))
         .slice(0, 5);
 
-    const completedSessions = userStudySessions
+    const unpostedSessions = userStudySessions
         .filter(session => session.studiedTime > 0 && session.postedID === null)
         .sort((a, b) => new Date(parseInt(b.lastInteraction)) - new Date(parseInt(a.lastInteraction)))
         .slice(0, 5);
@@ -155,7 +138,7 @@ export default function PreviousStudySessionsList() {
     return (
         <Stack>
             <SessionList sessions={activeSessions} title="Active Study Sessions" />
-            <SessionList sessions={completedSessions} title="Unposted Study Sessions" />
+            <SessionList sessions={unpostedSessions} title="Unposted Study Sessions" />
             <Button
                 variant="subtle"
                 rightSection={<IconArrowRight size={16} />}

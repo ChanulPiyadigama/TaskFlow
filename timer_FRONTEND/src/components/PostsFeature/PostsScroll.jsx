@@ -214,7 +214,19 @@ export default function PostsScroll(){
                   )}
 
 
-                  <Title order={1} size="3rem" mb="lg">{post.title}</Title>
+                  <Title 
+                    order={1} 
+                    size="2.4rem" 
+                    mb="lg"
+                    style={{
+                        wordWrap: 'break-word',
+                        wordBreak: 'break-word',
+                        whiteSpace: 'normal',
+                        overflowWrap: 'break-word'
+                    }}
+                >
+                    {post.title}
+                </Title>
 
 
                   {post.postType === 'StudySessionPost' && (
@@ -224,7 +236,7 @@ export default function PostsScroll(){
                           <Text size="s" c="dimmed">
                             Studied for:
                           </Text>
-                          <Text size="4.5rem" fw={700} c='#9370DB'>
+                          <Text size="5rem" fw={700} c='#9370DB'>
                             {Math.floor(post.studiedTime / 3600)}h {Math.floor((post.studiedTime % 3600) / 60)}m {post.studiedTime % 60}s
                           </Text>
                         </Stack>
