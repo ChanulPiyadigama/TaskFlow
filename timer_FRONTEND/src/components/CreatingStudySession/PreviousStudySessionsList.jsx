@@ -1,29 +1,32 @@
 import { GET_ALL_USER_STUDY_SESSIONS, DELETE_STUDY_SESSION_BY_ID } from "../../data/queries";
 import { useQuery, useMutation } from "@apollo/client";
 import { List, Loader, Text, Title, Paper, Stack, Group, Button, Menu, ActionIcon } from "@mantine/core";
-import { IconClock, IconArrowRight, IconDots, IconTrash } from '@tabler/icons-react';
+import { IconClock, IconArrowRight, IconDots, IconTrash, IconShare } from '@tabler/icons-react';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useModal } from "../../context/ModalContext";
+import StudySessionPostForm from "../CreatingUserPost/StudySessionPostFrom";
 
 
 export default function PreviousStudySessionsList() {
     const { loading: loadingStudySessions, data: dataStudySessions, error: errorStudySessions } = useQuery(GET_ALL_USER_STUDY_SESSIONS);
     
     const [deleteStudySession, {data: deleteData, loading: deleteLoading, error: deleteError}] = useMutation(DELETE_STUDY_SESSION_BY_ID, {
-    update(cache, { data }) {
-        if (data?.deleteStudySessionById) {
-            // Remove from cache without network request since its more efficient than doing a full refetch
-            cache.evict({ 
-                id: cache.identify(data.deleteStudySessionById) 
-            });
-            cache.gc();
+        update(cache, { data }) {
+            if (data?.deleteStudySessionById) {
+                // Remove from cache without network request since its more efficient than doing a full refetch
+                cache.evict({ 
+                    id: cache.identify(data.deleteStudySessionById) 
+                });
+                cache.gc();
+            }
+        },
+        onError: (error) => {
+            console.error('Error deleting study session:', error.message);
         }
-    },
-    onError: (error) => {
-        console.error('Error deleting study session:', error.message);
-    }
-});
+    });
     
+    const { openModal } = useModal();
     const navigate = useNavigate();
     const { user } = useAuth(); 
 
@@ -31,6 +34,10 @@ export default function PreviousStudySessionsList() {
         deleteStudySession({
             variables: { studySessionId: sessionId }
         })
+    }
+
+    const handlePostSession = (sessionId) => {
+        openModal(<StudySessionPostForm preSelectedSessionId={sessionId}/>)
     }
 
 
@@ -49,7 +56,7 @@ export default function PreviousStudySessionsList() {
         .slice(0, 5);
 
     const completedSessions = userStudySessions
-        .filter(session => session.studiedTime > 0)
+        .filter(session => session.studiedTime > 0 && session.postedID === null)
         .sort((a, b) => new Date(parseInt(b.lastInteraction)) - new Date(parseInt(a.lastInteraction)))
         .slice(0, 5);
 
@@ -77,7 +84,10 @@ export default function PreviousStudySessionsList() {
                                     "&:hover": isCompleted ? {} : { transform: "scale(1.02)" }, 
                                     opacity: isCompleted ? 0.7 : 1, 
                                 }}
-                                onClick={isCompleted ? undefined : () => navigate(`/StudySession/${session.id}`)}
+                                onClick={isCompleted 
+                                    ? () => handlePostSession(session.id)
+                                    : () => navigate(`/StudySession/${session.id}`)
+                                }
                             >
                                 <Group position="apart" mb="xs">
                                     <Text size="sm" fw={500} lineClamp={1} style={{ flex: 1, marginRight: '8px' }}>
@@ -104,7 +114,7 @@ export default function PreviousStudySessionsList() {
                                             </Menu.Target>
                                             <Menu.Dropdown>
                                                 <Menu.Item 
-                                                    icon={<IconTrash size={14} />} 
+                                                    leftSection={<IconTrash size={14} />} 
                                                     color="red"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
@@ -112,6 +122,16 @@ export default function PreviousStudySessionsList() {
                                                     }}
                                                 >
                                                     Delete
+                                                </Menu.Item>
+                                                <Menu.Item 
+                                                    leftSection={<IconShare size={14} />} 
+                                                    color="violet"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handlePostSession(session.id);
+                                                    }}
+                                                >
+                                                    Post
                                                 </Menu.Item>
                                             </Menu.Dropdown>
                                         </Menu>
@@ -135,7 +155,7 @@ export default function PreviousStudySessionsList() {
     return (
         <Stack>
             <SessionList sessions={activeSessions} title="Active Study Sessions" />
-            <SessionList sessions={completedSessions} title="Completed Study Sessions" />
+            <SessionList sessions={completedSessions} title="Unposted Study Sessions" />
             <Button
                 variant="subtle"
                 rightSection={<IconArrowRight size={16} />}

@@ -35,7 +35,7 @@ export default function PostCompletedStudySessionModalConfirmation({ studiedTime
 
     const handlePostSession = () => {
         closeModal(); 
-        openModal(<StudySessionPostForm  preSelectedSession={studySessionData.getSpecificStudySession}/>); 
+        openModal(<StudySessionPostForm  preSelectedSession={studySessionId}/>); 
     };
 
     const handleSkip = () => {

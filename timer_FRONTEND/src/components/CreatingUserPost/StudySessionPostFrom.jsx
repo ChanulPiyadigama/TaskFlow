@@ -1,6 +1,6 @@
-import { Textarea, TextInput, Button, Stack, Title, Paper, Checkbox, Group, Text } from "@mantine/core"
+import {Button, Stack, Title, Paper, Checkbox, Group, Text, Loader, Center } from "@mantine/core"
 import { useQuery } from "@apollo/client"
-import { GET_ALL_USER_STUDY_SESSIONS } from "../../data/queries"
+import { GET_ALL_USER_STUDY_SESSIONS, GET_STUDY_SESSION_BYID } from "../../data/queries"
 import { useState } from "react"
 import { CREATE_USER_STUDY_SESSION_POST, GET_FRIENDS_POSTS } from "../../data/queries"
 import { useMutation } from "@apollo/client"
@@ -8,7 +8,7 @@ import { useModal } from "../../context/ModalContext"
 import { useEffect } from "react"
 import PostInputs from "./PostInputs"
 
-export default function StudySessionPostForm({preSelectedSession}) {
+export default function StudySessionPostForm({preSelectedSessionId}) {
     const { closeModal } = useModal()
 
     const { loading: loadingStudySessions, data: dataStudySessions, error: errorStudySessions } = useQuery(GET_ALL_USER_STUDY_SESSIONS)
@@ -44,23 +44,28 @@ export default function StudySessionPostForm({preSelectedSession}) {
     }
     )
 
-    useEffect(() => {
-        if (preSelectedSession) {
-
-            // Use the pre-selected session data
-            setPostingSession(preSelectedSession);
-            setTitle(preSelectedSession.title || "");
-            setDescription(preSelectedSession.description || "");
+    const { data: studySessionData, loading: loadingSessionData, error:  errorSessionData} = useQuery(GET_STUDY_SESSION_BYID, {
+        variables: { studySessionId : preSelectedSessionId },
+        fetchPolicy: 'cache-first',
+        skip: !preSelectedSessionId, // Skip if no preSelectedSessionId is provided
+        onError: (error) => {
+            console.error('Error fetching study session data:', error.message);
         }
-    }, [])
+    });
+
+    useEffect(() => {
+        if (studySessionData) {
+            setPostingSession(studySessionData.getSpecificStudySession);
+            setTitle(studySessionData.getSpecificStudySession.title || "");
+            setDescription(studySessionData.getSpecificStudySession.description || "");
+        }
+    }, [studySessionData])
 
     const [postingSession, setPostingSession] = useState(null)
     const [excludeTime, setExcludeTime] = useState(false)
-    const [title, setTitle] = useState(postingSession?.title ||"")
-    const [description, setDescription] = useState(postingSession?.description ||"")
+    const [title, setTitle] = useState("")
+    const [description, setDescription] = useState("")
 
-
-    if (loadingStudySessions) return <p>Loading...</p>
 
     const handleStudySessionSelected = (session) => {
         setTitle(session.title)
@@ -105,6 +110,31 @@ export default function StudySessionPostForm({preSelectedSession}) {
         e.target.reset()
     }
 
+    // Show loading if any of the queries are loading
+    if (loadingStudySessions || (preSelectedSessionId && loadingSessionData)) {
+        return (
+            <Center h={200}>
+                <Stack align="center" gap="md">
+                    <Loader size="lg" />
+                    <Text size="sm" c="dimmed">Loading study sessions...</Text>
+                </Stack>
+            </Center>
+        );
+    }
+
+    // Show error if any queries failed
+    if (errorStudySessions || errorSessionData) {
+        return (
+            <Center h={200}>
+                <Stack align="center" gap="md">
+                    <Text c="red" size="sm">
+                        Error loading data: {errorStudySessions?.message || errorSessionData?.message}
+                    </Text>
+                </Stack>
+            </Center>
+        );
+    }
+    console.log("Posting session:", postingSession)
     return (
         <Stack gap="md">
             {!postingSession ? (
