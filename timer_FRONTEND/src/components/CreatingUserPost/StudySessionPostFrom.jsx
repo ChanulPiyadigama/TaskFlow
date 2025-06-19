@@ -10,7 +10,7 @@ import PostInputs from "./PostInputs"
 
 export default function StudySessionPostForm({preSelectedSessionId}) {
     const { closeModal } = useModal()
-
+    console.log(preSelectedSessionId)
     const { loading: loadingStudySessions, data: dataStudySessions, error: errorStudySessions } = useQuery(GET_ALL_USER_STUDY_SESSIONS)
     const [createUserPost, { loading: loadingCreateUserPost, data: dataCreateUserPost, error: errorCreateUserPost }] = useMutation(CREATE_USER_STUDY_SESSION_POST, {
         update: (cache, { data: { createStudySessionPost } }) => {
@@ -27,7 +27,7 @@ export default function StudySessionPostForm({preSelectedSessionId}) {
                     variables: { limit: 10 },
                     data: {
                         getUserFriendsPosts: [
-                            createStudySessionPost,
+                            createStudySessionPost.post,
                             ...existingData.getUserFriendsPosts
                         ]
                     }
@@ -134,7 +134,6 @@ export default function StudySessionPostForm({preSelectedSessionId}) {
             </Center>
         );
     }
-    console.log("Posting session:", postingSession)
     return (
         <Stack gap="md">
             {!postingSession ? (

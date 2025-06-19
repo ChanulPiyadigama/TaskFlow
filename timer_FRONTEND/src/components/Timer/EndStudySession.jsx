@@ -12,7 +12,6 @@ export default function EndStudySessionModal({studySessionId, studiedTime}) {
     const { closeModal } = useModal();
     const navigate = useNavigate();
     const { openModal } = useModal();
-   
 
     const [completeSession, {loading: loadingStudySesssionCompletion, data: dataStudySessionCompletition, error: errorStudySessionCompleition}] = useMutation(COMPLETE_STUDY_SESSION, {
         onCompleted: (data) => {

@@ -246,7 +246,6 @@ export default function PostsScroll(){
 
                   <Text size="s" c="dimmed" mb="lg">
                       {getDescriptionDisplay(post.description, post.id)}
-                      {console.log(post.description.length)}
                       {post.description.length > 100 && (
                         <Button
                           variant="subtle"

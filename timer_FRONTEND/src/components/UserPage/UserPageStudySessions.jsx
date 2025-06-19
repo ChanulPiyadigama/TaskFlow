@@ -58,7 +58,7 @@ export default function UserPageStudySessions() {
 
 
     const handleOnClickSession = (session) =>{
-        if (session.studiedTime > 0 && session.postedID === null) {
+        if (session.studiedTime >= 0 && !session.postedID) {
             handlePostSession(session.id);
         } else if (session.studiedTime < 0) {
             navigate(`/StudySession/${session.id}`);

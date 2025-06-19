@@ -51,7 +51,7 @@ export default function PreviousStudySessionsList() {
             <List spacing="sm" styles={{ itemWrapper: { listStyleType: "none" } }}>
                 {sessions.length > 0 ? (
                     sessions.slice(0, 5).map((session) => {
-                        const isCompleted = session.studiedTime > 0;
+                        const isCompleted = session.studiedTime >= 0;
                         
                         return (
                             <Paper

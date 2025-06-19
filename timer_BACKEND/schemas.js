@@ -109,6 +109,11 @@ const typeDefs = `
         user: User!
     }
 
+    type CreateStudySessionPostResponse {
+        post: StudySessionPost!
+        studySession: StudySession!
+    }
+
     type Query{
         allTimers: [Timer]
         allUsers: [User]
@@ -145,7 +150,7 @@ const typeDefs = `
         createStudySession(startTimeIsoString: String!, title: String, description: String, duration: Int): StudySession!
         updateStudySessionInteractionDate(studySessionID: ID!, newTime: String!): StudySession!
         deleteAllStudySessions: String!
-        createStudySessionPost(title: String!, description: String, exclusions: StudySessionPostExclusions, studySessionId: ID! ): StudySessionPost!
+        createStudySessionPost(title: String!, description: String, exclusions: StudySessionPostExclusions, studySessionId: ID! ): CreateStudySessionPostResponse!
         clearUserOutgoingFriendRequests: String!
         clearUserIncomingFriendRequests: String!
         createCommentForPost(postID: ID!, content: String!): BasePost!

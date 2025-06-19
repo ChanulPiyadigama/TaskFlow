@@ -170,6 +170,9 @@ mutation CreateStudySession($startTimeIsoString: String!, $title: String, $descr
       totalTime
     }
     studiedTime
+    postedID {
+      id
+    }
   }
 }
 `
@@ -258,30 +261,35 @@ mutation UpdateStudySessionInteractionDate($studySessionId: ID!, $newTime: Strin
 export const CREATE_USER_STUDY_SESSION_POST = gql`
 mutation CreateStudySessionPost($title: String!, $studySessionId: ID!, $exclusions: StudySessionPostExclusions, $description: String) {
   createStudySessionPost(title: $title, studySessionId: $studySessionId, exclusions: $exclusions, description: $description) {
-    id
-    createdAt
-    description
-    postedID{
+    post{
       id
+      createdAt
+      description
+      exclusions {
+        excludeTime
+      }
+      lastInteraction
+      postType
+      title
+      user{
+        id
+        name
+        username
+      }
+      likes{
+        id
+      }
+      comments {
+        id
+      }
+      studiedTime
     }
-    exclusions {
-      excludeTime
-    }
-    lastInteraction
-    postType
-    title
-    user{
+    studySession{
       id
-      name
-      username
+      postedID{
+        id
+      }
     }
-    likes{
-      id
-    }
-    comments {
-      id
-    }
-    studiedTime
   }
 }`
 

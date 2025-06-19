@@ -621,7 +621,7 @@ const resolvers = {
             if (!studySession) {
                 throw new Error('No study session found');
             }
-            if (studySession.studiedTime === -1) {
+            if (studySession.studiedTime < 0) {
                 throw new Error('Study session has not been completed yet');
             }
 
@@ -633,7 +633,7 @@ const resolvers = {
                 user: context.currentUser.id,
                 exclusions: args.exclusions,
                 studySession: args.studySessionId,
-                studiedTime: studySession.studiedTime,
+                studiedTime: studySession.studiedTime
             });
             await post.save()
 
@@ -644,7 +644,11 @@ const resolvers = {
             studySession.postedID = post._id;
             await studySession.save();
             const populatedPost = await post.populate(['studySession', 'comments', 'likes', 'user'])
-            return populatedPost
+            const populatedStudySession = await studySession.populate('postedID');
+            return {
+                post: populatedPost,  
+                studySession: populatedStudySession  
+            };
         },
         clearUserOutgoingFriendRequests: async (parent, args, context) => {
             if (!context.currentUser) {
