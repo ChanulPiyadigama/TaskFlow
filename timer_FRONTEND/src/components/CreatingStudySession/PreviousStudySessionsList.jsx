@@ -18,7 +18,7 @@ export default function PreviousStudySessionsList() {
     const { user } = useAuth(); 
     const { handleDeleteSession, deleteLoading } = useDeleteStudySession();
 
-    
+
     const handlePostSession = (sessionId) => {
         openModal(<StudySessionPostForm preSelectedSessionId={sessionId}/>)
     }
@@ -34,12 +34,12 @@ export default function PreviousStudySessionsList() {
 
     // Split sessions into active and completed
     const activeSessions = userStudySessions
-        .filter(session => !session.studiedTime || session.studiedTime <= 0)
+        .filter(session =>  session.studiedTime < 0)
         .sort((a, b) => new Date(parseInt(b.lastInteraction)) - new Date(parseInt(a.lastInteraction)))
         .slice(0, 5);
 
     const unpostedSessions = userStudySessions
-        .filter(session => session.studiedTime > 0 && session.postedID === null)
+        .filter(session => session.studiedTime >= 0 && !session.postedID)
         .sort((a, b) => new Date(parseInt(b.lastInteraction)) - new Date(parseInt(a.lastInteraction)))
         .slice(0, 5);
 

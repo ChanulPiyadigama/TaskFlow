@@ -45,15 +45,15 @@ export default function UserPageStudySessions() {
 
     // Split and sort sessions
     const activeSessions = studySessions
-        .filter(session => !session.studiedTime || session.studiedTime <= 0)
+        .filter(session => session.studiedTime < 0)
         .sort((a, b) => new Date(parseInt(b.lastInteraction)) - new Date(parseInt(a.lastInteraction)));
 
     const unpostedSessions = studySessions
-        .filter(session => session.studiedTime > 0 && session.postedID === null)
+        .filter(session => session.studiedTime >= 0 && !session.postedID)
         .sort((a, b) => new Date(parseInt(b.lastInteraction)) - new Date(parseInt(a.lastInteraction)));
 
     const postedSessions = studySessions
-        .filter(session => session.studiedTime > 0 && session.postedID != null)
+        .filter(session => session.studiedTime >= 0 && session.postedID)
         .sort((a, b) => new Date(parseInt(b.lastInteraction)) - new Date(parseInt(a.lastInteraction)));
 
 
@@ -114,7 +114,7 @@ export default function UserPageStudySessions() {
                             >
                                 Delete
                             </Menu.Item>
-                            {(session.studiedTime > 0 && session.postedID === null) && <Menu.Item 
+                            {(session.studiedTime >= 0 && !session.postedID) && <Menu.Item 
                                 leftSection={<IconShare size={14} />} 
                                 color="violet"
                                 onClick={(e) => {

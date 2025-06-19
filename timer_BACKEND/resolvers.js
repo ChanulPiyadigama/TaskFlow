@@ -104,13 +104,18 @@ const resolvers = {
                 throw new Error('No study session found');
             }
 
-            const populatedStudySession = await studySession.populate({
-                path: 'timer',
-                populate: [
-                    { path: 'log' },       
-                    { path: 'currentBreak' }  
-                ]
-            });
+            const populatedStudySession = await studySession.populate([
+                {
+                    path: 'timer',
+                    populate: [
+                        { path: 'log' },       
+                        { path: 'currentBreak' }  
+                    ]
+                },
+                {
+                    path: 'postedID'
+                }
+            ]);
 
             return populatedStudySession
         },

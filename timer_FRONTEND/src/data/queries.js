@@ -182,6 +182,9 @@ query GetSpecificStudySession($studySessionId: ID!) {
     id
     title
     studiedTime
+    postedID{
+      id
+    }
     timer {
       currentBreak {
         elapsedTime
@@ -258,6 +261,9 @@ mutation CreateStudySessionPost($title: String!, $studySessionId: ID!, $exclusio
     id
     createdAt
     description
+    postedID{
+      id
+    }
     exclusions {
       excludeTime
     }
@@ -270,6 +276,9 @@ mutation CreateStudySessionPost($title: String!, $studySessionId: ID!, $exclusio
       username
     }
     likes{
+      id
+    }
+    comments {
       id
     }
     studiedTime

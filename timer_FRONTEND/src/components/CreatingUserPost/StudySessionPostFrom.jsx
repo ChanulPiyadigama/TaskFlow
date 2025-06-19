@@ -76,7 +76,7 @@ export default function StudySessionPostForm({preSelectedSessionId}) {
     }
 
     const unPostedSessions = dataStudySessions.getUserStudySessions.filter((session) => 
-        !session.postedID && session.studiedTime > 0
+        !session.postedID && session.studiedTime >= 0
     )
 
 
