@@ -1,12 +1,13 @@
-import { Stack, Card, Text, Group, Badge, Loader, Grid, Button, Box, Title } from '@mantine/core';
-import { GET_ALL_USER_POSTS } from '../../data/queries';
+import { Stack, Card, Text, Group, Badge, Loader, Grid, Button, Box, Title, Menu, ActionIcon } from '@mantine/core';
+import { GET_ALL_USER_POSTS, DELETE_POST_BY_ID } from '../../data/queries';
 import { useQuery } from '@apollo/client';
-import {IconMessage, IconCalendar } from '@tabler/icons-react';
+import { IconMessage, IconCalendar, IconDots, IconTrash } from '@tabler/icons-react';
 import { useModal } from '../../context/ModalContext';
 import PostComments from '../PostsFeature/PostComments';
 import LikeButton from '../PostsFeature/LikeButton';
 import { getCategoryColor } from '../HelperFunctions/mainFeatureFunctions';
 import { useState, useEffect, useRef } from 'react';
+import { useMutation } from '@apollo/client';
 
 //displays the posts in a 3column grid, the posts are simplifed but when clicked opens the same post comment view, for full details. 
 //used same inifinte scroll logic as in the main posts feature
@@ -24,8 +25,31 @@ export default function UserPagePosts() {
             }
         },
     });
-    
+
+    const [deletePost, { data: deletePostData, loading: deletingPost, error: deletePostError }] = useMutation(DELETE_POST_BY_ID, {
+        update(cache, { data }) {
+            if (data?.deletePostById) {
+                // Apollo can automatically figure out the cache ID
+                cache.evict({ 
+                    id: cache.identify(data.deletePostById) 
+                });
+                cache.gc();
+            }
+        },
+        onError: (error) => {
+            console.error('Error deleting post:', error);
+        }
+    });
+
+    //opens PostComments modal to show post in detail 
     const { openModal } = useModal();
+
+    //to delete a post, calls mutation 
+    const handleDeletePost = async (postId) => {
+        deletePost({
+            variables: { postId }
+        })
+    };
 
     // Intersection Observer for infinite scroll
     useEffect(() => {
@@ -97,7 +121,8 @@ export default function UserPagePosts() {
             </Stack>
         );
     }
-    console.log(userPostsData)
+
+
     return (
         <Box p="md">
             <Grid gutter="lg">
@@ -117,7 +142,7 @@ export default function UserPagePosts() {
                             onClick={() => openModal(<PostComments postId={post.id} />)}
                         >
                             <Stack spacing="lg" style={{ flex: 1 }}>
-                                {/* Date badge */}
+                                {/* Date badge and menu */}
                                 <Group position="apart" mb="xs">
                                     <Badge 
                                         color="blue" 
@@ -127,6 +152,30 @@ export default function UserPagePosts() {
                                     >
                                         {new Date(Number(post.createdAt)).toLocaleDateString()}
                                     </Badge>
+                                    
+                                    <Menu shadow="md" width={120}>
+                                        <Menu.Target>
+                                            <ActionIcon 
+                                                variant="subtle" 
+                                                size="sm"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                <IconDots size={16} />
+                                            </ActionIcon>
+                                        </Menu.Target>
+                                        <Menu.Dropdown>
+                                            <Menu.Item 
+                                                icon={<IconTrash size={14} />} 
+                                                color="red"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeletePost(post.id);
+                                                }}
+                                            >
+                                                Delete
+                                            </Menu.Item>
+                                        </Menu.Dropdown>
+                                    </Menu>
                                 </Group>
 
                                 {post.postType === 'StudySessionPost' && 

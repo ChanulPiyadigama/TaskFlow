@@ -442,7 +442,9 @@ mutation Mutation($category: String!, $description: String, $title: String!) {
 
 export const DELETE_POST_BY_ID = gql`
 mutation DeletePostById($postId: ID!) {
-  deletePostById(postID: $postId)
+  deletePostById(postID: $postId) {
+    id
+  }
 }
 `
 

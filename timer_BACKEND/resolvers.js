@@ -807,10 +807,9 @@ const resolvers = {
                         { $unset: { postedID: 1 } }
                     );
                 }
-
                 await BasePost.findByIdAndDelete(args.postID);
 
-                return "Post deleted successfully!";
+                return post;
             } catch (error) {
                 console.error("Error deleting post:", error);
                 throw new Error("Failed to delete post");
