@@ -1,22 +1,30 @@
 import { CREATE_STUDY_SESSION, GET_ALL_USER_STUDY_SESSIONS } from "../../data/queries"
 import { useMutation } from "@apollo/client"
-import { TextInput, Textarea, Stack, Button, Text } from '@mantine/core'
+import { TextInput, Textarea, NumberInput, Stack, Button, Text } from '@mantine/core'
 import { useNavigate } from "react-router-dom"
 import { useModal } from "../../context/ModalContext"
-import { useState } from 'react'
+import { useState } from "react"
 
+//creates a study session and redirects to the study session page, on creation mutation loads page, and loads page
+//again with study session obj that been saved to cache along with timer obj 
 export default function CreateStudySessionForm() {
     const navigate = useNavigate()
     const {closeModal} = useModal()
-    const [timeValue, setTimeValue] = useState('')
-    const [durationSeconds, setDurationSeconds] = useState(0)
+
+    const [duration, setDuration] = useState("");
     
     const [createStudySession, {loading: loadingCreateStudySession, data: dataCreateStudySession, error: errorCreateStudySession}] = useMutation(CREATE_STUDY_SESSION, {
+        //we have to manually update the cache with the new timer, specfically for the query that 
+        //previousstudylist uses so that it will grab the new timer
+        //also cache is autmoatically from the mutation which is apollo client thus no need for client
         update: (cache, { data: { createStudySession } }) => {
+            // Read existing study sessions from cache
             const existingData = cache.readQuery({ 
                 query: GET_ALL_USER_STUDY_SESSIONS 
             });
     
+            // Write back to cache for specific query, so now when that query runs in cache, 
+            // it will return this new array
             cache.writeQuery({
                 query: GET_ALL_USER_STUDY_SESSIONS,
                 data: {
@@ -27,7 +35,7 @@ export default function CreateStudySessionForm() {
             });
         },
         onCompleted: (dataCreateStudySession) => {
-            closeModal()
+            closeModal() // close the modal after creating the study session
             navigate(`/StudySession/${dataCreateStudySession.createStudySession.id}`)
         },
         onError: (errorCreateStudySession) => {
@@ -35,77 +43,81 @@ export default function CreateStudySessionForm() {
         }
     })
 
-const formatTimeInput = (value) => {
-    // Remove any non-digit characters
-    const digits = value.replace(/\D/g, '');
-    
-    // Limit to 6 digits max
-    const limited = digits.slice(0, 6);
-    
-    // If empty, return empty string (don't format)
-    if (limited.length === 0) {
-        setDurationSeconds(0);
-        return '';
-    }
-    
-    let formatted = '';
-    let hours = 0, minutes = 0, seconds = 0;
-    
-    if (limited.length <= 2) {
-        // 1-2 digits: just show the digits, don't format yet
-        seconds = parseInt(limited) || 0;
-        formatted = limited; // Show raw digits
-    } else if (limited.length <= 4) {
-        // 3-4 digits: treat as minutes:seconds (500 -> 05:00, 1230 -> 12:30)
-        minutes = parseInt(limited.slice(0, -2)) || 0;
-        seconds = parseInt(limited.slice(-2)) || 0;
-        formatted = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    } else {
-        // 5-6 digits: treat as hours:minutes:seconds (12345 -> 1:23:45, 123456 -> 12:34:56)
-        hours = parseInt(limited.slice(0, -4)) || 0;
-        minutes = parseInt(limited.slice(-4, -2)) || 0;
-        seconds = parseInt(limited.slice(-2)) || 0;
-        formatted = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
-    
-    // Validate time values for longer inputs
-    if (limited.length > 2 && (minutes > 59 || seconds > 59)) {
-        return timeValue; // Return previous value if invalid
-    }
-    
-    // Calculate total seconds
-    const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-    setDurationSeconds(totalSeconds);
-    
-    return formatted;
-};
 
-    const handleTimeChange = (event) => {
-        const newValue = formatTimeInput(event.target.value);
-        setTimeValue(newValue);
-    };
 
     const handleSubmit = (e) => {
         e.preventDefault()
 
         const formData = new FormData(e.currentTarget)
+        
+        // Convert the duration from HH:MM:SS format to total seconds
+        const durationInSeconds = convertToSeconds(duration);
+        
+        // Validate minimum duration
+        if (durationInSeconds === 0) {
+            alert("Please enter a valid duration greater than 0");
+            return;
+        }
+        
         createStudySession({
             variables: {
                 title: formData.get("title"),
                 description: formData.get("description"),
-                duration: durationSeconds, // Use calculated seconds
+                duration: durationInSeconds, 
                 startTimeIsoString: new Date().toISOString()
             }
         })
         e.target.reset()
-        setTimeValue('')
-        setDurationSeconds(0)
+        setDuration('')
+    }
+
+    const convertToSeconds = (timeString) => {
+        if (!timeString) return 0;
+        
+        const paddedDigits = timeString.padStart(6, '0');
+        let hours = parseInt(paddedDigits.slice(0, 2)) || 0;
+        let minutes = parseInt(paddedDigits.slice(2, 4)) || 0;
+        let seconds = parseInt(paddedDigits.slice(4, 6)) || 0;
+
+        if (minutes > 59){
+            minutes = 59
+        }
+        if (seconds > 59){
+            seconds = 59
+        }
+        
+        return hours * 3600 + minutes * 60 + seconds;
+    }
+
+    const handleDurationChange = (value) => {
+
+        // Remove semicolons and any non-digit characters, then remove leading zeros
+        const cleanedValue = value.replace(/[;\D]/g, '').replace(/^0+/, '') || '0';
+
+        if (cleanedValue.length > 6) {
+            return;
+        }
+        setDuration(cleanedValue);
+    }
+
+    function insertChar(str, char, index) {
+        return str.slice(0, index) + char + str.slice(index);
+    }
+
+    //to create a dynamic input for duration similar to the generic google timer, i deconstruct and 
+    //reconstruct the string state value on every change 
+    const durationCombined = (val) =>{
+        let paddedVal = val.padStart(6, '0')
+
+        paddedVal = insertChar(paddedVal, ":", 2);
+        paddedVal = insertChar(paddedVal, ":", 5);
+        return paddedVal;
     }
 
     if (loadingCreateStudySession){
         return <p>Creating study session...</p>
     }
-
+    console.log(convertToSeconds(duration))
     return (
         <form onSubmit={handleSubmit}>
             <Stack spacing="md" mb="xl">
@@ -120,7 +132,7 @@ const formatTimeInput = (value) => {
                     name="title"
                     placeholder="What are you studying today?"
                     required
-                    maxLength={120}
+                    maxLength = {120}
                 />
                 
                 <Textarea
@@ -129,32 +141,27 @@ const formatTimeInput = (value) => {
                     placeholder="Add some details about your study session..."
                     autosize
                     minRows={2}
-                    maxLength={400}
+                    maxLength = {400}
                 />
                 
-                <TextInput
-                    label="Duration (HH:MM:SS)"
+                <TextInput 
+                    label="Duration (seconds)"
                     name="duration"
-                    description="Enter digits for time: 5 = 5 seconds, 500 = 5 minutes, 12345 = 1h 23m 45s"
-                    placeholder="Type: 5, 0, 0 for 5 minutes"
-                    value={timeValue}
-                    onChange={handleTimeChange}
-                    required
-                    error={durationSeconds === 0 && timeValue ? "Duration must be greater than 0" : null}
+                    description="How long do you want to study?"
+                    value = {durationCombined(duration)}
+                    onChange={(e)=> handleDurationChange(e.target.value)}
                 />
-                
-                {durationSeconds > 0 && (
-                    <Text size="sm" c="dimmed">
-                        Total: {Math.floor(durationSeconds / 3600)}h {Math.floor((durationSeconds % 3600) / 60)}m {durationSeconds % 60}s
-                        ({durationSeconds} seconds)
+
+                {duration && convertToSeconds(duration) > 0 && (
+                    <Text size="xs" c="dimmed" mt="xs">
+                        Duration: {Math.floor(convertToSeconds(duration) / 3600)}h {Math.floor((convertToSeconds(duration) % 3600) / 60)}m {convertToSeconds(duration) % 60}s 
                     </Text>
                 )}
                 
                 <Button 
                     type="submit" 
-                    loading={loadingCreateStudySession}
+                    loading={loadingCreateStudySession} // when clicked and operation sent, disable button to not send more
                     fullWidth
-                    disabled={durationSeconds === 0}
                 >
                     Start Session
                 </Button>
