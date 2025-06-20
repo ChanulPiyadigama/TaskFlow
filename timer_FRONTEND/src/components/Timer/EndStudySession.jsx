@@ -5,40 +5,25 @@ import { COMPLETE_STUDY_SESSION } from '../../data/queries';
 import { useMutation } from '@apollo/client';
 import { data, useNavigate } from 'react-router-dom';
 import PostCompletedStudySessionModalConfirmation from './PostCompletedStudySessionModalConfirmation';
+import { useEndStudySession } from '../HelperFunctions/endStudySession.jsx';
 
 //this modal checks if the user is sure they want to end the study session, if so we send a mutation to the server
 //and update both the timer and study session data first in the server, then the client's cache
 export default function EndStudySessionModal({studySessionId, studiedTime, timerID}) {
     const { closeModal } = useModal();
-    const navigate = useNavigate();
-    const { openModal } = useModal();
+    const{endStudySession, loadingStudySessionCompletion, errorStudySessionCompletion} = useEndStudySession();
 
-    const [completeSession, {loading: loadingStudySesssionCompletion, data: dataStudySessionCompletition, error: errorStudySessionCompleition}] = useMutation(COMPLETE_STUDY_SESSION, {
-        onCompleted: (data) => {
-            closeModal();
-            navigate("/")
-            openModal(
-                <PostCompletedStudySessionModalConfirmation 
-                    studySessionId = {studySessionId}
-                />
-            );
 
-        },
-        onError: (error) => {
-            console.error("Error completing study session:", error);
-        }
-    });
     const handleEndSession = () => {
-        localStorage.removeItem(`timer-${timerID}-timeLeft`)
-        completeSession({
-            variables: {
-                studySessionId: studySessionId,
-                studiedTime: studiedTime
-            }
+        endStudySession({
+            studySessionId,
+            studiedTime,
+            timerID,
+            showConfirmationModal: true
         });
     }
 
-    if (loadingStudySesssionCompletion) {
+    if (loadingStudySessionCompletion) {
         return (
             <Stack align="center" spacing="lg">
                 <Loader size="md" />
@@ -49,7 +34,7 @@ export default function EndStudySessionModal({studySessionId, studiedTime, timer
     
     return (
         <Stack align="center" spacing="lg">
-            {errorStudySessionCompleition && (
+            {errorStudySessionCompletion && (
                 <Alert 
                     icon={<IconAlertCircle size={16} />} 
                     title="Error" 
@@ -72,14 +57,14 @@ export default function EndStudySessionModal({studySessionId, studiedTime, timer
                     variant="light" 
                     color="gray" 
                     onClick={closeModal}
-                    disabled={loadingStudySesssionCompletion}
+                    disabled={loadingStudySessionCompletion}
                 >
                     Cancel
                 </Button>
                 <Button 
                     color="red" 
                     onClick={handleEndSession}
-                    loading={loadingStudySesssionCompletion}
+                    loading={loadingStudySessionCompletion}
                 >
                     End Session
                 </Button>

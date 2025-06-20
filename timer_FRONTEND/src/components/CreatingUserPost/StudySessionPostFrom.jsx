@@ -47,12 +47,12 @@ export default function StudySessionPostForm({preSelectedSessionId}) {
 
     const { studySession, loading: loadingStudySession, error: errorStudySession } = useGetStudySessionById(preSelectedSessionId);
 
-
+    console.log(studySession)
     useEffect(() => {
         if (studySession) {
-            setPostingSession(studySession.getSpecificStudySession);
-            setTitle(studySession.getSpecificStudySession.title || "");
-            setDescription(studySession.getSpecificStudySession.description || "");
+            setPostingSession(studySession);
+            setTitle(studySession.title || "");
+            setDescription(studySession.description || "");
         }
     }, [studySession])
 

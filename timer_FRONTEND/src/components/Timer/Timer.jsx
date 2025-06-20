@@ -9,7 +9,7 @@ import ResetTimerModal from "./ResetTimerConfirmModal";
 import EndStudySessionModal from "./EndStudySession";
 import { useQuery } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
-import PostCompletedStudySessionModalConfirmation from "./PostCompletedStudySessionModalConfirmation";
+import { useEndStudySession } from "../HelperFunctions/endStudySession.jsx";
 
 
 
@@ -25,6 +25,8 @@ export default function Timer({timerID}) {
     const [breakLogVisible, setBreakLogVisible] = useState(false);
     const [studySessionId, setStudySessionId] = useState(null);
     const navigate = useNavigate();
+    const{endStudySession, loadingStudySessionCompletion, errorStudySessionCompletion} = useEndStudySession();
+    
     
     //get studysession id from cache 
 
@@ -153,14 +155,24 @@ export default function Timer({timerID}) {
     //useeffect will rerun on pause/resume, clearing the interval and starting/stopping the new interval
     useEffect(() => {
         //when loading no timer, dont run logic
-        if (timer.isPaused || !timer || timer.timeLeft <= 0) return; 
+        if (timer.isPaused || !timer || timer.timeLeft < 0) return; 
 
         //setInterval is a js function immune to react rerenders, so it runs in the background until it is cleared and is not affected by the rerender.
         //cache updates happen immedietly unlike state updates that provide the updated value in the next render, this means
         //that even though setInterval is happening in the background away from react, it will still use the newest timer
         //cache values since it isnt relient on rerenders, and can be accessed anywhere.
         const intervalId = setInterval(() => {
-            if (timer.timeLeft > 0){
+            //grab the timeleft state value (stored in cache)
+            const currentTimer = client.cache.readFragment({
+                id: client.cache.identify({ __typename: "Timer", id: timer.id }),
+                fragment: gql`
+                    fragment CurrentTimer on Timer {
+                        timeLeft
+                    }
+                `
+            });
+            if (currentTimer && currentTimer.timeLeft > 0){
+                console.log("Updating timer", currentTimer.timeLeft);
                 //the modification will rerender timer (usequuery subscriotion), provide us with new timer obj (timeleft) to display on screen
                 client.cache.modify({
                     id: client.cache.identify({ __typename: "Timer", id: timer.id }),
@@ -176,27 +188,18 @@ export default function Timer({timerID}) {
                 });
             }else{
                 clearInterval(intervalId)
-                client.cache.modify({
-                    id: client.cache.identify({ __typename: "Timer", id: timer.id }), 
-                    fields: {
-                        timeLeft() {
-                            localStorage.setItem(`timer-${timer.id}-timeLeft`, 0);
-                            return 0;
-                        },
-                    },
+                const studiedTime = timerData.totalTime - currentTimer.timeLeft;
+                endStudySession({
+                    studySessionId,
+                    studiedTime,
+                    timerID,
+                    showConfirmationModal: true
                 });
-                localStorage.removeItem(`timer-${timer.id}-timeLeft`);
-                navigate("/")
-                openModal(
-                    <PostCompletedStudySessionModalConfirmation 
-                        studySessionId = {studySessionId}
-                    />
-                )
             }
         }, 1000);
 
         return () => clearInterval(intervalId); 
-    }, [timer.isPaused]);
+    }, [timer.isPaused, studySessionId]);
 
 
     //cover time to HH::MM::SS
@@ -220,11 +223,9 @@ export default function Timer({timerID}) {
       return parts.join(', ');
     }
 
-    if (timersLoading) return <p>Loading timers...</p>;
+    if (timersLoading || loadingStudySessionCompletion) return <p>Loading...</p>;
     if (errorGettingTimers) return <p>Error fetching timers: {error.message}</p>;
     if (resetLoading) return <p>Reseting Timer... </p>
-
-    
     return (
     <Card shadow="sm" padding="xl" radius="md" withBorder style={{ maxWidth: '80%', margin: '0 auto' }}>
         <Stack align="center" spacing="xl">

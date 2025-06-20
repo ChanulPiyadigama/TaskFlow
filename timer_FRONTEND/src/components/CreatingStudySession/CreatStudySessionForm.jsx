@@ -117,7 +117,6 @@ export default function CreateStudySessionForm() {
     if (loadingCreateStudySession){
         return <p>Creating study session...</p>
     }
-    console.log(convertToSeconds(duration))
     return (
         <form onSubmit={handleSubmit}>
             <Stack spacing="md" mb="xl">
