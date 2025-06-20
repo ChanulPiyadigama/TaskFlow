@@ -8,7 +8,7 @@ import PostCompletedStudySessionModalConfirmation from './PostCompletedStudySess
 
 //this modal checks if the user is sure they want to end the study session, if so we send a mutation to the server
 //and update both the timer and study session data first in the server, then the client's cache
-export default function EndStudySessionModal({studySessionId, studiedTime}) {
+export default function EndStudySessionModal({studySessionId, studiedTime, timerID}) {
     const { closeModal } = useModal();
     const navigate = useNavigate();
     const { openModal } = useModal();
@@ -30,6 +30,7 @@ export default function EndStudySessionModal({studySessionId, studiedTime}) {
         }
     });
     const handleEndSession = () => {
+        localStorage.removeItem(`timer-${timerID}-timeLeft`)
         completeSession({
             variables: {
                 studySessionId: studySessionId,

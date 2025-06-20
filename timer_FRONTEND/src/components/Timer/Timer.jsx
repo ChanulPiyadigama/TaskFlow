@@ -8,6 +8,8 @@ import { useModal } from "../../context/ModalContext";
 import ResetTimerModal from "./ResetTimerConfirmModal";
 import EndStudySessionModal from "./EndStudySession";
 import { useQuery } from "@apollo/client";
+import { useNavigate } from "react-router-dom";
+import PostCompletedStudySessionModalConfirmation from "./PostCompletedStudySessionModalConfirmation";
 
 
 
@@ -22,6 +24,7 @@ export default function Timer({timerID}) {
     };
     const [breakLogVisible, setBreakLogVisible] = useState(false);
     const [studySessionId, setStudySessionId] = useState(null);
+    const navigate = useNavigate();
     
     //get studysession id from cache 
 
@@ -182,6 +185,14 @@ export default function Timer({timerID}) {
                         },
                     },
                 });
+                localStorage.removeItem(`timer-${timer.id}-timeLeft`);
+                navigate("/")
+                openModal(
+                    <PostCompletedStudySessionModalConfirmation 
+                        studiedTime={studiedTime}
+                        studySessionId = {studySessionId}
+                    />
+                )
             }
         }, 1000);
 
@@ -265,7 +276,7 @@ export default function Timer({timerID}) {
                     color="red" 
                     onClick={() => {
                         if (studySessionId) {
-                            openModal(<EndStudySessionModal studySessionId={studySessionId} studiedTime = {timerData.totalTime - timerData.timeLeft}/>);
+                            openModal(<EndStudySessionModal studySessionId={studySessionId} studiedTime = {timerData.totalTime - timerData.timeLeft} timerID={timerID}/>);
                         } else {
                             console.error("Could not find associated study session");
                         }
