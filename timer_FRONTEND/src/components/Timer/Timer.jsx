@@ -189,7 +189,6 @@ export default function Timer({timerID}) {
                 navigate("/")
                 openModal(
                     <PostCompletedStudySessionModalConfirmation 
-                        studiedTime={studiedTime}
                         studySessionId = {studySessionId}
                     />
                 )

@@ -3,20 +3,13 @@ import { IconTrophy, IconShare, IconAlertCircle } from '@tabler/icons-react';
 import { useModal } from '../../context/ModalContext';
 import { useNavigate } from 'react-router-dom';
 import StudySessionPostForm from '../CreatingUserPost/StudySessionPostFrom';
-import { GET_STUDY_SESSION_BYID } from '../../data/queries';
-import { useQuery } from '@apollo/client';
+import { useGetStudySessionById } from '../HelperFunctions/getStudySessionByID';
 
-export default function PostCompletedStudySessionModalConfirmation({ studiedTime, studySessionId }) {
+export default function PostCompletedStudySessionModalConfirmation({studySessionId }) {
     const { closeModal, openModal } = useModal();
     const navigate = useNavigate();
 
-    const { data: studySessionData, loading, error } = useQuery(GET_STUDY_SESSION_BYID, {
-        variables: { studySessionId : studySessionId },
-        fetchPolicy: 'cache-first',
-        onError: (error) => {
-            console.error('Error fetching study session data:', error.message);
-        }
-    });
+    const { studySession, loading: loadingStudySession, error: errorStudySession } = useGetStudySessionById(studySessionId);
 
     // Format the studied time for display
     const formatTime = (timeInSeconds) => {
@@ -42,9 +35,8 @@ export default function PostCompletedStudySessionModalConfirmation({ studiedTime
         closeModal();
         navigate('/'); 
     };
-    console.log("Study session data:", studySessionData);
 
-    if (loading) {
+    if (loadingStudySession) {
         return (
             <Stack align="center" spacing="lg" p="md">
                 <Loader size="lg" />
@@ -54,7 +46,7 @@ export default function PostCompletedStudySessionModalConfirmation({ studiedTime
     }
 
 
-    if (error) {
+    if (errorStudySession) {
         return (
             <Stack align="center" spacing="lg" p="md">
                 <Alert icon={<IconAlertCircle size={16} />} color="red">
@@ -77,9 +69,9 @@ export default function PostCompletedStudySessionModalConfirmation({ studiedTime
                 You've successfully completed your study session
             </Text>
 
-            {studySessionData.title && (
+            {studySession.title && (
                 <Text size="md" fw={500} ta="center">
-                    "{studySessionData.title}"
+                    "{studySession.title}"
                 </Text>
             )}
 
@@ -97,7 +89,7 @@ export default function PostCompletedStudySessionModalConfirmation({ studiedTime
                         Total Study Time:
                     </Text>
                     <Text size="2rem" fw={700} c="#9370DB" ta="center">
-                        {formatTime(studiedTime)}
+                        {formatTime(studySession.studiedTime)}
                     </Text>
                 </Stack>
             </Paper>
@@ -120,7 +112,7 @@ export default function PostCompletedStudySessionModalConfirmation({ studiedTime
                     onClick={handlePostSession}
                     leftSection={<IconShare size={20} />}
                     size="lg"
-                    disabled= {loading}
+                    disabled= {loadingStudySession}
                 >
                     Share My Progress
                 </Button>

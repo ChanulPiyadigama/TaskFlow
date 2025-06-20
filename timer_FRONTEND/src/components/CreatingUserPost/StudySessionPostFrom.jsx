@@ -1,6 +1,7 @@
 import {Button, Stack, Title, Paper, Checkbox, Group, Text, Loader, Center } from "@mantine/core"
 import { useQuery } from "@apollo/client"
-import { GET_ALL_USER_STUDY_SESSIONS, GET_STUDY_SESSION_BYID } from "../../data/queries"
+import { GET_ALL_USER_STUDY_SESSIONS } from "../../data/queries"
+import { useGetStudySessionById } from "../HelperFunctions/getStudySessionByID"
 import { useState } from "react"
 import { CREATE_USER_STUDY_SESSION_POST, GET_FRIENDS_POSTS } from "../../data/queries"
 import { useMutation } from "@apollo/client"
@@ -44,22 +45,16 @@ export default function StudySessionPostForm({preSelectedSessionId}) {
     }
     )
 
-    const { data: studySessionData, loading: loadingSessionData, error:  errorSessionData} = useQuery(GET_STUDY_SESSION_BYID, {
-        variables: { studySessionId : preSelectedSessionId },
-        fetchPolicy: 'cache-first',
-        skip: !preSelectedSessionId, // Skip if no preSelectedSessionId is provided
-        onError: (error) => {
-            console.error('Error fetching study session data:', error.message);
-        }
-    });
+    const { studySession, loading: loadingStudySession, error: errorStudySession } = useGetStudySessionById(preSelectedSessionId);
+
 
     useEffect(() => {
-        if (studySessionData) {
-            setPostingSession(studySessionData.getSpecificStudySession);
-            setTitle(studySessionData.getSpecificStudySession.title || "");
-            setDescription(studySessionData.getSpecificStudySession.description || "");
+        if (studySession) {
+            setPostingSession(studySession.getSpecificStudySession);
+            setTitle(studySession.getSpecificStudySession.title || "");
+            setDescription(studySession.getSpecificStudySession.description || "");
         }
-    }, [studySessionData])
+    }, [studySession])
 
     const [postingSession, setPostingSession] = useState(null)
     const [excludeTime, setExcludeTime] = useState(false)
@@ -111,7 +106,7 @@ export default function StudySessionPostForm({preSelectedSessionId}) {
     }
 
     // Show loading if any of the queries are loading
-    if (loadingStudySessions || (preSelectedSessionId && loadingSessionData)) {
+    if (loadingStudySessions || (preSelectedSessionId && loadingStudySession)) {
         return (
             <Center h={200}>
                 <Stack align="center" gap="md">
@@ -123,7 +118,7 @@ export default function StudySessionPostForm({preSelectedSessionId}) {
     }
 
     // Show error if any queries failed
-    if (errorStudySessions || errorSessionData) {
+    if (errorStudySessions || errorStudySession) {
         return (
             <Center h={200}>
                 <Stack align="center" gap="md">

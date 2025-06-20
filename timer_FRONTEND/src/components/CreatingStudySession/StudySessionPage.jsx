@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import Timer from "../Timer/Timer";
-import { GET_STUDY_SESSION_BYID } from "../../data/queries";
+import { useGetStudySessionById } from "../HelperFunctions/getStudySessionByID";
 import { useMutation, useQuery } from "@apollo/client";
 import { useEffect } from "react";
 import { UPDATE_STUDY_SESSION_INTERACTION_TIME } from "../../data/queries";
@@ -12,12 +12,8 @@ export default function StudySessionPage() {
     //or to go directly to this route, we would need to get the study session from the network since this componenet will be the first to mount 
     const {id} = useParams();
 
-    const { loading: loadingStudySession, data: dataStudySession, error: errorStudySession } = useQuery(GET_STUDY_SESSION_BYID, {
-        variables: { studySessionId: id },
-        onError: (errorStudySession) => {
-            console.error("Error getting study session:", errorStudySession);
-        }
-    });
+    const { studySession, loading: loadingStudySession, error: errorStudySession } = useGetStudySessionById(id);
+
 
     const [updateInteraction] = useMutation(UPDATE_STUDY_SESSION_INTERACTION_TIME, {
         onError: (error) => {
@@ -50,8 +46,6 @@ export default function StudySessionPage() {
     if(loadingStudySession) return <Loader />;
     if(errorStudySession) return <p>Error...</p>
     
-    const studySession = dataStudySession.getSpecificStudySession;
-
     //pass the timer id to the timer component so it can get the timer from the cache
     return (
         <div>

@@ -19,7 +19,6 @@ export default function EndStudySessionModal({studySessionId, studiedTime, timer
             navigate("/")
             openModal(
                 <PostCompletedStudySessionModalConfirmation 
-                    studiedTime={studiedTime}
                     studySessionId = {studySessionId}
                 />
             );
