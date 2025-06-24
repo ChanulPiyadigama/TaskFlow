@@ -3,10 +3,13 @@ import { useMutation } from "@apollo/client";
 import { useAuth } from "../../context/AuthContext";
 import { useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
-import { TextInput, PasswordInput, Button, Card, Title, Text, Loader, Stack } from "@mantine/core";
+import { TextInput, PasswordInput, Button, Card, Title, Text, Loader, Stack, Divider, Anchor } from "@mantine/core";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const { setToken, setUser } = useAuth();
+  const navigate = useNavigate();
+  
   const [login, { loading, data, error }] = useMutation(LOGIN, {
     onError: (error) => {
       console.log(error);
@@ -21,7 +24,7 @@ export default function Login() {
       const decodedToken = jwtDecode(token);
       setUser(decodedToken);
     }
-  }, [data, setToken]);
+  }, [data, setToken, setUser]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -32,6 +35,9 @@ export default function Login() {
     login({ variables: { username, password } });
   };
 
+  const handleRegisterClick = () => {
+    navigate("/register");
+  };
 
   //card is a container that you can style, A title is a H1-H6 tag with 2 here
   //autofoucs puts the curoser on the input on mounting
@@ -49,6 +55,22 @@ export default function Login() {
           </Button>
         </Stack>
       </form>
+      
+      <Divider my="md" label="or" labelPosition="center" />
+      
+      <Stack gap="sm">
+        <Text size="sm" ta="center" c="dimmed">
+          Don't have an account?
+        </Text>
+        <Button 
+          variant="outline" 
+          fullWidth 
+          onClick={handleRegisterClick}
+          disabled={loading}
+        >
+          Create Account
+        </Button>
+      </Stack>
     </Card>
   );
 }

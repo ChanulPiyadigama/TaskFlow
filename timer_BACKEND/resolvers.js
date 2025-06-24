@@ -257,28 +257,108 @@ const resolvers = {
         //creates a user, saves to db where details are checked by mongoose schema, then returns a token containing user details
         //which can be decoded on client side to get user details
         createUser: async (parent, args) => {
-            const saltRounds = 10;
-            const passwordHash = await bcrypt.hash(args.password, saltRounds);
+            // Input validation
+            if (!args.username || !args.password || !args.name || !args.email) {
+                throw new Error('All fields (username, password, name, email) are required');
+            }
 
-            const user = new User({
-                username: args.username,
-                password: passwordHash,
-                name: args.name
-            });
+            // Username validation
+            if (args.username.length < 3) {
+                throw new Error('Username must be at least 3 characters long');
+            }
+
+            if (args.username.length > 20) {
+                throw new Error('Username must be no more than 20 characters long');
+            }
+
+            // Only allow alphanumeric characters and underscores for username
+            if (!/^[a-zA-Z0-9_]+$/.test(args.username)) {
+                throw new Error('Username can only contain letters, numbers, and underscores');
+            }
+
+            // Password validation
+            if (args.password.length < 6) {
+                throw new Error('Password must be at least 6 characters long');
+            }
+
+            // Email validation (basic regex)
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(args.email)) {
+                throw new Error('Please provide a valid email address');
+            }
+
             try {
-                await user.save()
+                // Check if username already exists (case-insensitive)
+                const existingUserByUsername = await User.findOne({ 
+                    username: { $regex: new RegExp(`^${args.username}$`, 'i') } 
+                });
                 
+                if (existingUserByUsername) {
+                    throw new Error('Username is already taken');
+                }
+
+                // Check if email already exists (case-insensitive)
+                const existingUserByEmail = await User.findOne({ 
+                    email: { $regex: new RegExp(`^${args.email}$`, 'i') } 
+                });
+                
+                if (existingUserByEmail) {
+                    throw new Error('Email is already in use');
+                }
+
+                // Hash password
+                const saltRounds = 10;
+                const passwordHash = await bcrypt.hash(args.password, saltRounds);
+
+                // Create user with normalized data
+                const user = new User({
+                    username: args.username.toLowerCase(), // Store username in lowercase
+                    password: passwordHash,
+                    name: args.name.trim(),
+                    email: args.email.toLowerCase().trim() // Store email in lowercase
+                });
+
+                await user.save();
+                
+                // Create JWT token
                 const token = jwt.sign(
-                    { id: user._id, username: user.username, name: user.name },
+                    { 
+                        id: user._id, 
+                        username: user.username, 
+                        name: user.name 
+                    },
                     SECRET,
                     { expiresIn: '1h' }
-                  )
-            
-                return token
+                );
+
+                return token;
 
             } catch (error) {
-            throw new Error('Error creating user')
-        }
+                // Handle MongoDB validation errors
+                if (error.name === 'ValidationError') {
+                    const messages = Object.values(error.errors).map(err => err.message);
+                    throw new Error(`Validation error: ${messages.join(', ')}`);
+                }
+
+                // Handle MongoDB duplicate key errors (if you have unique indexes)
+                if (error.code === 11000) {
+                    const field = Object.keys(error.keyPattern)[0];
+                    throw new Error(`${field.charAt(0).toUpperCase() + field.slice(1)} is already taken`);
+                }
+
+                // Re-throw our custom errors
+                if (error.message.includes('Username is already taken') || 
+                    error.message.includes('Email is already in use') ||
+                    error.message.includes('must be at least') ||
+                    error.message.includes('valid email') ||
+                    error.message.includes('required')) {
+                    throw error;
+                }
+
+                // Generic error for unexpected issues
+                console.error('Error creating user:', error);
+                throw new Error('Failed to create user. Please try again.');
+            }
         },
         login: async (parent, args) => {
             const user = await User.findOne({ username: args.username })

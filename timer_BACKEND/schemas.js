@@ -138,7 +138,7 @@ const typeDefs = `
     }
     
     type Mutation{
-        createUser(username: String!, password: String!, name: String!): String!
+        createUser(username: String!, password: String!, name: String!, email:String!): String!
         login(username: String!, password: String!): String!
         handleBreak(timerID: String, timeOfChange: String!, isPaused: Boolean!): Timer!
         clearBreaks: String!

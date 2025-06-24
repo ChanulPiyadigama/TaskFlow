@@ -6,6 +6,12 @@ export const LOGIN = gql`
     }
 `;
 
+export const CREATE_USER = gql`
+mutation CreateUser($username: String!, $password: String!, $name: String!, $email: String!) {
+  createUser(username: $username, password: $password, name: $name, email: $email)
+}
+`
+
 export const GET_USER_TIMERS = gql`
     query GetUserTimers {
         getUserTimers {
@@ -126,12 +132,6 @@ query GetUserOutgoingFriendRequests {
     name
     username
   }
-}
-`
-
-export const CREATE_USER = gql`
-mutation CreateUser($username: String!, $password: String!, $name: String!) {
-  createUser(username: $username, password: $password, name: $name)
 }
 `
 

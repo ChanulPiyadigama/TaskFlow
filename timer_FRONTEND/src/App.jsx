@@ -10,6 +10,7 @@ import UserPage from './components/UserPage/UserPage'
 import AppLayout from './Layouts/AppLayout'
 import { Loader } from '@mantine/core'
 import CustomModal from './Layouts/CustomModal'
+import Register from './components/Auth/Register'
 
 function App() {
 
@@ -53,6 +54,7 @@ function App() {
       <CustomModal />
       <Routes>
         <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
+        <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
         <Route path="/admin" element={<AdminPage />} />
         
         {/* Protected Routes */}

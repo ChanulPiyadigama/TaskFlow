@@ -8,10 +8,9 @@ export const AuthProvider = ({ children }) => {
 
     const [token, setToken] = useState(null);
     const [user, setUser] = useState(null);
-    const [timers, setTimers] = useState([]);
     //wraps the children in the provider of our context (authContext), so that all children can access the context denoted by the value prop
     return (
-        <authContext.Provider value={{ token, setToken, user, setUser, timers, setTimers }}>
+        <authContext.Provider value={{ token, setToken, user, setUser}}>
             {children}
         </authContext.Provider>
     )
