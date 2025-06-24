@@ -46,7 +46,6 @@ export default function UserPage() {
 
     
     const user = userId === currentUser.id ? currentUser : userData?.getUserInfoById;
-    console.log(user)
 
     return (
         <Container size="lg" py="xl">

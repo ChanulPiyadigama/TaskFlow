@@ -1,11 +1,10 @@
 import { useParams } from "react-router-dom";
 import Timer from "../Timer/Timer";
 import { useGetStudySessionById } from "../HelperFunctions/getStudySessionByID";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { useEffect } from "react";
 import { UPDATE_STUDY_SESSION_INTERACTION_TIME } from "../../data/queries";
-import { Loader } from "@mantine/core";
-
+import { Loader, Stack, Title } from "@mantine/core";
 export default function StudySessionPage() {
 
     //usequery to get a specific study session by id from route params, this is because if the user was to refresh,
@@ -48,9 +47,18 @@ export default function StudySessionPage() {
     
     //pass the timer id to the timer component so it can get the timer from the cache
     return (
-        <div>
-            <h1>{studySession.title}</h1>
-            <Timer timerID = {studySession.timer.id}/>
-        </div>
-      );
+        <Stack align="center" spacing="xl" style={{ width: '100%' }}>
+            <Title 
+                order={1} 
+                ta="center"
+                style={{ 
+                    maxWidth: '80%',
+                    wordWrap: 'break-word'
+                }}
+            >
+                {studySession.title}
+            </Title>
+            <Timer timerID={studySession.timer.id}/>
+        </Stack>
+    );
 }

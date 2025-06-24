@@ -10,7 +10,8 @@ import jwt from 'jsonwebtoken';
 import { SECRET } from "./util/config.js";
 import mongoose from "mongoose";
 
-import { createTimer } from "./resolverutils.js";
+import { createTimer, deletePostByIdUtil } from "./resolverUtils/resolverutils.js";
+import { deleteStudySessionByIdUtil } from "./resolverUtils/resolverutils.js";
 import { StudySessionPost } from "./models/postStudySession.js";
 
 
@@ -233,7 +234,8 @@ const resolvers = {
                         populate: {
                             path: 'user'
                         }
-                    }
+                    },
+                    'studySession'
                 ])
                 .sort({ createdAt: -1 })  // Sort by newest first
                 .limit(args.limit || 10); // Default limit of 10
@@ -776,88 +778,51 @@ const resolvers = {
             if (!context.currentUser) {
                 throw new Error('You must be logged in to delete a post');
             }
-
-            const post = await BasePost.findById(args.postID);
-            if (!post) {
-                throw new Error('No post found');
-            }
-
-            if (!post.user.equals(context.currentUser.id)) {
-                throw new Error('You can only delete your own posts');
-            }
-
-            //delete all things related to the post 
-            try{
-                const comments = await Comment.find({ post: post._id });
-                const commentIds = comments.map(comment => comment._id);
-
-                if (commentIds.length > 0){
-                    await User.updateMany(
-                        {comments: {$in: commentIds}},
-                        {$pull: {comments: {$in: commentIds}}}
-                    )
-
-                    await Comment.deleteMany({ post: post._id });
+            
+            // Get the post with populated data BEFORE deletion
+            const post = await BasePost.findById(args.postID)
+                .populate([
+                    {
+                        path: 'studySession',
+                        populate: {
+                            path: 'timer',
+                            populate: ['log', 'currentBreak']
+                        }
+                    },
+                    'comments'
+                ]);
+                if (!post) {
+                    throw new Error('No post found');
                 }
 
-                await User.updateMany(
-                    { likedPosts: post._id },
-                    { $pull: { likedPosts: post._id } }
-                )
+            // Delete using your utility function
+            await deletePostByIdUtil(args.postID, context.currentUser.id);
 
-                await User.findByIdAndUpdate(
-                    context.currentUser.id,
-                    { $pull: { allPosts: post._id} }
-                );
-
-                if (post.postType === 'StudySessionPost') {
-                    await StudySession.findByIdAndUpdate(
-                        post.studySession,
-                        { $unset: { postedID: 1 } }
-                    );
-                }
-                await BasePost.findByIdAndDelete(args.postID);
-
-                return post;
-            } catch (error) {
-                console.error("Error deleting post:", error);
-                throw new Error("Failed to delete post");
-            }
+            return post
         },
         deleteStudySessionById: async (parent, args, context) => {
-            if (!context.currentUser) {
-                throw new Error('You must be logged in to delete a study session');
-            }
-
-            const studySession = await StudySession.findById(args.studySessionID);
+            // Get the study session with all related data BEFORE deletion
+            const studySession = await StudySession.findById(args.studySessionID).populate([
+                {
+                    path: 'timer',
+                    populate: [
+                        { path: 'log' },
+                        { path: 'currentBreak' }
+                    ]
+                },
+                { path: 'user' }
+            ]);
+            
             if (!studySession) {
                 throw new Error('No study session found');
             }
-
-            if (!studySession.user.equals(context.currentUser.id)) {
-                throw new Error('You can only delete your own study sessions');
-            }
-
-            //delete all things related to the study session
-            try{
-                //delete the timer associated with the study session
-                if (studySession.timer) {
-                    await Timer.findByIdAndDelete(studySession.timer);
-                }
-                
-                //remove the study session from the user's allPosts array
-                await User.findByIdAndUpdate(
-                    context.currentUser.id,
-                    { $pull: { allPosts: studySession._id } }
-                );
-
-                await StudySession.findByIdAndDelete(args.studySessionID);
-
-                return studySession;
-            } catch (error) {
-                console.error("Error deleting study session:", error);
-                throw new Error("Failed to delete study session");
-            }
+            
+            
+            // Perform the deletion
+            await deleteStudySessionByIdUtil(args.studySessionID, context.currentUser.id);
+            
+            console.log("Deleted study session:", studySession);
+            return studySession;
         },
 
 
@@ -902,6 +867,62 @@ const resolvers = {
             } catch (error) {
                 console.error("Error resetting likes on posts:", error);
                 throw new Error("Failed to reset likes on posts");
+            }
+        },
+        deleteAllPosts: async (parent, args, context) => {
+            try {
+                // Get all posts first
+                const allPosts = await BasePost.find({});
+                
+                if (allPosts.length === 0) {
+                    return "No posts found to delete.";
+                }
+
+                let deletedCount = 0;
+                let errors = [];
+
+                // Delete each post using Util
+                for (const post of allPosts) {
+                    try {
+                        await deletePostByIdUtil(post._id, post.user);
+                        deletedCount++;
+                    } catch (error) {
+                        console.error(`Error deleting post ${post._id}:`, error);
+                        errors.push(`Failed to delete post "${post.title}" (ID: ${post._id}): ${error.message}`);
+                    }
+                }
+
+                if (errors.length > 0) {
+                    console.warn("Some posts failed to delete:", errors);
+                    return `Successfully deleted ${deletedCount} posts. ${errors.length} posts failed to delete.`;
+                }
+
+                return `Successfully deleted all ${deletedCount} posts and their related data.`;
+            } catch (error) {
+                console.error("Error deleting all posts:", error);
+                throw new Error("Failed to delete all posts");
+            }
+        },
+        clearEntireDatabase: async (parent, args, context) => {
+            
+            try {
+                // Clear all collections
+                const results = await Promise.allSettled([
+                    User.deleteMany({}),
+                    Timer.deleteMany({}),
+                    StudySession.deleteMany({}),
+                    Break.deleteMany({}),
+                    BasePost.deleteMany({}),
+                    Comment.deleteMany({})
+                ]);
+                
+                const successful = results.filter(r => r.status === 'fulfilled').length;
+                const failed = results.filter(r => r.status === 'rejected').length;
+                
+                return `Database cleared: ${successful} collections cleared successfully, ${failed} failed.`;
+            } catch (error) {
+                console.error("Error clearing database:", error);
+                throw new Error("Failed to clear database");
             }
         }
 

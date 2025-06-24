@@ -113,6 +113,7 @@ const typeDefs = `
         post: StudySessionPost!
         studySession: StudySession!
     }
+    
 
     type Query{
         allTimers: [Timer]
@@ -159,8 +160,10 @@ const typeDefs = `
         updatestudiedTimeforStudySessionPost: String!
         resetAllLikesOnPosts: String!
         createGeneralPost(title: String!, description: String, category: String!): GeneralPost!
-        deletePostById(postID: ID!): BasePost
+        deletePostById(postID: ID!): BasePost!
         deleteStudySessionById(studySessionID: ID!): StudySession
+        deleteAllPosts: String!
+        clearEntireDatabase: String!
     }
 
 `;

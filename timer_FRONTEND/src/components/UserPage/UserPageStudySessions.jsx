@@ -20,6 +20,7 @@ import { useState } from 'react';
 import { useModal } from '../../context/ModalContext';
 import StudySessionPostForm from '../CreatingUserPost/StudySessionPostFrom';
 import { useDeleteStudySession } from '../HelperFunctions/deleteStudySessionById';
+import { useDeletePostById } from '../HelperFunctions/deletePostById';
 
 
 //shows all the study sessions split into active, unposted, and posted, use state to toggle visibility of each section
@@ -30,6 +31,7 @@ export default function UserPageStudySessions() {
     const [activeListVisible, setActiveListVisible] = useState(false);
     const [completedListVisible, setCompletedListVisible] = useState(false);
     const [postedListVisible, setPostedListVisible] = useState(false);
+    const { handleDeletePost, loadingDeletingPost, deletePostError } = useDeletePostById();
 
     const { loading, error, data } = useQuery(GET_ALL_USER_STUDY_SESSIONS);
     const { handleDeleteSession, deleteLoading } = useDeleteStudySession();
@@ -104,7 +106,7 @@ export default function UserPageStudySessions() {
                             </ActionIcon>
                         </Menu.Target>
                         <Menu.Dropdown>
-                            <Menu.Item 
+                            {(!session.postedID) && <Menu.Item 
                                 leftSection={<IconTrash size={14} />} 
                                 color="red"
                                 onClick={(e) => {
@@ -113,7 +115,17 @@ export default function UserPageStudySessions() {
                                 }}
                             >
                                 Delete
-                            </Menu.Item>
+                            </Menu.Item>}
+                            {(session.studiedTime >= 0 && session.postedID) && <Menu.Item 
+                                leftSection={<IconTrash size={14} />} 
+                                color="red"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeletePost(session.postedID);
+                                }}
+                            >
+                                Delete Post
+                            </Menu.Item>}
                             {(session.studiedTime >= 0 && !session.postedID) && <Menu.Item 
                                 leftSection={<IconShare size={14} />} 
                                 color="violet"
@@ -124,6 +136,7 @@ export default function UserPageStudySessions() {
                             >
                                 Post
                             </Menu.Item>}
+
                         </Menu.Dropdown>
                     </Menu>
                 </Group>

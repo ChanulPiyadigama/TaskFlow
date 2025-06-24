@@ -458,9 +458,26 @@ mutation Mutation($category: String!, $description: String, $title: String!) {
 `
 
 export const DELETE_POST_BY_ID = gql`
-mutation DeletePostById($postId: ID!) {
+mutation Mutation($postId: ID!) {
   deletePostById(postID: $postId) {
     id
+    comments {
+      id
+    }
+    ... on StudySessionPost {
+      studySession {
+        id
+        timer {
+          id
+          currentBreak {
+            id
+          }
+          log {
+            id
+          }
+        }
+      }
+    }
   }
 }
 `
@@ -491,6 +508,9 @@ query GetUserPosts($cursor: String, $limit: Int!) {
       studiedTime
       exclusions {
         excludeTime
+      }
+      studySession{
+        id
       }
     }
     ... on GeneralPost {
@@ -540,6 +560,18 @@ export const DELETE_STUDY_SESSION_BY_ID = gql`
 mutation Mutation($studySessionId: ID!) {
   deleteStudySessionById(studySessionID: $studySessionId) {
     id
+    timer {
+      id
+      log {
+        id
+      }
+      currentBreak {
+        id
+      }
+    }
+    user {
+      id
+    }
   }
 }
 `

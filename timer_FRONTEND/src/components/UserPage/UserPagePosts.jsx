@@ -1,5 +1,5 @@
 import { Stack, Card, Text, Group, Badge, Loader, Grid, Button, Box, Title, Menu, ActionIcon } from '@mantine/core';
-import { GET_ALL_USER_POSTS, DELETE_POST_BY_ID } from '../../data/queries';
+import { GET_ALL_USER_POSTS } from '../../data/queries';
 import { useQuery } from '@apollo/client';
 import { IconMessage, IconCalendar, IconDots, IconTrash } from '@tabler/icons-react';
 import { useModal } from '../../context/ModalContext';
@@ -7,7 +7,7 @@ import PostComments from '../PostsFeature/PostComments';
 import LikeButton from '../PostsFeature/LikeButton';
 import { getCategoryColor } from '../HelperFunctions/mainFeatureFunctions';
 import { useState, useEffect, useRef } from 'react';
-import { useMutation } from '@apollo/client';
+import { useDeletePostById } from '../HelperFunctions/deletePostById';
 
 //displays the posts in a 3column grid, the posts are simplifed but when clicked opens the same post comment view, for full details. 
 //used same inifinte scroll logic as in the main posts feature
@@ -15,6 +15,7 @@ export default function UserPagePosts() {
     const cursorRef = useRef(null);
     const loaderRef = useRef(null);
     const [hasMore, setHasMore] = useState(true);
+    const { handleDeletePost, loadingDeletingPost, deletePostError } = useDeletePostById();
     
     const { data: userPostsData, loading: loadingUserPosts, error: errorUserPosts, fetchMore } = useQuery(GET_ALL_USER_POSTS, {
         variables: { limit: 12 }, // 12 posts for 3-column grid (4 rows)
@@ -24,32 +25,14 @@ export default function UserPagePosts() {
                 cursorRef.current = btoa(lastPost.createdAt);
             }
         },
-    });
-
-    const [deletePost, { data: deletePostData, loading: deletingPost, error: deletePostError }] = useMutation(DELETE_POST_BY_ID, {
-        update(cache, { data }) {
-            if (data?.deletePostById) {
-                // Apollo can automatically figure out the cache ID
-                cache.evict({ 
-                    id: cache.identify(data.deletePostById) 
-                });
-                cache.gc();
-            }
-        },
         onError: (error) => {
-            console.error('Error deleting post:', error);
+            console.error('Error fetching user posts:', error.message);
         }
     });
 
+
     //opens PostComments modal to show post in detail 
     const { openModal } = useModal();
-
-    //to delete a post, calls mutation 
-    const handleDeletePost = async (postId) => {
-        deletePost({
-            variables: { postId }
-        })
-    };
 
     // Intersection Observer for infinite scroll
     useEffect(() => {
@@ -96,7 +79,7 @@ export default function UserPagePosts() {
         });
     };
 
-    if (loadingUserPosts && !userPostsData) {
+    if ((loadingUserPosts && !userPostsData) || loadingDeletingPost) {
         return (
             <Box p="md">
                 <Grid gutter="lg">
@@ -112,11 +95,11 @@ export default function UserPagePosts() {
         );
     }
 
-    if (errorUserPosts) {
+    if (errorUserPosts || deletePostError) {
         return (
             <Stack align="center" py="xl">
                 <Text c="red" size="sm">
-                    Error loading posts: {errorUserPosts.message}
+                    Error loading posts
                 </Text>
             </Stack>
         );

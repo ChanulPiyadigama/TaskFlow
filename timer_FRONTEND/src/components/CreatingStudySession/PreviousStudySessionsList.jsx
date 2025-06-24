@@ -106,7 +106,7 @@ export default function PreviousStudySessionsList() {
                                                 >
                                                     Delete
                                                 </Menu.Item>
-                                                <Menu.Item 
+                                                {(session.studiedTime != -1 && !session.postedID) && <Menu.Item 
                                                     leftSection={<IconShare size={14} />} 
                                                     color="violet"
                                                     onClick={(e) => {
@@ -115,7 +115,7 @@ export default function PreviousStudySessionsList() {
                                                     }}
                                                 >
                                                     Post
-                                                </Menu.Item>
+                                                </Menu.Item>}
                                             </Menu.Dropdown>
                                         </Menu>
                                     </Group>
