@@ -912,6 +912,116 @@ const resolvers = {
             console.log("Deleted study session:", studySession);
             return studySession;
         },
+        updateUserDetails: async (parent, args, context) => {
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to update your profile');
+            }
+            //do similar checks as in createUser, but this time we are updating the user
+            const { name, username, email } = args;
+
+            if (!name || !username || !email) {
+                throw new Error('All fields (name, username, email) are required');
+            }
+
+            if (username.length < 3) {
+                throw new Error('Username must be at least 3 characters long');
+            }
+
+            if (username.length > 20) {
+                throw new Error('Username must be no more than 20 characters long');
+            }
+
+            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                throw new Error('Username can only contain letters, numbers, and underscores');
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                throw new Error('Please provide a valid email address');
+            }
+
+            try {
+                // Check if new username is taken (excluding current user)
+                if (username.toLowerCase() !== context.currentUser.username.toLowerCase()) {
+                    const existingUserByUsername = await User.findOne({ 
+                        username: { $regex: new RegExp(`^${username}$`, 'i') },
+                        _id: { $ne: context.currentUser.id }
+                    });
+                    
+                    if (existingUserByUsername) {
+                        throw new Error('Username is already taken');
+                    }
+                }
+
+                // Check if new email is taken (excluding current user)
+                if (email.toLowerCase() !== context.currentUser.email?.toLowerCase()) {
+                    const existingUserByEmail = await User.findOne({ 
+                        email: { $regex: new RegExp(`^${email}$`, 'i') },
+                        _id: { $ne: context.currentUser.id }
+                    });
+                    
+                    if (existingUserByEmail) {
+                        throw new Error('Email is already in use');
+                    }
+                }
+
+                // Update user with normalized data
+                const updatedUser = await User.findByIdAndUpdate(
+                    context.currentUser.id,
+                    {
+                        name: name.trim(),
+                        username: username.toLowerCase().trim(),
+                        email: email.toLowerCase().trim()
+                    },
+                    { new: true }
+                );
+
+                if (!updatedUser) {
+                    throw new Error('User not found');
+                }
+
+                // Create new JWT token with updated info since we want the user info to be securely sent back to client 
+                const token = jwt.sign(
+                    { 
+                        id: updatedUser._id, 
+                        username: updatedUser.username, 
+                        name: updatedUser.name,
+                        email: updatedUser.email
+                    },
+                    SECRET,
+                    { expiresIn: '1h' }
+                );
+
+                return token;
+
+            } catch (error) {
+                // Handle MongoDB validation errors
+                if (error.name === 'ValidationError') {
+                    const messages = Object.values(error.errors).map(err => err.message);
+                    throw new Error(`Validation error: ${messages.join(', ')}`);
+                }
+
+                // Handle MongoDB duplicate key errors (if you have unique indexes)
+                if (error.code === 11000) {
+                    const field = Object.keys(error.keyPattern)[0];
+                    throw new Error(`${field.charAt(0).toUpperCase() + field.slice(1)} is already taken`);
+                }
+
+                // Re-throw our custom errors
+                if (error.message.includes('Username is already taken') || 
+                    error.message.includes('Email is already in use') ||
+                    error.message.includes('must be at least') ||
+                    error.message.includes('valid email') ||
+                    error.message.includes('required') ||
+                    error.message.includes('User not found')) {
+                    throw error;
+                }
+
+                // Generic error for unexpected issues
+                console.error('Error updating user details:', error);
+                throw new Error('Failed to update user details. Please try again.');
+            }
+        },
 
 
 
@@ -1013,6 +1123,9 @@ const resolvers = {
                 throw new Error("Failed to clear database");
             }
         },
+
+
+
         //these are for password reset functionality
         requestPasswordReset: async (parent, args) => {
             const { email } = args;

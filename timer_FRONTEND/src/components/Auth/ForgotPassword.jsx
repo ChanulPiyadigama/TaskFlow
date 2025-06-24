@@ -4,8 +4,10 @@ import { REQUEST_PASSWORD_RESET } from '../../data/queries';
 import { TextInput, Button, Card, Title, Text, Alert, Stack } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 export default function ForgotPassword() {
+    const { user, setToken, setUser } = useAuth();
     const [email, setEmail] = useState('');
     const [success, setSuccess] = useState(false);
     const navigate = useNavigate();
@@ -13,6 +15,11 @@ export default function ForgotPassword() {
     const [requestReset, { loading, error }] = useMutation(REQUEST_PASSWORD_RESET, {
         onCompleted: () => {
             setSuccess(true);
+            if (user) {
+                setToken(null);
+                setUser(null);
+                localStorage.removeItem('user-token');
+            }
         }
     });
 

@@ -587,3 +587,9 @@ mutation ResetPassword($token: String!, $newPassword: String!) {
   resetPassword(token: $token, newPassword: $newPassword)
 }
 `;
+
+export const UPDATE_USER_DETAILS = gql`
+mutation UpdateUserDetails($name: String, $email: String, $username: String) {
+  updateUserDetails(name: $name, email: $email, username: $username)
+}
+`

@@ -169,6 +169,7 @@ const typeDefs = `
         clearEntireDatabase: String!
         requestPasswordReset(email: String!): String
         resetPassword(token: String!, newPassword: String!): String
+        updateUserDetails(username: String, name: String, email: String): String!
     }
 
 `;

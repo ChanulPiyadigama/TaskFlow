@@ -8,12 +8,15 @@ import UserPagePosts from "./UserPagePosts";
 import UserPageStudySessions from "./UserPageStudySessions";
 import { GET_USERINFO_BYID } from "../../data/queries";
 import { useQuery } from "@apollo/client";
+import { useModal } from "../../context/ModalContext";
+import { EditUserDetails } from "../Auth/EditUserDetails";
 
 export default function UserPage() {
     const { user: currentUser, setToken, setUser } = useAuth();
     const {userId} = useParams();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('about');
+    const {openModal} = useModal();
 
     // Add handleLogout function
     const handleLogout = () => {
@@ -71,6 +74,7 @@ export default function UserPage() {
                             <Button 
                                 leftSection={<IconPencil size={14} />}
                                 variant="light"
+                                onClick={() => openModal(<EditUserDetails/>)}
                             >
                                 Edit Profile
                             </Button>
