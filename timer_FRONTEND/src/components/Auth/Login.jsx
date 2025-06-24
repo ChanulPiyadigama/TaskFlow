@@ -56,6 +56,16 @@ export default function Login() {
           </Button>
         </Stack>
       </form>
+      <Text size="sm" ta="right">
+        <Anchor 
+            component="button" 
+            type="button"
+            onClick={() => navigate('/forgot-password')}
+            disabled={loading}
+        >
+            Forgot password?
+        </Anchor>
+    </Text>
       
       <Divider my="md" label="or" labelPosition="center" />
       

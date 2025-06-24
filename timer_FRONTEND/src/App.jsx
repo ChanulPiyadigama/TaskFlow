@@ -11,6 +11,8 @@ import AppLayout from './Layouts/AppLayout'
 import { Loader } from '@mantine/core'
 import CustomModal from './Layouts/CustomModal'
 import Register from './components/Auth/Register'
+import ForgotPassword from './components/Auth/ForgotPassword';
+import ResetPassword from './components/Auth/ResetPassword';
 
 function App() {
 
@@ -56,6 +58,8 @@ function App() {
         <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
         <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/forgot-password" element={!user ? <ForgotPassword /> : <Navigate to="/" />} />
+        <Route path="/reset-password/:token" element={!user ? <ResetPassword /> : <Navigate to="/" />} />
         
         {/* Protected Routes */}
         <Route element={user ? <AppLayout /> : <Navigate to="/login" />}>

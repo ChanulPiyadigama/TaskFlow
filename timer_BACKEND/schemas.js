@@ -12,6 +12,9 @@ const typeDefs = `
         allPosts: [BasePost]
         comments: [Comment]
         likedPosts: [BasePost]
+        email: String!
+        resetPasswordToken: String
+        resetPasswordExpires: String
     }
 
     type StudySession{
@@ -164,6 +167,8 @@ const typeDefs = `
         deleteStudySessionById(studySessionID: ID!): StudySession
         deleteAllPosts: String!
         clearEntireDatabase: String!
+        requestPasswordReset(email: String!): String
+        resetPassword(token: String!, newPassword: String!): String
     }
 
 `;

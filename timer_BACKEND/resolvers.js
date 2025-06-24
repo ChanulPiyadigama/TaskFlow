@@ -9,6 +9,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { SECRET } from "./util/config.js";
 import mongoose from "mongoose";
+import { sendPasswordResetEmail } from './Services/emailService.js';
+import crypto from 'crypto';
 
 import { createTimer, deletePostByIdUtil } from "./resolverUtils/resolverutils.js";
 import { deleteStudySessionByIdUtil } from "./resolverUtils/resolverutils.js";
@@ -1010,6 +1012,65 @@ const resolvers = {
                 console.error("Error clearing database:", error);
                 throw new Error("Failed to clear database");
             }
+        },
+        //these are for password reset functionality
+        requestPasswordReset: async (parent, args) => {
+            const { email } = args;
+            
+            // Find user by email
+            const user = await User.findOne({ email: email.toLowerCase() });
+            if (!user) {
+                // Don't reveal if email exists or not for security
+                return "If an account with that email exists, we've sent a password reset link.";
+            }
+
+            // Generate reset token
+            const resetToken = crypto.randomBytes(32).toString('hex');
+            
+            // Save token to user (expires in 1 hour)
+            user.resetPasswordToken = resetToken;
+            user.resetPasswordExpires = Date.now() + 3600000; 
+            await user.save();
+
+            // Send email
+            const emailSent = await sendPasswordResetEmail(user.email, resetToken);
+            
+            if (!emailSent) {
+                throw new Error('Failed to send reset email. Please try again.');
+            }
+
+            return "If an account with that email exists, we've sent a password reset link.";
+        },
+
+        resetPassword: async (parent, args) => {
+            const { token, newPassword } = args;
+            
+            // Find user with valid reset token
+            const user = await User.findOne({
+                resetPasswordToken: token,
+                resetPasswordExpires: { $gt: Date.now() }
+            });
+
+            if (!user) {
+                throw new Error('Password reset token is invalid or has expired.');
+            }
+
+            // Validate new password
+            if (newPassword.length < 6) {
+                throw new Error('Password must be at least 6 characters long');
+            }
+
+            // Hash new password
+            const saltRounds = 10;
+            const passwordHash = await bcrypt.hash(newPassword, saltRounds);
+
+            // Update user password and clear reset token
+            user.password = passwordHash;
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpires = undefined;
+            await user.save();
+
+            return "Password has been successfully reset. You can now log in with your new password.";
         }
 
     }
