@@ -325,7 +325,8 @@ const resolvers = {
                     { 
                         id: user._id, 
                         username: user.username, 
-                        name: user.name 
+                        name: user.name,
+                        email: user.email  
                     },
                     SECRET,
                     { expiresIn: '1h' }
@@ -376,9 +377,14 @@ const resolvers = {
             //these verified tokens and change them. Anyone can decode them to get the info indide, but they can't change it
             //without the SECRET, if they try the token will be invalid when being verified in the request context
             const token = jwt.sign(
-              { id: user._id, username: user.username, name: user.name },
-              SECRET,
-              { expiresIn: '1h' }
+            { 
+                id: user._id, 
+                username: user.username, 
+                name: user.name,
+                email: user.email
+            },
+            SECRET,
+            { expiresIn: '1h' }
             )
       
             return token

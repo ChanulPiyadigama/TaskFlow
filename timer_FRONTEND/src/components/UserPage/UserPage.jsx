@@ -1,7 +1,7 @@
 import { useAuth } from "../../context/AuthContext";
 import { Container, Title, Paper, Text, Group, Button, Tabs, Loader, Alert } from "@mantine/core";
 import { useNavigate, useParams } from "react-router-dom";
-import { IconPencil, IconUser, IconClock, IconNote } from "@tabler/icons-react";
+import { IconPencil, IconUser, IconClock, IconNote, IconLogout } from "@tabler/icons-react";
 import { useState } from "react";
 import UserPageAbout from "./UserPageAbout";
 import UserPagePosts from "./UserPagePosts";
@@ -10,10 +10,18 @@ import { GET_USERINFO_BYID } from "../../data/queries";
 import { useQuery } from "@apollo/client";
 
 export default function UserPage() {
-    const { user: currentUser } = useAuth();
+    const { user: currentUser, setToken, setUser } = useAuth();
     const {userId} = useParams();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('about');
+
+    // Add handleLogout function
+    const handleLogout = () => {
+        setToken(null);
+        setUser(null);
+        localStorage.removeItem('user-token');
+        navigate('/login');
+    };
 
     //we use usequery since user might come to this route directly, even through if its through search 
     //some user data would already be in cache 
@@ -56,12 +64,26 @@ export default function UserPage() {
                         <Title order={2}>{user.name}</Title>
                         <Text size="lg" c="dimmed">@{user.username}</Text>
                     </div>
-                    <Button 
-                        leftSection={<IconPencil size={14} />}
-                        variant="light"
-                    >
-                        Edit Profile
-                    </Button>
+                    
+                    {/* Show buttons only for current user */}
+                    {userId === currentUser.id && (
+                        <Group spacing="sm">
+                            <Button 
+                                leftSection={<IconPencil size={14} />}
+                                variant="light"
+                            >
+                                Edit Profile
+                            </Button>
+                            <Button 
+                                leftSection={<IconLogout size={14} />}
+                                variant="light"
+                                color="red"
+                                onClick={handleLogout}
+                            >
+                                Logout
+                            </Button>
+                        </Group>
+                    )}
                 </Group>
             </Paper>
 

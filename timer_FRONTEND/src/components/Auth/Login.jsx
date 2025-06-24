@@ -22,6 +22,7 @@ export default function Login() {
       setToken(token);
       localStorage.setItem("user-token", token);
       const decodedToken = jwtDecode(token);
+      console.log("Decoded Token:", decodedToken);
       setUser(decodedToken);
     }
   }, [data, setToken, setUser]);
