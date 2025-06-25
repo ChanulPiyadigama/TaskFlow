@@ -14,6 +14,7 @@ import {
   } from "@mantine/core";
 import { IconSearch, IconUserPlus, IconCheck, IconUserCheck } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 
 /*
@@ -36,6 +37,7 @@ import { useNavigate } from "react-router-dom";
 */
 export default function AddFriend() {
   const [searchTerm, setSearchTerm] = useState("");
+  const { user } = useAuth();
 
   //(1)
   const {loading: loadingOutgoingFriendRequests, data: dataOutgoingFriendRequests, error: errorOutgoingFriendRequests} = useQuery(GET_USER_OUTGOING_FRIEND_REQUESTS)
@@ -114,7 +116,7 @@ export default function AddFriend() {
 
   if (loadingOutgoingFriendRequests || loadingUserFriends) return <Loader size="sm" />;
   if (errorOutgoingFriendRequests) return <Text c="red" size="sm">Error: {errorOutgoingFriendRequests.message}</Text>;
-
+  const users = data?.searchUsers?.filter(foundUser => foundUser.username !== user.username) || [];
   return (
     <Stack spacing="md">
       <Title order={2}>Find Friends</Title>
@@ -138,7 +140,7 @@ export default function AddFriend() {
       )}
 
       <Stack spacing="xs">
-        {data?.searchUsers?.map((user) => (
+        {users.map((user) => (
           <Card key={user.id} withBorder shadow="sm">
             <Group justify="space-between" align="center">
               <div

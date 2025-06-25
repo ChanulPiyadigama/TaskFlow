@@ -396,6 +396,11 @@ query Query($postId: ID!) {
       createdAt
       content
       lastInteraction
+      user {
+        id
+        name
+        username
+      }
     }
     id
   }
@@ -461,6 +466,7 @@ export const DELETE_POST_BY_ID = gql`
 mutation Mutation($postId: ID!) {
   deletePostById(postID: $postId) {
     id
+    postType
     comments {
       id
     }

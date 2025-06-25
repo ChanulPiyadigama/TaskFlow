@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { TextInput, PasswordInput, Button, Card, Title, Text, Loader, Stack, Divider, Anchor } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
+import AdminPage from "./AdminActions";
 
 export default function Login() {
   const { setToken, setUser } = useAuth();
@@ -54,6 +55,7 @@ export default function Login() {
           <Button type="submit" fullWidth disabled={loading}>
             {loading ? <Loader size="sm" /> : "Login"}
           </Button>
+          <AdminPage/>
         </Stack>
       </form>
       <Text size="sm" ta="right">

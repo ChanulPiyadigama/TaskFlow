@@ -137,9 +137,21 @@ export default function PostComments({ postId }) {
               ) : (
                 dataPostComments?.getPostCommentsById?.comments?.map(comment => (
                   <Paper key={comment.id} p="md" withBorder>
-                    <Text size="sm">{comment.content}</Text>
-                    <Text size="xs" c="dimmed" mt="xs">
-                      {new Date(Number(comment.createdAt)).toLocaleTimeString()}
+                    <Group position="apart" align="flex-start" mb="xs">
+                      <Group spacing="xs">
+                        <Avatar size="sm" radius="xl" color="blue">
+                          {comment.user.name.charAt(0)}
+                        </Avatar>
+                        <Text size="sm" fw={500}>
+                          {comment.user.username}
+                        </Text>
+                      </Group>
+                      <Text size="xs" c="dimmed">
+                        {new Date(Number(comment.createdAt)).toLocaleTimeString()}
+                      </Text>
+                    </Group>
+                    <Text size="sm" ml="md">
+                      {comment.content}
                     </Text>
                   </Paper>
                 ))

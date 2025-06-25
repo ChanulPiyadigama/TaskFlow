@@ -121,7 +121,7 @@ export default function UserPageStudySessions() {
                                 color="red"
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    handleDeletePost(session.postedID);
+                                    handleDeletePost(session.postedID.id);
                                 }}
                             >
                                 Delete Post

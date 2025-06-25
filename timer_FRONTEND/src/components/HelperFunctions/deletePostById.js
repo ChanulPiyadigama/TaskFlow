@@ -3,7 +3,6 @@ import { useMutation } from "@apollo/client"
 export const useDeletePostById = () => {
     const [deletePost, {loading: loadingDeletingPost, error: deletePostError }] = useMutation(DELETE_POST_BY_ID, {
         update(cache, { data }) {
-            console.log("runs")
             const deletedPost = data?.deletePostById;
             console.log(deletedPost)
             if (deletedPost) {
@@ -23,10 +22,11 @@ export const useDeletePostById = () => {
                         });
                     });
                 }
-
+                console.log(deletedPost)
                 if (deletedPost.postType === 'StudySessionPost') {
+                    console.log("runs")
                     const deletedStudySession = deletedPost.studySession;
-                    
+                    console.log(deletedStudySession)
                     if (deletedStudySession) {
                         console.log('Evicting study session:', deletedStudySession);
                         

@@ -10,6 +10,7 @@ import PostsScroll from "./PostsFeature/PostsScroll";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../context/ModalContext";
 import AddFriend from "./FriendsFeature/AddFriend";
+import AdminPage from "./Auth/AdminActions";
 
 export default function HomePage() {
   const { user } = useAuth();

@@ -208,7 +208,12 @@ const resolvers = {
                 throw new Error('No post found');
             }
             //change here as you wish to populate other fields, for now we just want the comments
-            const populatedPost = await post.populate('comments')
+            const populatedPost = await post.populate({
+                path: 'comments',
+                populate: {
+                    path: 'user'
+                }
+            })
             return populatedPost;
         },
         getUserPosts: async (parent, args, context) => {
