@@ -24,7 +24,7 @@ const authLink = setContext((operation, { headers }) => {
 
 //the http link sends all requests to the specified uri
 const httpLink = createHttpLink({
-  uri: "http://localhost:4000", 
+  uri: "https://task-flow0.netlify.app/", 
 });
 
 //the client is set up with a link to the server, and a cache to store data locally on the client
