@@ -2,7 +2,7 @@ import Timer from "../models/Timer.js";
 import StudySession from "../models/StudySession.js";
 import User from "../models/User.js";
 import Break from "../models/Break.js";
-import { BasePost } from "../models/BasePost.js";
+import { BasePost } from "../models/basePost.js";
 import Comment from "../models/Comment.js";
 
 

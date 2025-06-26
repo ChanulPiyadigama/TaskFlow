@@ -4,7 +4,7 @@ import Break from "./models/Break.js";
 import Comment from "./models/Comment.js";
 import StudySession from "./models/StudySession.js";
 import { GeneralPost } from "./models/postGeneral.js";
-import { BasePost } from "./models/BasePost.js";
+import { BasePost } from "./models/basePost.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { SECRET } from "./util/config.js";
