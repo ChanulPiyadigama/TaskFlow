@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 
 
 export const sendPasswordResetEmail = async (email, resetToken) => {
-    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+    const resetUrl = `https://task-flow0.netlify.app/reset-password/${resetToken}`;
     
     const mailOptions = {
         from: process.env.EMAIL_USER,
