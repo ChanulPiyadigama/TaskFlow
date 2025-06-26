@@ -21,6 +21,7 @@ import { useModal } from '../../context/ModalContext';
 import StudySessionPostForm from '../CreatingUserPost/StudySessionPostFrom';
 import { useDeleteStudySession } from '../HelperFunctions/deleteStudySessionById';
 import { useDeletePostById } from '../HelperFunctions/deletePostById';
+import { useAuth } from '../../context/AuthContext';
 
 
 //shows all the study sessions split into active, unposted, and posted, use state to toggle visibility of each section
@@ -32,6 +33,7 @@ export default function UserPageStudySessions() {
     const [completedListVisible, setCompletedListVisible] = useState(false);
     const [postedListVisible, setPostedListVisible] = useState(false);
     const { handleDeletePost, loadingDeletingPost, deletePostError } = useDeletePostById();
+    const { user } = useAuth();
 
     const { loading, error, data } = useQuery(GET_ALL_USER_STUDY_SESSIONS);
     const { handleDeleteSession, deleteLoading } = useDeleteStudySession();

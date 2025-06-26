@@ -15,6 +15,7 @@ import {
 import { IconSearch, IconUserPlus, IconCheck, IconUserCheck } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigateToUser } from "../HelperFunctions/mainFeatureFunctions";
 
 
 /*
@@ -38,6 +39,7 @@ import { useAuth } from "../../context/AuthContext";
 export default function AddFriend() {
   const [searchTerm, setSearchTerm] = useState("");
   const { user } = useAuth();
+  const navigateToUser = useNavigateToUser();
 
   //(1)
   const {loading: loadingOutgoingFriendRequests, data: dataOutgoingFriendRequests, error: errorOutgoingFriendRequests} = useQuery(GET_USER_OUTGOING_FRIEND_REQUESTS)
@@ -141,7 +143,7 @@ export default function AddFriend() {
 
       <Stack spacing="xs">
         {users.map((user) => (
-          <Card key={user.id} withBorder shadow="sm">
+          <Card key={user.id} withBorder shadow="sm" onClick={() => navigateToUser(user.id)} p="md">
             <Group justify="space-between" align="center">
               <div
               onClick={() =>  navigate(`UserPage/${user.id}`)}

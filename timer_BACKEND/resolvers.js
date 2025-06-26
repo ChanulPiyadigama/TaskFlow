@@ -155,7 +155,7 @@ const resolvers = {
             if (!context.currentUser) {
                 throw new Error('You must be logged in to view your friends posts');
             }
-
+            console.log(context.currentUser)
             const friendIds = context.currentUser.friends 
 
             if (friendIds.length === 0) {
@@ -196,10 +196,38 @@ const resolvers = {
                 throw new Error('No user found');
             }
 
-            //for now this is used for the userpage which atm will just display the user's friends names
-            // and post title add on later
-            const populatedUser = await user.populate(['friends','allPosts'])
-
+            const populatedUser = await user.populate([
+                {
+                    path: 'allPosts',
+                    populate: [
+                        {
+                            path: 'likes',
+                            select: 'id'
+                        },
+                        {
+                            path: 'comments',
+                            select: 'id content createdAt lastInteraction'
+                        }
+                    ]
+                },
+                {
+                    path: 'friends',
+                    select: 'id email name username'
+                },
+                {
+                    path: 'likedPosts',
+                    select: 'id'
+                },
+                {
+                    path: 'studySessions',
+                    select: 'id description createdAt lastInteraction studiedTime title',
+                    populate: {
+                        path: 'postedID',
+                        select: 'id'
+                    }
+                }
+            ]);
+            
             return populatedUser;
         },
         getPostCommentsById: async (parent, args, context) => {

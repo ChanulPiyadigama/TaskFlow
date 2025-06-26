@@ -21,6 +21,7 @@ import PostComments from "./PostComments";
 import { useAuth } from "../../context/AuthContext";
 import { getCategoryColor } from "../HelperFunctions/mainFeatureFunctions";
 import LikeButton from "./LikeButton";
+import { useNavigate } from "react-router-dom";
 
 /*
 
@@ -49,6 +50,7 @@ export default function PostsScroll(){
     const [hasMore, setHasMore] = useState(true);
     const {openModal} = useModal()
     const [expandedPosts, setExpandedPosts] = useState(new Set());
+    const navigate = useNavigate();
 
 
     const {loading: loadingPosts, data: dataPosts, error: errorPosts, fetchMore} = useQuery(GET_FRIENDS_POSTS, {
@@ -157,6 +159,20 @@ export default function PostsScroll(){
           </Paper>
         </Container>
       );
+
+      //for new users
+      if (!loadingPosts && (!dataPosts?.getUserFriendsPosts || dataPosts.getUserFriendsPosts.length === 0)) {
+        return (
+          <Container p="md">
+            <Paper p="xl" withBorder style={{ textAlign: 'center' }}>
+              <Title order={3} c="dimmed" mb="md">No Posts Yet</Title>
+              <Text size="lg" c="dimmed">
+                Start creating posts or add friends to keep up with theirs!
+              </Text>
+            </Paper>
+          </Container>
+        );
+      }
       return (
         <Box p="md" w="90%" mx="auto">
           <Stack spacing="lg">
@@ -178,12 +194,15 @@ export default function PostsScroll(){
                 <Stack spacing="lg">
                   {/* User info and date at the top */}
                   <Group position="apart" mb="xs">
-                    <Group>
-                      <Avatar radius="xl" size = 'lg' color="blue">
-                        {post.user.name.charAt(0)}
-                      </Avatar>
-                      <Text fw={500} size= 'lg'>{post.user.name}</Text>
-                    </Group>
+                  <Group 
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => navigate(`/UserPage/${post.user.id}`)}
+                  >
+                    <Avatar radius="xl" size='lg' color="blue">
+                      {post.user.name.charAt(0)}
+                    </Avatar>
+                    <Text fw={500} size='lg'>{post.user.name}</Text>
+                  </Group>
                     
                     <Badge 
                       color="blue" 

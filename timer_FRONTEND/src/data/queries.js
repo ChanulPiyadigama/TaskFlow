@@ -313,22 +313,49 @@ export const GET_USERINFO_BYID = gql`
 query GetUserInfoById($userId: ID!) {
   getUserInfoById(userID: $userId) {
     id
+    email
     name
     username
     allPosts {
       id
-      description
-      likes
       title
+      postType
+      likes {
+        id
+      }
+      description
+      createdAt
+      comments {
+        id
+        content
+        createdAt
+        lastInteraction
+      }
+      lastInteraction
     }
     friends {
       id
+      email
       name
       username
     }
+    likedPosts {
+      id
+    }
+    studySessions {
+      id
+      description
+      createdAt
+      lastInteraction
+      postedID {
+        id
+      }
+      studiedTime
+      title
+    }
   }
 }
-`
+`;
 
 export const HANDLE_FRIEND_REQUEST = gql`
 mutation Mutation($senderId: ID!, $action: Boolean!) {

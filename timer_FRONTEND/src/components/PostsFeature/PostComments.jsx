@@ -5,11 +5,14 @@ import { useState } from 'react';
 import { IconSend, IconCalendar } from '@tabler/icons-react';
 import { getCategoryColor } from '../HelperFunctions/mainFeatureFunctions';
 import LikeButton from './LikeButton';
+import { useNavigate } from 'react-router-dom';
+import { useModal } from '../../context/ModalContext';
 
 //displays the commetns for the post in a modal, grabs the commetns form the network and updates the post in the cache (1), 
 //we also use mutation to create a comment and refetch to display (2)
 export default function PostComments({ postId }) {
-  
+  const navigate = useNavigate();
+  const { closeModal } = useModal();
   const { loading: loadingpost, data: PostData, error: errorpost } = useQuery(GET_POST_BY_ID,{
     variables: { postId: postId },
     onError: (error) => {
@@ -44,6 +47,10 @@ export default function PostComments({ postId }) {
     });
     setCommentText('');
   };
+  const handleNavigateToUser = (userId) => {
+    navigate(`/UserPage/${userId}`)
+    closeModal();
+  }
 
   if (loadingPostComments || loadingpost) return <Text>Loading comments...</Text>;
   if (errorPostComments) return <Text c="red">Error loading comments</Text>;
@@ -59,12 +66,15 @@ export default function PostComments({ postId }) {
           <Stack spacing="lg">
             {/* User info and date at the top */}
             <Group position="apart" mb="xs">
-              <Group>
-                <Avatar radius="xl" size='lg' color="blue">
-                  {post.user.name.charAt(0)}
-                </Avatar>
-                <Text fw={500} size='lg'>{post.user.name}</Text>
-              </Group>
+            <Group
+              style={{ cursor: 'pointer' }}
+              onClick={() => handleNavigateToUser(post.user.id)}
+            >
+              <Avatar radius="xl" size='lg' color="blue">
+                {post.user.name.charAt(0)}
+              </Avatar>
+              <Text fw={500} size='lg'>{post.user.name}</Text>
+            </Group>
               
               <Badge 
                 color="blue" 
@@ -138,7 +148,11 @@ export default function PostComments({ postId }) {
                 dataPostComments?.getPostCommentsById?.comments?.map(comment => (
                   <Paper key={comment.id} p="md" withBorder>
                     <Group position="apart" align="flex-start" mb="xs">
-                      <Group spacing="xs">
+                      <Group 
+                          spacing="xs"
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => handleNavigateToUser(comment.user.id)}
+                        >
                         <Avatar size="sm" radius="xl" color="blue">
                           {comment.user.name.charAt(0)}
                         </Avatar>

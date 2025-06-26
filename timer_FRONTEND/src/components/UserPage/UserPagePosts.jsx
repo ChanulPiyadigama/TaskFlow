@@ -8,14 +8,16 @@ import LikeButton from '../PostsFeature/LikeButton';
 import { getCategoryColor } from '../HelperFunctions/mainFeatureFunctions';
 import { useState, useEffect, useRef } from 'react';
 import { useDeletePostById } from '../HelperFunctions/deletePostById';
+import { useAuth } from '../../context/AuthContext';
 
 //displays the posts in a 3column grid, the posts are simplifed but when clicked opens the same post comment view, for full details. 
 //used same inifinte scroll logic as in the main posts feature
-export default function UserPagePosts() {
+export default function UserPagePosts(displayedUserId) {
     const cursorRef = useRef(null);
     const loaderRef = useRef(null);
     const [hasMore, setHasMore] = useState(true);
     const { handleDeletePost, loadingDeletingPost, deletePostError } = useDeletePostById();
+    const { user } = useAuth();
     
     const { data: userPostsData, loading: loadingUserPosts, error: errorUserPosts, fetchMore } = useQuery(GET_ALL_USER_POSTS, {
         variables: { limit: 12 }, // 12 posts for 3-column grid (4 rows)
@@ -136,7 +138,7 @@ export default function UserPagePosts() {
                                         {new Date(Number(post.createdAt)).toLocaleDateString()}
                                     </Badge>
                                     
-                                    <Menu shadow="md" width={120}>
+                                    {user.id == displayedUserId.displayedUserId && <Menu shadow="md" width={120}>
                                         <Menu.Target>
                                             <ActionIcon 
                                                 variant="subtle" 
@@ -158,7 +160,7 @@ export default function UserPagePosts() {
                                                 Delete
                                             </Menu.Item>
                                         </Menu.Dropdown>
-                                    </Menu>
+                                    </Menu>}
                                 </Group>
 
                                 {post.postType === 'StudySessionPost' && 

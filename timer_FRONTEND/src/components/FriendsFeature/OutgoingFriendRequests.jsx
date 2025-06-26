@@ -12,10 +12,11 @@ import {
   Paper
 } from "@mantine/core";
 import { IconSend } from "@tabler/icons-react";
+import { useNavigateToUser } from "../HelperFunctions/mainFeatureFunctions";
 
 export const OutgoingFriendRequests = () => {
   const { loading, data, error } = useQuery(GET_USER_OUTGOING_FRIEND_REQUESTS);
-
+  const navigateToUser = useNavigateToUser();
   if (loading) return <Loader size="md" />;
   if (error) return <Text c="red">Error loading friend requests</Text>;
 
@@ -33,7 +34,7 @@ export const OutgoingFriendRequests = () => {
       ) : (
         <Stack spacing="xs">
           {requests.map((friendReq) => (
-            <Card key={friendReq.id} withBorder shadow="sm" p="sm">
+            <Card key={friendReq.id} withBorder shadow="sm" p="sm" onClick={() => navigateToUser(friendReq.id)}>
               <Group position="apart">
                 <Group>
                   <Avatar 

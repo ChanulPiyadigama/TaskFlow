@@ -8,10 +8,11 @@ import {
     Group, Avatar, Stack, Button 
 } from "@mantine/core"
 import { IconUsers, IconUserPlus, IconUserCheck, IconUserExclamation } from "@tabler/icons-react"
+import { useNavigateToUser } from "../HelperFunctions/mainFeatureFunctions"
 
 export default function Friends() {
     const {loading: loadingUserFriends, data: dataUserFriends, error: errorUserFriends} = useQuery(GET_USER_FRIENDS)
-
+    const navigateToUser = useNavigateToUser();
     if(loadingUserFriends) return <Loader />
     if(errorUserFriends) return <Text c="red">Error loading friends</Text>
 
@@ -53,7 +54,9 @@ export default function Friends() {
                     {dataUserFriends?.getUserFriends.length > 0 ? (
                         <Stack spacing="xs">
                             {dataUserFriends.getUserFriends.map((friend) => (
-                                <Card key={friend.id} withBorder shadow="sm" p="sm">
+                                <Card key={friend.id} withBorder shadow="sm" p="sm"
+                                    onClick={() => navigateToUser(friend.id)}
+                                >
                                     <Group position="apart">
                                         <Group>
                                             <Avatar 
@@ -72,6 +75,7 @@ export default function Friends() {
                                             variant="subtle" 
                                             color="blue" 
                                             size="xs"
+                                            onClick={()=> navigateToUser(friend.id)}
                                         >
                                             View Profile
                                         </Button>

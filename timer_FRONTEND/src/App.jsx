@@ -13,13 +13,21 @@ import CustomModal from './Layouts/CustomModal'
 import Register from './components/Auth/Register'
 import ForgotPassword from './components/Auth/ForgotPassword';
 import ResetPassword from './components/Auth/ResetPassword';
+import { useApolloClient } from '@apollo/client'
 
 function App() {
 
   const { token, user, setToken, setUser } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
+  const client = useApolloClient()
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      // Clear the Apollo Client cache
+      await client.clearStore()
+    } catch (error) {
+      console.error('Error during logout:', error)
+    }
     setToken(null)
     setUser(null)
     localStorage.removeItem('user-token')
