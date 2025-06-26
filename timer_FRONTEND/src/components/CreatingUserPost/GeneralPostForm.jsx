@@ -1,7 +1,7 @@
 import { CREATE_GENERAL_POST, GET_FRIENDS_POSTS } from "../../data/queries";
 import { useMutation } from "@apollo/client";
 import { useState } from "react";
-import { Textarea, Button, TextInput, Select, Stack, Text } from '@mantine/core';
+import { Button,Select, Stack, Text } from '@mantine/core';
 import { useModal } from "../../context/ModalContext";
 import PostInputs from "./PostInputs";
 

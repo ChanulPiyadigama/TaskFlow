@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from 'react';
+import{ createContext, useState, useContext } from 'react';
 
 //create context, basically a global state that can be accessed by any component child eg a store 
 const authContext = createContext();

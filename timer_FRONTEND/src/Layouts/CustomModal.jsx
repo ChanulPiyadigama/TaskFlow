@@ -1,4 +1,4 @@
-import { Modal, Button } from "@mantine/core";
+import { Modal } from "@mantine/core";
 import { useModal } from "../context/ModalContext";
 
 

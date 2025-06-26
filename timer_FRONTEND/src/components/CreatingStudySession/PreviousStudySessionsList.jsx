@@ -1,5 +1,5 @@
-import { GET_ALL_USER_STUDY_SESSIONS, DELETE_STUDY_SESSION_BY_ID } from "../../data/queries";
-import { useQuery, useMutation } from "@apollo/client";
+import { GET_ALL_USER_STUDY_SESSIONS } from "../../data/queries";
+import { useQuery } from "@apollo/client";
 import { List, Loader, Text, Title, Paper, Stack, Group, Button, Menu, ActionIcon } from "@mantine/core";
 import { IconClock, IconArrowRight, IconDots, IconTrash, IconShare } from '@tabler/icons-react';
 import { useNavigate } from "react-router-dom";

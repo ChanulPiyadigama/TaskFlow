@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import {useEffect, useState } from "react";
 import { HANDLE_BREAK, RESET_TIMER, GET_ALL_USER_STUDY_SESSIONS } from "../../data/queries";
 import { useApolloClient, useFragment, useMutation } from "@apollo/client";
 import { gql } from "@apollo/client";
@@ -8,7 +8,6 @@ import { useModal } from "../../context/ModalContext";
 import ResetTimerModal from "./ResetTimerConfirmModal";
 import EndStudySessionModal from "./EndStudySession";
 import { useQuery } from "@apollo/client";
-import { useNavigate } from "react-router-dom";
 import { useEndStudySession } from "../HelperFunctions/endStudySession.jsx";
 
 
@@ -24,7 +23,6 @@ export default function Timer({timerID}) {
     };
     const [breakLogVisible, setBreakLogVisible] = useState(false);
     const [studySessionId, setStudySessionId] = useState(null);
-    const navigate = useNavigate();
     const{endStudySession, loadingStudySessionCompletion, errorStudySessionCompletion} = useEndStudySession();
     
     

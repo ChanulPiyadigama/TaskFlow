@@ -1,10 +1,6 @@
 import { Button, Group, Stack, Text, Loader, Alert } from '@mantine/core';
 import { IconAlertCircle } from '@tabler/icons-react';
 import { useModal } from '../../context/ModalContext';
-import { COMPLETE_STUDY_SESSION } from '../../data/queries';
-import { useMutation } from '@apollo/client';
-import { data, useNavigate } from 'react-router-dom';
-import PostCompletedStudySessionModalConfirmation from './PostCompletedStudySessionModalConfirmation';
 import { useEndStudySession } from '../HelperFunctions/endStudySession.jsx';
 
 //this modal checks if the user is sure they want to end the study session, if so we send a mutation to the server

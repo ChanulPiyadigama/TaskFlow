@@ -106,7 +106,7 @@ export default function StudySessionPostForm({preSelectedSessionId}) {
     }
 
     // Show loading if any of the queries are loading
-    if (loadingStudySessions || (preSelectedSessionId && loadingStudySession)) {
+    if (loadingStudySessions || (preSelectedSessionId && loadingStudySession) || loadingCreateUserPost) {
         return (
             <Center h={200}>
                 <Stack align="center" gap="md">

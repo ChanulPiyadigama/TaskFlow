@@ -1,6 +1,6 @@
 import { CREATE_STUDY_SESSION, GET_ALL_USER_STUDY_SESSIONS } from "../../data/queries"
 import { useMutation } from "@apollo/client"
-import { TextInput, Textarea, NumberInput, Stack, Button, Text } from '@mantine/core'
+import { TextInput, Textarea, Stack, Button, Text } from '@mantine/core'
 import { useNavigate } from "react-router-dom"
 import { useModal } from "../../context/ModalContext"
 import { useState } from "react"

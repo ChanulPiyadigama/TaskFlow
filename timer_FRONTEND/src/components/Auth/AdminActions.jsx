@@ -19,7 +19,6 @@ export default function AdminPage() {
         { username: "mia_brown", password: "MiaPass2024!", name: "Mia Brown", email: "mia.brown@gmail.com" },
         { username: "lucas_davis", password: "Lucas@Key567", name: "Lucas Davis", email: "lucas.davis@gmail.com" }
     ]
-    const client = useApolloClient()
     const [createUser] = useMutation(CREATE_USER)
     const [login] = useMutation(LOGIN)
     const [createStudySession] = useMutation(CREATE_STUDY_SESSION)

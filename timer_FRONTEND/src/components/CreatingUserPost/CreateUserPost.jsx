@@ -1,4 +1,4 @@
-import { Button, Stack, Textarea, TextInput, Text, Paper } from "@mantine/core";
+import { Button, Stack,Text, Paper } from "@mantine/core";
 import { useState } from "react";
 import StudySessionPostForm from "./StudySessionPostFrom";
 import GeneralPostForm from "./GeneralPostForm";

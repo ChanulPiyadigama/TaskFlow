@@ -1,5 +1,5 @@
 import { AppShell, Button, Text, Group } from '@mantine/core';
-import { IconClock, IconUsers, IconUser } from "@tabler/icons-react";
+import {IconUsers, IconUser } from "@tabler/icons-react";
 import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
 import Friends from '../components/FriendsFeature/Friends';

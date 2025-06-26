@@ -1,20 +1,16 @@
 import { useAuth } from "../context/AuthContext";
-import { useState } from "react";
 import Friends from "./FriendsFeature/Friends";
-import { AppShell, Button, Text, Group, Grid, Card, Stack, Modal } from '@mantine/core';
-import { IconClock, IconUsers, IconPlus, IconBook, IconUserPlus } from "@tabler/icons-react";
+import {Button, Text, Grid, Card, Stack } from '@mantine/core';
+import {IconPlus, IconBook, IconUserPlus } from "@tabler/icons-react";
 import CreateStudySessionForm from "./CreatingStudySession/CreatStudySessionForm";
 import PreviousStudySessionsList from "./CreatingStudySession/PreviousStudySessionsList";
 import CreateUserPost from "./CreatingUserPost/CreateUserPost";
 import PostsScroll from "./PostsFeature/PostsScroll";
-import { useNavigate } from "react-router-dom";
 import { useModal } from "../context/ModalContext";
 import AddFriend from "./FriendsFeature/AddFriend";
-import AdminPage from "./Auth/AdminActions";
 
 export default function HomePage() {
   const { user } = useAuth();
-  const navigate = useNavigate()
   const { openModal } = useModal()
 
   return (

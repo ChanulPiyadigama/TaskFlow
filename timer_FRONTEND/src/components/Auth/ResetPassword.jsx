@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { RESET_PASSWORD } from '../../data/queries';
 import { PasswordInput, Button, Card, Title, Text, Alert, Stack } from '@mantine/core';

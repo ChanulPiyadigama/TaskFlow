@@ -17,7 +17,7 @@ import { useApolloClient } from '@apollo/client'
 
 function App() {
 
-  const { token, user, setToken, setUser } = useAuth()
+  const { user, setToken, setUser } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const client = useApolloClient()
 

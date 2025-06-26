@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { useAuth } from '../../context/AuthContext';
 import { useModal } from '../../context/ModalContext';
@@ -14,7 +14,7 @@ import {
     Center,
     Text           
 } from '@mantine/core';
-import { IconCheck, IconX, IconKey } from '@tabler/icons-react';
+import {IconX, IconKey } from '@tabler/icons-react';
 import { jwtDecode } from 'jwt-decode';
 import { UPDATE_USER_DETAILS } from '../../data/queries';
 import { useNavigate } from 'react-router-dom';
