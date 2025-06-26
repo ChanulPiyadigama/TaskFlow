@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/client";
 import { useAuth } from "../../context/AuthContext";
 import { useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
-import { TextInput, PasswordInput, Button, Card, Title, Text, Loader, Stack, Divider, Anchor } from "@mantine/core";
+import { TextInput, PasswordInput, Button, Card, Title, Text, Loader, Stack, Divider, Box, Anchor } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
@@ -44,44 +44,52 @@ export default function Login() {
   //autofoucs puts the curoser on the input on mounting
   //when loading, a loader is shown wich is samll spinning icon
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder style={{ maxWidth: 400, margin: "auto", marginTop: 50 }}>
-      <Title order={2} mb="md">Login</Title>
-      {error && <Text c="red">{error.message}</Text>}
-      <form onSubmit={handleLogin}>
-        <Stack>
-          <TextInput label="Username" name="username" required autoFocus />
-          <PasswordInput label="Password" name="password" required />
-          <Button type="submit" fullWidth disabled={loading}>
-            {loading ? <Loader size="sm" /> : "Login"}
+    <>
+      <Card shadow="sm" padding="lg" radius="md" withBorder style={{ maxWidth: 400, margin: "auto", marginTop: 50 }}>
+        <Title order={2} mb="md">Login</Title>
+        {error && <Text c="red">{error.message}</Text>}
+        <form onSubmit={handleLogin}>
+          <Stack>
+            <TextInput label="Username" name="username" required autoFocus />
+            <PasswordInput label="Password" name="password" required />
+            <Button type="submit" fullWidth disabled={loading}>
+              {loading ? <Loader size="sm" /> : "Login"}
+            </Button>
+          </Stack>
+        </form>
+        <Text size="sm" ta="right">
+          <Anchor 
+              component="button" 
+              type="button"
+              onClick={() => navigate('/forgot-password')}
+              disabled={loading}
+          >
+              Forgot password?
+          </Anchor>
+      </Text>
+        
+        <Divider my="md" label="or" labelPosition="center" />
+        
+        <Stack gap="sm">
+          <Text size="sm" ta="center" c="dimmed">
+            Don't have an account?
+          </Text>
+          <Button 
+            variant="outline" 
+            fullWidth 
+            onClick={handleRegisterClick}
+            disabled={loading}
+          >
+            Create Account
           </Button>
         </Stack>
-      </form>
-      <Text size="sm" ta="right">
-        <Anchor 
-            component="button" 
-            type="button"
-            onClick={() => navigate('/forgot-password')}
-            disabled={loading}
-        >
-            Forgot password?
-        </Anchor>
-    </Text>
+      </Card>
       
-      <Divider my="md" label="or" labelPosition="center" />
-      
-      <Stack gap="sm">
-        <Text size="sm" ta="center" c="dimmed">
-          Don't have an account?
+      <Box mt="lg">
+        <Text size="sm" c="dimmed" ta="center">
+          Made by Chanul Piyadigama - chanulpiyadi@gmail.com
         </Text>
-        <Button 
-          variant="outline" 
-          fullWidth 
-          onClick={handleRegisterClick}
-          disabled={loading}
-        >
-          Create Account
-        </Button>
-      </Stack>
-    </Card>
+      </Box>
+    </>
   );
 }
