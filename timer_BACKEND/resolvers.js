@@ -29,7 +29,7 @@ const resolvers = {
 
 
     Query: {
-        //grabs objs from db and returns them
+        //grabs the objs from db and returns them
         allTimers: async () => {
             return await Timer.find({});
         },
