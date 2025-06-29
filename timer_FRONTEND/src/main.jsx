@@ -24,7 +24,7 @@ const authLink = setContext((operation, { headers }) => {
 
 //the http link sends all requests to the specified uri
 const httpLink = createHttpLink({
-  uri: "https://taskflow-68l3.onrender.com/graphql", 
+  uri: "https://taskflow-68l3.onrender.com/", 
 });
 
 //the client is set up with a link to the server, and a cache to store data locally on the client
