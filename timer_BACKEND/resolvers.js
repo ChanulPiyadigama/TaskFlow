@@ -245,7 +245,10 @@ const resolvers = {
             return populatedPost;
         },
         getUserPostsById: async (parent, args, context) => {
-            console.log("fetching user posts")
+            if (!context.currentUser) {
+                throw new Error('You must be logged in to delete a post');
+            }
+            
             // Build the query object
             const query = { user: args.userId };
             

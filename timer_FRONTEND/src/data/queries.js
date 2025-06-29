@@ -517,7 +517,7 @@ mutation Mutation($postId: ID!) {
 
 export const GET_ALL_USER_POSTS = gql`
 query GetUserPostsById($limit: Int!, $userId: ID!, $cursor: String) {
-  getUserPostsById(userId: $userId, cursor: $cursor, limit: $limit) {
+  getUserPostsById(limit: $limit, userId: $userId, cursor: $cursor) {
     title
     postType
     id
@@ -528,7 +528,6 @@ query GetUserPostsById($limit: Int!, $userId: ID!, $cursor: String) {
       id
       name
       username
-      __typename
     }
     likes {
       id
