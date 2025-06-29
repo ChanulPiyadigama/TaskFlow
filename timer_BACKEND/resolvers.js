@@ -244,13 +244,10 @@ const resolvers = {
             })
             return populatedPost;
         },
-        getUserPosts: async (parent, args, context) => {
-            if (!context.currentUser) {
-                throw new Error('You must be logged in to view your posts');
-            }
-
+        getUserPostsById: async (parent, args, context) => {
+            console.log("fetching user posts")
             // Build the query object
-            const query = { user: context.currentUser.id };
+            const query = { user: args.userId };
             
             if (args.cursor) {
                 // Decode the base64 cursor string to original UNIX timestamp

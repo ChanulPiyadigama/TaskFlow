@@ -18,12 +18,15 @@ export default function UserPagePosts(displayedUserId) {
     const [hasMore, setHasMore] = useState(true);
     const { handleDeletePost, loadingDeletingPost, deletePostError } = useDeletePostById();
     const { user } = useAuth();
-    
+
     const { data: userPostsData, loading: loadingUserPosts, error: errorUserPosts, fetchMore } = useQuery(GET_ALL_USER_POSTS, {
-        variables: { limit: 12 }, // 12 posts for 3-column grid (4 rows)
+        variables: { limit: 12, userId: displayedUserId.displayedUserId }, // 12 posts for 3-column grid (4 rows)
         onCompleted: (data) => {
-            if (data?.getUserPosts?.length > 0) {
-                const lastPost = data.getUserPosts[data.getUserPosts.length - 1];
+            if (data?.getUserPostsById
+?.length > 0) {
+                const lastPost = data.getUserPostsById
+[data.getUserPostsById
+.length - 1];
                 cursorRef.current = btoa(lastPost.createdAt);
             }
         },
@@ -65,17 +68,21 @@ export default function UserPagePosts(displayedUserId) {
         fetchMore({
             variables: { cursor: cursorRef.current, limit: 12 },
             updateQuery: (prev, { fetchMoreResult }) => {
-                if (!fetchMoreResult || fetchMoreResult.getUserPosts.length === 0) {
+                if (!fetchMoreResult || fetchMoreResult.getUserPostsById
+.length === 0) {
                     setHasMore(false);
                     return prev;
                 }
                 
-                const newPosts = fetchMoreResult.getUserPosts;
+                const newPosts = fetchMoreResult.getUserPostsById
+;
                 const lastPost = newPosts[newPosts.length - 1];
                 cursorRef.current = btoa(lastPost.createdAt);
                 
                 return {
-                    getUserPosts: [...prev.getUserPosts, ...newPosts]
+                    getUserPostsById
+: [...prev.getUserPostsById
+, ...newPosts]
                 };
             }
         });
@@ -111,7 +118,8 @@ export default function UserPagePosts(displayedUserId) {
     return (
         <Box p="md">
             <Grid gutter="lg">
-                {userPostsData?.getUserPosts?.map((post) => (
+                {userPostsData?.getUserPostsById
+?.map((post) => (
                     <Grid.Col key={post.id} span={4}>
                         <Card 
                             withBorder 
@@ -231,7 +239,8 @@ export default function UserPagePosts(displayedUserId) {
                 </Box>
             )}
             
-            {userPostsData?.getUserPosts?.length === 0 && (
+            {userPostsData?.getUserPostsById
+?.length === 0 && (
                 <Text c="dimmed" ta="center" py="xl">
                     No posts yet
                 </Text>

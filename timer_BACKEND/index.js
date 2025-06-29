@@ -16,9 +16,9 @@ import User from "./models/User.js";
 const connectDB = async () => {
     try {
       await mongoose.connect(MONGODB_URI);
-      console.log('✅ Connected to MongoDB');
+      console.log(' Connected to MongoDB');
     } catch (error) {
-      console.error('❌ Error connecting to MongoDB:', error.message);
+      console.error(' Error connecting to MongoDB:', error.message);
       process.exit(1);
     }
 };
@@ -56,15 +56,20 @@ const start = async () => {
                     const user = await User.findById(decodedToken.id);
                     return { currentUser: user };
                   } catch (error) {
-                    console.error('❌ Invalid or expired token:', error.message);
+                    console.error(' Invalid or expired token:', error.message);
                   }
                 }
                 return { currentUser: null };
               },
         })
     )
+    /*
+    const PORT = process.env.PORT || 4000;
 
-
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+    */
 }
 
 start();

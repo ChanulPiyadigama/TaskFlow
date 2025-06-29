@@ -516,8 +516,8 @@ mutation Mutation($postId: ID!) {
 `
 
 export const GET_ALL_USER_POSTS = gql`
-query GetUserPosts($cursor: String, $limit: Int!) {
-  getUserPosts(cursor: $cursor, limit: $limit) {
+query GetUserInfoById($userId: ID!, $cursor: String, $limit: Int!) {
+  getUserPostsById(userId: $userId, cursor: $cursor, limit: $limit) {
     title
     postType
     id
