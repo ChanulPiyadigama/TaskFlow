@@ -524,6 +524,12 @@ query GetUserPostsById($limit: Int!, $userId: ID!, $cursor: String) {
     description
     createdAt
     lastInteraction
+    user {   
+      id
+      name
+      username
+      __typename
+    }
     likes {
       id
     }
