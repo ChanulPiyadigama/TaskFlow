@@ -24,7 +24,7 @@ const authLink = setContext((operation, { headers }) => {
 
 //the http link sends all requests to the specified uri
 const httpLink = createHttpLink({
-  uri: "http://ec2-3-27-59-39.ap-southeast-2.compute.amazonaws.com", 
+  uri: "http://3.27.59.39/", 
 });
 
 //the client is set up with a link to the server, and a cache to store data locally on the client
