@@ -24,7 +24,7 @@ const authLink = setContext((operation, { headers }) => {
 
 //the http link sends all requests to the specified uri
 const httpLink = createHttpLink({
-  uri: "http://3.27.59.39/", 
+  uri: "https://2345254563.work/", 
 });
 
 //the client is set up with a link to the server, and a cache to store data locally on the client
