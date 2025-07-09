@@ -45,6 +45,7 @@ const start = async () => {
         cors({
             origin: [
                 'https://task-flow0.netlify.app',  
+                'https://2345254563.work',
                 'http://localhost:3000',           
                 'http://localhost:5173',           
             ],
