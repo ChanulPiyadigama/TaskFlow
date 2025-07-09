@@ -46,10 +46,15 @@ const start = async () => {
             origin: [
                 'https://task-flow0.netlify.app',  
                 'https://2345254563.work',
+                'http://2345254563.work',        // ✅ Add HTTP version
                 'http://localhost:3000',           
                 'http://localhost:5173',           
             ],
             credentials: true,
+            methods: ['GET', 'POST', 'OPTIONS'],           // ✅ Explicitly allow OPTIONS
+            allowedHeaders: ['Content-Type', 'Authorization'], // ✅ Explicitly allow headers
+            preflightContinue: false,                      // ✅ Handle preflight properly
+            optionsSuccessStatus: 200                      // ✅ Return 200 for OPTIONS
         }),
         express.json(),
         expressMiddleware(server, {
