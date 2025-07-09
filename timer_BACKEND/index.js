@@ -38,6 +38,16 @@ const start = async () => {
     //ensure apollo server is started before handlign requests
     await server.start()
 
+
+    app.options('*', (req, res) => {
+      res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+      res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.header('Access-Control-Allow-Credentials', 'true');
+      res.sendStatus(200);
+    });
+
+
     //request run through middleware, including graphql server, all http requests are post reqs sent to '/' with a body of a
     //graphql query, which allows graphql to extract specific data to return
     app.use(
