@@ -42,7 +42,14 @@ const start = async () => {
     //graphql query, which allows graphql to extract specific data to return
     app.use(
         '/',
-        cors(),
+        cors({
+            origin: [
+                'https://task-flow0.netlify.app',  
+                'http://localhost:3000',           
+                'http://localhost:5173',           
+            ],
+            credentials: true,
+        }),
         express.json(),
         expressMiddleware(server, {
             //context attaches decoded user from token to each req so we can access it in resolvers, 
