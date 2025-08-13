@@ -54,20 +54,12 @@ const start = async () => {
 
     //request run through middleware, including graphql server, all http requests are post reqs sent to '/' with a body of a
     //graphql query, which allows graphql to extract specific data to return
-    app.use(cors({
-        origin: [
-            'https://task-flow0.netlify.app',  
-            'https://2345254563.work',
-            'http://2345254563.work',       
-            'http://localhost:3000',           
-            'http://localhost:5173',           
-        ],
-        credentials: true,
-        methods: ['GET', 'POST', 'OPTIONS'],           
-        allowedHeaders: ['Content-Type', 'Authorization'], 
-        preflightContinue: false,                   
-        optionsSuccessStatus: 200                   
-    }));
+  app.use(cors({
+      origin: true, 
+      credentials: true,
+      methods: ['GET', 'POST', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+  }));
 
     app.use(
         '/',
@@ -92,7 +84,7 @@ const start = async () => {
 
     const PORT = process.env.PORT || 4000;
 
-    app.listen(PORT, '0.0.0.0', () => {  // ✅ Listen on all interfaces
+    app.listen(PORT, '0.0.0.0', () => {  
       console.log(`Server running on port: ${PORT}`);
     });
 }
