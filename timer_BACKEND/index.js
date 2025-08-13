@@ -38,28 +38,41 @@ const start = async () => {
     //ensure apollo server is started before handlign requests
     await server.start()
 
+    app.options('*', cors({
+        origin: [
+            'https://task-flow0.netlify.app',  
+            'https://2345254563.work',
+            'http://2345254563.work',       
+            'http://localhost:3000',           
+            'http://localhost:5173',           
+        ],
+        credentials: true,
+        methods: ['GET', 'POST', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        optionsSuccessStatus: 200
+    }));
+
     //request run through middleware, including graphql server, all http requests are post reqs sent to '/' with a body of a
     //graphql query, which allows graphql to extract specific data to return
+    app.use(cors({
+        origin: [
+            'https://task-flow0.netlify.app',  
+            'https://2345254563.work',
+            'http://2345254563.work',       
+            'http://localhost:3000',           
+            'http://localhost:5173',           
+        ],
+        credentials: true,
+        methods: ['GET', 'POST', 'OPTIONS'],           
+        allowedHeaders: ['Content-Type', 'Authorization'], 
+        preflightContinue: false,                   
+        optionsSuccessStatus: 200                   
+    }));
+
     app.use(
         '/',
-        cors({
-            origin: [
-                'https://task-flow0.netlify.app',  
-                'https://2345254563.work',
-                'http://2345254563.work',       
-                'http://localhost:3000',           
-                'http://localhost:5173',           
-            ],
-            credentials: true,
-            methods: ['GET', 'POST', 'OPTIONS'],           
-            allowedHeaders: ['Content-Type', 'Authorization'], 
-            preflightContinue: false,                   
-            optionsSuccessStatus: 200                   
-        }),
         express.json(),
         expressMiddleware(server, {
-            //context attaches decoded user from token to each req so we can access it in resolvers, 
-            //if no authheader, currentUser is null
             context: async ({ req }) => {
                 const authHeader = req.headers.authorization;
                 if (authHeader?.startsWith("Bearer ")) {
@@ -79,10 +92,9 @@ const start = async () => {
 
     const PORT = process.env.PORT || 4000;
 
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {  // ✅ Listen on all interfaces
       console.log(`Server running on port: ${PORT}`);
     });
-
 }
 
 start();
