@@ -27,25 +27,44 @@ connectDB();
 
 const start = async () => {
     const app = express()
-    //create a http server, and have the express app handle incoming requests
     const httpServer = http.createServer(app)
 
-    //create the apolloserver to handle graphql requests
     const server = new ApolloServer({
         schema: makeExecutableSchema({ typeDefs, resolvers }),
     })
 
-    //ensure apollo server is started before handlign requests
     await server.start()
 
-    //request run through middleware, including graphql server, all http requests are post reqs sent to '/' with a body of a
-    //graphql query, which allows graphql to extract specific data to return
-  app.use(cors({
-      origin: true, 
-      credentials: true,
-      methods: ['GET', 'POST', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
-  }));
+    // ✅ Add explicit OPTIONS handler FIRST
+    app.options('*', cors({
+        origin: [
+            'https://task-flow0.netlify.app',  
+            'https://2345254563.work',
+            'http://2345254563.work',       
+            'http://localhost:3000',           
+            'http://localhost:5173',           
+        ],
+        credentials: true,
+        methods: ['GET', 'POST', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        optionsSuccessStatus: 200
+    }));
+
+    // ✅ Apply CORS to all routes
+    app.use(cors({
+        origin: [
+            'https://task-flow0.netlify.app',  
+            'https://2345254563.work',
+            'http://2345254563.work',       
+            'http://localhost:3000',           
+            'http://localhost:5173',           
+        ],
+        credentials: true,
+        methods: ['GET', 'POST', 'OPTIONS'],           
+        allowedHeaders: ['Content-Type', 'Authorization'], 
+        preflightContinue: false,                   
+        optionsSuccessStatus: 200                   
+    }));
 
     app.use(
         '/',
